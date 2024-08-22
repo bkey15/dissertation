@@ -1,7 +1,12 @@
 library(tidyverse)
+library(here)
+library(feather)
 library(vdemdata)
+library(desta)
 
 vdem <- vdem
+words <- load(here("data/every_single_word/every_single_word.RData"))
+mdb_speeches <- read_feather(here("data/mdb_speeches.feather"))
 
 vdem_sml <- vdem |> 
   filter(year > 1991) |> 
