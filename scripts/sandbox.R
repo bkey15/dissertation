@@ -3,10 +3,28 @@ library(here)
 library(feather)
 library(vdemdata)
 library(desta)
+library(PanelMatch)
+library(tscsdep)
+library(hdm)
+library(DoubleML)
+library(naniar)
+
+vignette(package = "PanelMatch")
+vignette("using_panelmatch", package = "PanelMatch")
 
 vdem <- vdem
 words <- load(here("data/every_single_word/every_single_word.RData"))
 mdb_speeches <- read_feather(here("data/mdb_speeches.feather"))
+
+vdem_dem_prot <- vdem |> 
+  select(
+    country_name,
+    year,
+    v2cademmob
+    ) |> 
+  filter(year > 1957)
+
+miss_var_summary(vdem_dem_prot)
 
 vdem_sml <- vdem |> 
   filter(year > 1991) |> 
@@ -18,7 +36,8 @@ vdem_sml <- vdem |>
     v2x_gender,
     v2xpe_exlgender,
     v2xcl_slave,
-    v2pepwrort) |> 
+    v2pepwrort,
+    ) |> 
   mutate(
     lgbt = pnorm(v2pepwrort),
     v2xpe_exlgender_rescale = 1 - v2xpe_exlgender,
