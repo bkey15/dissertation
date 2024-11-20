@@ -8,6 +8,7 @@ library(tscsdep)
 library(hdm)
 library(DoubleML)
 library(naniar)
+library(readxl)
 
 vignette(package = "PanelMatch")
 vignette("using_panelmatch", package = "PanelMatch")
@@ -69,3 +70,12 @@ test2 <- vdem_sml |>
 test3 <- vdem_sml |> 
   arrange(v2x_civlib) |> 
   slice_head(prop = 1/3)
+
+ist_dat <- read_xlsx(here("data/ch3/ist_dat/IST_JPR_Attia&Grauvogel.xlsx"))
+unique(ist_dat$target)
+
+ist_dat <- ist_dat |> 
+  mutate(
+    startdate_new = dmy(ist_dat$startdate),
+    terdate_new = dmy(ist_dat$terdate)
+    )

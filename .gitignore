@@ -1,6 +1,6 @@
 # Big files
-data/ch3/mdb_speeches.feather
-data/ch3/every_single_word/every_single_word.RData
+data/ch4/mdb_speeches.feather
+data/ch4/every_single_word/every_single_word.RData
 
 # History files
 .Rhistory
