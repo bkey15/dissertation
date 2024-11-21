@@ -79,3 +79,11 @@ ist_dat <- ist_dat |>
     startdate_new = dmy(ist_dat$startdate),
     terdate_new = dmy(ist_dat$terdate)
     )
+
+desta <- read_delim(
+  file = "data/ch1/desta/desta_version_02_02.txt"
+) |> 
+  filter(entry_type != "consolidated") |> 
+  mutate(
+    number = as.numeric(number)
+  )
