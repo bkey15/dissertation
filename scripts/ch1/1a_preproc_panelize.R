@@ -215,19 +215,93 @@ ptas <- ptas |>
   filter(
     entry_type != "consolidated",
     entry_type != "withdrawal",
+    !is.na(entryforceyear)
     )
-
-
-
-
-
-
-
 
 years_hrs <- tibble(year = 1946:2021)
 
 ptas_long <- ptas |> 
-  cross_join(years_hrs)
+  select(-year) |> 
+  cross_join(years_hrs) |> 
+  relocate(
+    year,
+    entryforceyear,
+    exitforceyear
+    )
+
+ptas_long <- ptas_long |> 
+  mutate(
+    inforce = case_when(
+      year < entryforceyear ~ 0,
+      year >= entryforceyear & is.na(exitforceyear) ~ 1,
+      year >= entryforceyear & year < exitforceyear ~ 1,
+      year >= exitforceyear ~ 0
+      ),
+    across(18:23, ~ .x*inforce)
+    )
+
+ptas_long_test <- ptas_long |> 
+  mutate(
+    country_a = paste(country1, iso1, sep = "_"),
+    country_b = paste(country2, iso2, sep = "_")
+    )
+
+ptas_longest_test <- ptas_long_test |> 
+  pivot_longer(
+    cols = c(country_a, country_b),
+    values_to = "country",
+    names_repair = "minimal"
+    ) |> 
+  select(-name) |> 
+  separate_wider_delim(
+    country,
+    delim = "_",
+    names = c("country", "iso")
+    ) |> 
+  mutate(
+    iso = as.numeric(iso)
+    ) |> 
+  relocate(country, iso)
+
+ptas_longest_test <- ptas_longest_test |> 
+  mutate(
+    country1 = if_else(
+      country == country1,
+      NA,
+      country1
+      ),
+    country2 = if_else(
+      country == country2,
+      NA,
+      country2
+      ),
+    partner = if_else(
+      is.na(country1),
+      country2,
+      country1
+      ),
+    iso1 = if_else(
+      iso == iso1,
+      NA,
+      iso1
+      ),
+    iso2 = if_else(
+      iso == iso2,
+      NA,
+      iso2
+      ),
+    iso_partner = if_else(
+      is.na(iso1),
+      iso2,
+      iso1
+      )
+    ) |> 
+  select(-country1, -country2, -iso1, -iso2) |> 
+  relocate(partner, iso_partner, .after = iso) |> 
+  arrange(iso)
+
+ptas_longest_test_small <- ptas_longest_test |> 
+  select(1:5, 17:19)
 
 ## splits ----
 ### non-dyads ----
