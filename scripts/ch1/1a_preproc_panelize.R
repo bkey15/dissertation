@@ -2,24 +2,24 @@
 library(tidyverse)
 library(here)
 library(readxl)
-library(vdemdata)
+library(countrycode)
 
 # load data ----
-## desta ----
+## desta
 desta_dyads <- read_xlsx(
-  path = "data/ch1/desta/desta_list_of_treaties_02_02_dyads.xlsx",
+  path = "data/ch1/raw/desta/desta_list_of_treaties_02_02_dyads.xlsx",
   sheet = 2
   )
 
-## lechner ----
+## lechner
 lechner <- read_delim(
-  file = "data/ch1/lechner_data/nti_201711.txt"
+  file = "data/ch1/raw/lechner_data/nti_201711.txt"
   )
 
-## withdraw ----
+## withdraw
 ### assuming withdrawals take place, w/ immediate effect, ignoring NA cases in entryforceyear
 withdraw <- read_xlsx(
-  path = "data/ch1/desta/desta_dyadic_withdrawal_02_02.xlsx",
+  path = "data/ch1/raw/desta/desta_dyadic_withdrawal_02_02.xlsx",
   sheet = 2
   ) |> 
   select(1:17) |> 
@@ -28,16 +28,13 @@ withdraw <- read_xlsx(
     -c(entryforceyear, year)
     )
 
-## hr scores ----
-load(here("data/common/fariss/LHRS-v4.02-2021.Rdata"))
+## hr scores
+load(here("data/common/raw/fariss/LHRS-v4.02-2021.Rdata"))
 hrs <- data
 rm(data)
 
-## vdem ----
-vdem <- vdem
-
-# prep ptas data ----
-## merge ----
+# panelize ptas data ----
+## merge ptas datasets ----
 ### desta_dyads & lechner
 ptas <- desta_dyads |> 
   inner_join(
@@ -53,7 +50,7 @@ ptas <- desta_dyads |>
     ) |> 
   relocate(base_treaty)
 
-### test success
+#### test success; should only retain the ptas in Lechner's dataset
 desta_dyads |> 
   filter(base_treaty %in% lechner$number) |> 
   summarize(n = n())
@@ -218,6 +215,8 @@ ptas <- ptas |>
     !is.na(entryforceyear)
     )
 
+## lengthen ptas data ----
+### create row for each pta per year in HR scores
 years_hrs <- tibble(year = 1946:2021)
 
 ptas_long <- ptas |> 
@@ -229,6 +228,7 @@ ptas_long <- ptas |>
     exitforceyear
     )
 
+### create indicator for whether pta is "in force" for the year at issue; standardize Lechner vars by this indicator, such that scores > 0 only appear during in-force years
 ptas_long <- ptas_long |> 
   mutate(
     inforce = case_when(
@@ -240,13 +240,15 @@ ptas_long <- ptas_long |>
     across(18:23, ~ .x*inforce)
     )
 
-ptas_long_test <- ptas_long |> 
+### create country-code var for each partner
+ptas_long <- ptas_long |> 
   mutate(
     country_a = paste(country1, iso1, sep = "_"),
     country_b = paste(country2, iso2, sep = "_")
     )
 
-ptas_longest_test <- ptas_long_test |> 
+### create initial panel (will contain many country-year duplicates); separate country-code vars and create IDs for every "main" country and partner per treaty-year
+ptas_panel <- ptas_long |> 
   pivot_longer(
     cols = c(country_a, country_b),
     values_to = "country",
@@ -263,7 +265,7 @@ ptas_longest_test <- ptas_long_test |>
     ) |> 
   relocate(country, iso)
 
-ptas_longest_test <- ptas_longest_test |> 
+ptas_panel <- ptas_panel |> 
   mutate(
     country1 = if_else(
       country == country1,
@@ -300,71 +302,45 @@ ptas_longest_test <- ptas_longest_test |>
   relocate(partner, iso_partner, .after = iso) |> 
   arrange(iso)
 
-ptas_longest_test_small <- ptas_longest_test |> 
-  select(1:5, 17:19)
+### select only essential vars
+ptas_panel <- ptas_panel |> 
+  select(1:5, 8, 17:19, 23)
 
-## splits ----
-### non-dyads ----
-#### initial split
-non_dyads <- ptas |> 
-  filter(str_count(name, "\\S+") != 2)
-
-#### isolate false non-dyads
-false_non_dyads <- non_dyads |> 
-  filter(
-    str_detect(name, "Bosnia and Herzegovina") |
-      str_detect(name, "New Zealand") |
-      str_detect(name, "Papua New Guinea") |
-      str_detect(name, "Belarus Russia") |
-      str_detect(name, "Costa Rica") |
-      str_detect(name, "Canada US") |
-      str_detect(name, "Hong Kong") |
-      str_detect(name, "El Salvador") |
-      str_detect(name, "Croatia Macedonia") |
-      str_detect(name, "Czech Republic") |
-      str_detect(name, "Dominican Republic") |
-      str_detect(name, "Faroe Islands") |
-      str_detect(name, "German Democratic Republic") |
-      str_detect(name, "France Tunisia") |
-      str_detect(name, "Sri Lanka") |
-      str_detect(name, "Ireland UK") |
-      str_detect(name, "South Africa") |
-      str_detect(name, "Trinidad and Tobago") |
-      str_detect(name, "United States")
+### convert ISO codes to COW codes
+ptas_panel <- ptas_panel |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = iso,
+      origin = "iso3n",
+      destination = "cown"
+      ),
+    cow = case_when(
+      iso == 688 ~ 345,
+      iso == 900 ~ 347,
+      .default = cow
+      ),
+    cow_partner = countrycode(
+      sourcevar = iso_partner,
+      origin = "iso3n",
+      destination = "cown"
+      ),
+    cow_partner = case_when(
+      iso_partner == 688 ~ 345,
+      iso_partner == 900 ~ 347,
+      .default = cow_partner
+      )
     ) |> 
+  relocate(cow, .after = country) |> 
+  relocate(cow_partner, .after = partner)
+
+### remove obs where cow or cow_partner is NA (HR scores only has COW countries; most of these aren't in V-Dem either; trying to prevent unnecessary duplicates at next step)
+ptas_panel <- ptas_panel |> 
   filter(
-    !number %in% c(66, 130, 173, 175, 184, 188, 249, 280, 307, 308, 347, 416, 817)
+    !is.na(cow) & !is.na(cow_partner)
     )
 
-### dyads ----
-#### initial split
-dyads <- ptas |> 
-  filter(str_count(name, "\\S+") == 2)
-
-#### isolate false dyads
-false_dyads <- dyads |> 
-  filter(
-    str_detect(name, "EFTA") |
-      str_detect(name, "EC") |
-      str_detect(name, "MERCOSUR") |
-      str_detect(name, "Lome") |
-      str_detect(name, "Yaound") |
-      number %in% c(4, 100, 253, 291, 682)
-    )
-
-## merges ----
-### non-dyads ----
-non_dyads <- non_dyads |> 
-  filter(
-    !number %in% unique(false_non_dyads$number)
-    ) |> 
-  rbind(false_dyads) |> 
-  arrange(number)
-
-### dyads ----
-dyads <- dyads |> 
-  filter(
-    !number %in% unique(false_dyads$number)
-    ) |> 
-  rbind(false_non_dyads) |> 
-  arrange(number)
+## save ----
+ptas_panel |> 
+  save(
+    file = here("data/ch1/preprocessed/ptas_panel.rda")
+  )
