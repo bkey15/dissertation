@@ -103,8 +103,6 @@ standards <- gdp_small |>
 # standards: 679 none
 # standards: 680 1967-1990
 # ptas_panel, inforce == 1: 679 1998-present
-
-
 standards <- standards |> 
   mutate(
     cow = case_when(
@@ -142,7 +140,7 @@ missings <- ptas_panel |>
 ptas_panel <- ptas_panel |> 
   mutate(
     across(
-      15:18,
+      c(9:11, 15:18),
       ~ case_when(
         .x == 0 & inforce == 1 ~ 0,
         .x == 0 & inforce == 0 ~ NA,
@@ -154,10 +152,30 @@ ptas_panel <- ptas_panel |>
 ## standardize
 ptas_standard <- ptas_panel |> 
   summarize(
+    cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
+    esr_mean = mean(esr_all_lta, na.rm = TRUE),
     cpr_gdp_mean = mean(cpr_gdp, na.rm = TRUE),
     cpr_gdppc_mean = mean(cpr_gdppc, na.rm = TRUE),
     esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
-  arrange(cow, year)
+  mutate(
+    across(
+      3:8,
+      ~ if_else(
+        is.nan(.x), NA, .x
+        )
+      ),
+    inforce = if_else(
+      is.na(cpr_mean) | is.na(esr_mean), 0, 1
+      )
+    ) |> 
+  arrange(cow, year) |> 
+  relocate(inforce, .after = year)
+
+# save ----
+ptas_standard |> 
+  save(
+    file = here("data/ch1/preprocessed/ptas_standard.rda")
+  )
