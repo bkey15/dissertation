@@ -3,20 +3,21 @@ library(tidyverse)
 library(here)
 library(readxl)
 library(countrycode)
+library(states)
 
 # load data ----
-## desta
+## desta ----
 desta_dyads <- read_xlsx(
   path = "data/ch1/raw/desta/desta_list_of_treaties_02_02_dyads.xlsx",
   sheet = 2
   )
 
-## lechner
+## lechner ----
 lechner <- read_delim(
   file = "data/ch1/raw/lechner_data/nti_201711.txt"
   )
 
-## withdraw
+## withdraw ----
 ### assuming withdrawals take place, w/ immediate effect, ignoring NA cases in entryforceyear
 withdraw <- read_xlsx(
   path = "data/ch1/raw/desta/desta_dyadic_withdrawal_02_02.xlsx",
@@ -28,10 +29,18 @@ withdraw <- read_xlsx(
     -c(entryforceyear, year)
     )
 
-## hr scores
-load(here("data/common/raw/fariss/LHRS-v4.02-2021.Rdata"))
-hrs <- data
-rm(data)
+## hras ----
+cat <- read_xls(
+  path = "data/ch1/raw/un/UnderlyingData_CAT_OHCHR_26_11_2024.xls",
+  skip = 1
+  ) |> 
+  janitor::clean_names()
+
+iccpr <- read_xls(
+  path = "data/ch1/raw/un/UnderlyingData_ICCPR_OHCHR_26_11_2024.xls",
+  skip = 1
+  ) |> 
+  janitor::clean_names()
 
 # panelize ptas data ----
 ## merge ptas datasets ----
@@ -344,3 +353,200 @@ ptas_panel |>
   save(
     file = here("data/ch1/preprocessed/ptas_panel.rda")
   )
+
+# panelize hras data ----
+## load cowstates (from `states`) & years_hrs
+cowstates <- cowstates |> 
+  rename(
+    cow = cowcode,
+    country = country_name
+    ) |> 
+  select(cow, country) |> 
+  distinct()
+
+years_hrs <- tibble(year = 1946:2021)
+
+## cat ----
+### check for failed merger points
+cat_fail <- cat |> 
+  rename(rat_year = date_of_ratification_accession) |> 
+  select(country, rat_year) |> 
+  mutate(rat_year = year(rat_year)) |> 
+  full_join(cowstates) |> 
+  arrange(country)
+
+### fix
+cat_fix <- cat_fail |> 
+  mutate(
+    rat_year = case_when(
+      cow == 58 ~ 1993,
+      cow == 145 ~ 1999,
+      cow == 402 ~ 1992,
+      cow == 437 ~ 1995,
+      cow == 316 ~ 1988,
+      cow == 860 ~ 2003,
+      cow == 265 ~ 1987,
+      cow == 572 ~ 2004,
+      cow == 812 ~ 2012,
+      cow == 343 ~ 1994,
+      cow == 359 ~ 1995,
+      cow == 365 ~ 1987,
+      cow == 60 ~ 2020,
+      cow == 57 ~ 2001,
+      cow == 345 ~ 1991,
+      cow == 652 ~ 2004,
+      cow == 640 ~ 1988,
+      cow == 200 ~ 1988,
+      cow == 101 ~ 1991,
+      cow == 816 ~ 2015,
+      .default = rat_year
+      )
+    ) |> 
+  filter(
+    cow != 300,
+    cow != 267,
+    cow != 245,
+    cow != 315,
+    cow != 260,
+    cow != 240,
+    cow != 273,
+    cow != 275,
+    cow != 730,
+    cow != 347,
+    cow != 280,
+    cow != 332,
+    cow != 327,
+    cow != 335,
+    cow != 817,
+    cow != 269,
+    cow != 713,
+    cow != 337,
+    cow != 947,
+    cow != 329,
+    cow != 271,
+    cow != 678,
+    cow != 680,
+    cow != 511
+    ) |> 
+  relocate(cow, .after = country)
+
+### check
+cat_og <- cat |> 
+  rename(rat_year = date_of_ratification_accession) |> 
+  select(country, rat_year) |> 
+  mutate(rat_year = year(rat_year))
+
+diff_check1 <- cat_fix |> 
+  select(-cow) |> 
+  setdiff(cat_og)
+
+### create ratification indicator (first states ratified in 1986)
+cat_rat <- cat_fix |> 
+  cross_join(years_hrs) |> 
+  mutate(
+    cat_rat = case_when(
+      year < 1986 ~ NA,
+      year < rat_year ~ 0,
+      year >= rat_year ~ 1,
+      is.na(rat_year) ~ 0
+      )
+    ) |> 
+  select(cow, year, cat_rat) |> 
+  arrange(cow, year)
+
+## iccpr ----
+### check for failed merger points
+iccpr_fail <- iccpr |> 
+  rename(rat_year = date_of_ratification_accession) |> 
+  select(country, rat_year) |> 
+  mutate(rat_year = year(rat_year)) |> 
+  full_join(cowstates) |> 
+  arrange(country)
+
+### fix
+iccpr_fix <- iccpr_fail |> 
+  mutate(
+    rat_year = case_when(
+      cow == 58 ~ 2019,
+      cow == 145 ~ 1982,
+      cow == 402 ~ 1993,
+      cow == 437 ~ 1992,
+      cow == 316 ~ 1975,
+      cow == 860 ~ 2003,
+      cow == 265 ~ 1973,
+      cow == 572 ~ 2004,
+      cow == 812 ~ 2009,
+      cow == 343 ~ 1994,
+      cow == 359 ~ 1993,
+      cow == 365 ~ 1973,
+      cow == 57 ~ 1981,
+      cow == 345 ~ 1971,
+      cow == 652 ~ 1969,
+      cow == 640 ~ 2003,
+      cow == 200 ~ 1976,
+      cow == 101 ~ 1978,
+      cow == 816 ~ 1982,
+      .default = rat_year
+      )
+    ) |> 
+  filter(
+    cow != 300,
+    cow != 267,
+    cow != 245,
+    cow != 315,
+    cow != 260,
+    cow != 240,
+    cow != 273,
+    cow != 275,
+    cow != 730,
+    cow != 347,
+    cow != 280,
+    cow != 332,
+    cow != 327,
+    cow != 335,
+    cow != 817,
+    cow != 269,
+    cow != 713,
+    cow != 337,
+    cow != 947,
+    cow != 329,
+    cow != 271,
+    cow != 678,
+    cow != 680,
+    cow != 511
+    )
+
+### check
+iccpr_og <- iccpr |> 
+  rename(rat_year = date_of_ratification_accession) |> 
+  select(country, rat_year) |> 
+  mutate(rat_year = year(rat_year))
+
+diff_check2 <- iccpr_fix |> 
+  select(-cow) |> 
+  setdiff(iccpr_og)
+
+### note: countries in the 2 diff-checks should be the same
+
+### create ratification indicator (first states ratified in 1966)
+iccpr_rat <- iccpr_fix |> 
+  cross_join(years_hrs) |> 
+  mutate(
+    iccpr_rat = case_when(
+      year < 1966 ~ NA,
+      year < rat_year ~ 0,
+      year >= rat_year ~ 1,
+      is.na(rat_year) ~ 0
+      )
+    )  |> 
+  select(cow, year, iccpr_rat) |> 
+  arrange(cow, year)
+
+## merge & save ----
+hras <- cat_rat |> 
+  left_join(iccpr_rat)
+
+hras |> 
+  save(
+    file = here("data/ch1/preprocessed/hras.rda")
+    )

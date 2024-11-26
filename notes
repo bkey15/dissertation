@@ -2,3 +2,11 @@
 
 -When should newly-independent countries enter the dataset?
 -When should the models begin?
+
+#11/26/24#
+
+-COW coding rules for former countries:
+  -260 -> 255 (Germany)
+  -315 -> 316 (Czech Rep.)
+  -678 -> 679 (Yemen)
+  -Yugoslavia -> Serbia (345)
