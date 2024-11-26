@@ -42,6 +42,9 @@ iccpr <- read_xls(
   ) |> 
   janitor::clean_names()
 
+## bop ----
+bop <- read_csv("data/common/raw/imf/imf_bop_small.csv")
+
 # panelize ptas data ----
 ## merge ptas datasets ----
 ### desta_dyads & lechner
@@ -549,4 +552,51 @@ hras <- cat_rat |>
 hras |> 
   save(
     file = here("data/ch1/preprocessed/hras.rda")
+    )
+
+# panelize bop data ----
+## shrink ----
+### note: not cleaning names with janitor::clean_names b/c it's producing "x" before year column names
+bop_small <- bop |> 
+  select(
+    !c(ends_with("Q1") | ends_with("Q2") | ends_with("Q3") | ends_with("Q4"))
+    ) |> 
+  select(1:2, 9:84) |> 
+  rename(
+    economy_iso3 = "Economy ISO3",
+    economy_iso4 = "Economy ISO4",
+    )
+
+## convert ISO codes to COW codes ----
+bop_small <- bop_small |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = economy_iso3,
+      origin = "iso3c",
+      destination = "cown"
+      ),
+    cow = case_when(
+      economy_iso3 == "SRB" ~ 345,
+      economy_iso3 == "XKX" ~ 347,
+      .default = cow
+      )
+    ) |> 
+  filter(!is.na(cow)) |> 
+  relocate(cow, .after = economy_iso4)
+
+## panelize ----
+bop_panel <- bop_small |> 
+  pivot_longer(
+    cols = 4:79,
+    names_to = "year",
+    values_to = "bop_raw"
+    ) |> 
+  mutate(year = as.numeric(year)) |> 
+  select(cow, year, bop_raw) |> 
+  arrange(cow, year)
+
+## save ----
+bop_panel |> 
+  save(
+    file = here("data/ch1/preprocessed/bop_panel.rda")
     )

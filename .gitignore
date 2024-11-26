@@ -1,7 +1,6 @@
 # Big files
 data/ch4/mdb_speeches.feather
 data/ch4/every_single_word/every_single_word.RData
-data/common/raw/imf/IMF-BOP.xlsx
 
 # History files
 .Rhistory

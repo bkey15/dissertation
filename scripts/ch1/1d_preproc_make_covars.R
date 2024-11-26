@@ -30,6 +30,10 @@ ptas_final <- merge_base |>
     -c(cat_rat, iccpr_rat)
     )
 
+# make bop as % of GDP ----
+test <- ptas_final |> 
+  mutate(gdp_raw = 10^gdp_log10)
+
 # save ----
 ptas_final |> 
   save(

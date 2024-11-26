@@ -29,6 +29,9 @@ wdi <- read_csv(
 ## hras
 load(here("data/ch1/preprocessed/hras.rda"))
 
+## bop
+load(here("data/ch1/preprocessed/bop_panel.rda"))
+
 # prep merge ----
 ## vdem ----
 ### note 1: use only high- and mid-level
@@ -171,10 +174,14 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(hras)
 
+## merge_base & bop_panel
+merge_base <- merge_base |> 
+  left_join(bop_panel)
+
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
-  relocate(42:50, .after = hr_score)
+  relocate(43:51, .after = hr_score)
 
 # save ----
 merge_base |> 
