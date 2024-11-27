@@ -531,12 +531,12 @@ diff_check2 <- iccpr_fix |>
 
 ### note: countries in the 2 diff-checks should be the same
 
-### create ratification indicator (first states ratified in 1966)
+### create ratification indicator (first states ratified in 1968)
 iccpr_rat <- iccpr_fix |> 
   cross_join(years_hrs) |> 
   mutate(
     iccpr_rat = case_when(
-      year < 1966 ~ NA,
+      year < 1968 ~ NA,
       year < rat_year ~ 0,
       year >= rat_year ~ 1,
       is.na(rat_year) ~ 0

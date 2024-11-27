@@ -9,23 +9,24 @@ library(states)
 load(here("data/ch1/preprocessed/ptas_panel.rda"))
 
 ## gdp_dat
+### using 2022 Fariss et al. data b/c 2024 data is hard to interpret (almost double what it should be in most cases); is important as standard for bop % calculations
 gdp_dat <- read_rds(
   here(
-    "data/common/raw/fariss/estimates_gdp_model_combined_normal_noslope_gamma_lambda_additive_test_20240416.rds"
+    "data/common/raw/fariss/estimates_gdp_model_combined_normal_noslope_gamma_lambda_additive_test_20220215.rds"
     )
   )
 
 ## gdppc_dat
 gdppc_dat <- read_rds(
   here(
-    "data/common/raw/fariss/estimates_gdppc_model_combined_normal_noslope_gamma_lambda_additive_test_20240416.rds"
+    "data/common/raw/fariss/estimates_gdppc_model_combined_normal_noslope_gamma_lambda_additive_test_20220215.rds"
     )
   )
 
 ## pop_dat
 pop_dat <- read_rds(
   here(
-    "data/common/raw/fariss/estimates_pop_model_combined_normal_noslope_gamma_lambda_additive_test_20240416.rds"
+    "data/common/raw/fariss/estimates_pop_model_combined_normal_noslope_gamma_lambda_additive_test_20210827.rds"
     )
   )
 
@@ -121,16 +122,25 @@ pop_dat <- pop_dat |>
 
 ## shrink
 gdp_small <- gdp_dat |> 
-  select(cow, year, mean_log10) |> 
-  rename(gdp_log10 = mean_log10)
+  select(cow, year, mean, mean_log10) |> 
+  rename(
+    gdp_mean = mean,
+    gdp_log10 = mean_log10
+    )
 
 gdppc_small <- gdppc_dat |> 
-  select(cow, year, mean_log10) |> 
-  rename(gdppc_log10 = mean_log10)
+  select(cow, year, mean, mean_log10) |> 
+  rename(
+    gdppc_mean = mean,
+    gdppc_log10 = mean_log10
+    )
 
 pop_small <- pop_dat |> 
-  select(cow, year, mean_log10) |> 
-  rename(pop_log10 = mean_log10)
+  select(cow, year, mean, mean_log10) |> 
+  rename(
+    pop_mean = mean,
+    pop_log10 = mean_log10
+    )
 
 ## merge
 standards <- gdp_small |> 
@@ -178,7 +188,7 @@ ptas_panel <- ptas_panel |>
 ptas_panel <- ptas_panel |> 
   mutate(
     across(
-      c(9:11, 16:21),
+      c(9:11, 19:24),
       ~ case_when(
         .x == 0 & inforce == 1 ~ 0,
         .x == 0 & inforce == 0 ~ NA,

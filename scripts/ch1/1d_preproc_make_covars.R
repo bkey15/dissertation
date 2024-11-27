@@ -31,8 +31,12 @@ ptas_final <- merge_base |>
     )
 
 # make bop as % of GDP ----
-test <- ptas_final |> 
-  mutate(gdp_raw = 10^gdp_log10)
+ptas_final <- ptas_final |> 
+  mutate(
+    gdp_raw = gdp_mean*10000000,
+    bop_pct_gdp = (bop_raw/gdp_raw)*100
+    ) |> 
+  select(-gdp_raw, -bop_raw)
 
 # save ----
 ptas_final |> 

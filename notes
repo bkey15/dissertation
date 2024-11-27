@@ -10,3 +10,7 @@
   -315 -> 316 (Czech Rep.)
   -678 -> 679 (Yemen)
   -Yugoslavia -> Serbia (345)
+  
+#11/27/24#
+
+-HRAs values pre-1968, right now, is NA (this is year where first HRA is ratified). Should these values be NA or 0?
