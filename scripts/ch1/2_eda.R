@@ -5,6 +5,7 @@ library(naniar)
 
 # load data ----
 load(here("data/ch1/preprocessed/ptas_final.rda"))
+load(here("data/ch1/preprocessed/ptas_final_l1.rda"))
 
 # missingness check ----
 ## no start point ----
@@ -66,25 +67,89 @@ ptas_final |>
 # cpr viz.s ----
 ptas_final |> 
   ggplot(aes(x = cpr_mean, y = hr_score)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm")
 
 ptas_final |> 
   ggplot(aes(x = cpr_gdp_mean, y = hr_score)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm")
 
 ptas_final |> 
   ggplot(aes(x = cpr_gdppc_mean, y = hr_score)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = cpr_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = cpr_gdp_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = cpr_gdppc_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
 
 # esr viz.s ----
 ptas_final |> 
   ggplot(aes(x = esr_mean, y = hr_score)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm")
 
 ptas_final |> 
   ggplot(aes(x = esr_gdp_mean, y = hr_score)) +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "lm")
 
 ptas_final |> 
   ggplot(aes(x = esr_gdppc_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = esr_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = esr_gdp_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = esr_gdppc_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# bop viz.s ----
+ptas_final |> 
+  ggplot(aes(x = bop_pct_gdp)) +
+  geom_density()
+
+ptas_final |> 
+  ggplot(aes(x = bop_pct_gdp, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final_l1 |> 
+  ggplot(aes(x = bop_pct_gdp, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ptas_final |> 
+  filter(year == 2019) |> 
+  ggplot(aes(x = bop_pct_gdp, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# autocorrelation ----
+ptas_final |> 
+  group_by(cow) |> 
+  mutate(hr_lag = lag(hr_score)) |> 
+  ggplot(aes(x = hr_lag, y = hr_score)) +
   geom_point()

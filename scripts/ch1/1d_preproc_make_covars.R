@@ -38,6 +38,11 @@ ptas_final <- ptas_final |>
     ) |> 
   select(-gdp_raw, -bop_raw)
 
+# drop gdp_mean, gdppc_mean, and pop_mean ----
+## note: doing this for now so they don't end up in imputations/lasso
+ptas_final <- ptas_final |> 
+  select(-gdp_mean, -gdppc_mean, -pop_mean)
+
 # save ----
 ptas_final |> 
   save(

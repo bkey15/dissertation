@@ -9,6 +9,7 @@ library(hdm)
 library(DoubleML)
 library(naniar)
 library(readxl)
+library(foreign)
 
 vignette(package = "PanelMatch")
 vignette("using_panelmatch", package = "PanelMatch")
@@ -87,3 +88,5 @@ desta <- read_delim(
   mutate(
     number = as.numeric(number)
   )
+
+sb <- read.dta(file = here("replication_files/ch1/spilker_bohmelt/11558_2012_9155_MOESM2_ESM/01_RIO shapefile.dta"))

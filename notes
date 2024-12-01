@@ -14,3 +14,8 @@
 #11/27/24#
 
 -HRAs values pre-1968, right now, is NA (this is year where first HRA is ratified). Should these values be NA or 0?
+
+#11/30/24#
+
+-In Hafner-Burton (2005, p. 615), check note 87. Doesn't seem to be a way of telling how the autocorrelative "binary indicators" were computed.
+-Add HRAs var to imputation models.

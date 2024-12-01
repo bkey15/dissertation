@@ -1,4 +1,4 @@
-# Replicate Hafner-Burton (2005) w/ two-way fixed effects & multiple imputation (`mice`). Impute missings vals.
+# Impute missings vals.
 
 # load packages ----
 library(tidyverse)
@@ -25,10 +25,10 @@ imps_no_start <- ptas_final |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 50), ~ FALSE
+      c(1:12, 47), ~ FALSE
       ),
     across(
-      c(13:49, 51),
+      c(13:46, 48),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -47,10 +47,10 @@ imps_1968 <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 50), ~ FALSE
+      c(1:12, 47), ~ FALSE
       ),
     across(
-      c(13:49, 51),
+      c(13:46, 48),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -69,10 +69,10 @@ imps_1977 <- ptas_1977 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 50), ~ FALSE
+      c(1:12, 47), ~ FALSE
       ),
     across(
-      c(13:49, 51),
+      c(13:46, 48),
       ~ if_else(
         is.na(.x),
         TRUE,

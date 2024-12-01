@@ -10,6 +10,31 @@ load(here("data/ch1/results/imputations/imp_1.rda"))
 load(here("data/ch1/results/imputations/imp_2.rda"))
 load(here("data/ch1/results/imputations/imp_3.rda"))
 
+# prep fits ----
+## get column names ----
+### note: manually lagging each variable for now. Difficult to include lags in preprocessing (ungrouped, lags can move from most recent observation of one country to the oldest obs of the next cow-country)
+test3 <- test |> 
+  group_by(cow, .imp) |> 
+  mutate(
+    across(
+      c(1:2, ),
+      ~ lag(.x)
+      )
+    ) |> 
+  relocate(year, lag)
+
+
+cols <- imp_1 |> 
+  complete() |> 
+  names()
+
+## print ----
+paste0("lag(", cols, ") +")
+
+
+# lag covars ----
+
+
 # no start year ----
 ## cpr ----
 ### mean ----

@@ -1,5 +1,6 @@
 # load packages ----
 library(tidyverse)
+library(glmnet)
 
 # load data ----
 hb_rep_mice_subfolders <- c("data/ch1/results/fits/hb_rep/mice/no_start_year/", "data/ch1/results/fits/hb_rep/mice/start_1968/", "data/ch1/results/fits/hb_rep/mice/start_1977/")
