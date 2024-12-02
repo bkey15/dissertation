@@ -183,6 +183,14 @@ merge_base <- merge_base |>
   left_join(ptas_standard) |> 
   relocate(46:54, .after = hr_score)
 
+# fix inforce ----
+merge_base <- merge_base |> 
+  mutate(
+    inforce = if_else(
+      is.na(inforce), 0, inforce
+      )
+    )
+
 # save ----
 merge_base |> 
   save(
