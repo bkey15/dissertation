@@ -309,6 +309,11 @@ for(name in covar_names){
 }
 
 # get min lambdas ----
+## load cv results if needed ----
+load(here("data/ch1/results/tunes/imp_1_cv_res.rda"))
+load(here("data/ch1/results/tunes/imp_2_cv_res.rda"))
+load(here("data/ch1/results/tunes/imp_3_cv_res.rda"))
+
 ## imp_1 ----
 imp_1_lams <- list()
 covar_names <- names(imp_1_cv_res)
@@ -408,6 +413,12 @@ imp_3_cv_res |>
   save(file = here("data/ch1/results/tunes/imp_3_cv_res.rda"))
 
 # save lambdas ----
+## full ----
+imp_1_lams |> save(file = here("data/ch1/results/tunes/imp_1_lams.rda"))
+imp_2_lams |> save(file = here("data/ch1/results/tunes/imp_2_lams.rda"))
+imp_3_lams |> save(file = here("data/ch1/results/tunes/imp_3_lams.rda"))
+
+## means ----
 imp_1_lams_mean |> save(file = here("data/ch1/results/tunes/imp_1_lams_mean.rda"))
 imp_2_lams_mean |> save(file = here("data/ch1/results/tunes/imp_2_lams_mean.rda"))
 imp_3_lams_mean |> save(file = here("data/ch1/results/tunes/imp_3_lams_mean.rda"))
