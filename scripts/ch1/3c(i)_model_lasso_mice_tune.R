@@ -6,145 +6,88 @@ library(here)
 library(mice)
 library(glmnet)
 library(naniar)
+library(parallel)
+library(doMC)
 
 # load data ----
 load(here("data/ch1/results/imputations/imp_1_l1.rda"))
 load(here("data/ch1/results/imputations/imp_2_l1.rda"))
 load(here("data/ch1/results/imputations/imp_3_l1.rda"))
 
+# set cores ----
+## check
+n <- detectCores() - 1
+
+## set
+registerDoMC(cores = n)
+
 # get imputations ----
 ## imp_1 (no start year) ----
-imp_1.1 <- imp_1_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 1) |> 
-  select(1:48)
+imp_1_dfs <- list()
+m <- 1:5
 
-imp_1.2 <- imp_1_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 2) |> 
-  select(1:48)
-
-imp_1.3 <- imp_1_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 3) |> 
-  select(1:48)
-
-imp_1.4 <- imp_1_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 4) |> 
-  select(1:48)
-
-imp_1.5 <- imp_1_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 5) |> 
-  select(1:48)
+for(i in m){
+  imp_df <- imp_1_l1 |> 
+    mice::complete(
+      action = "long",
+      include = TRUE
+      ) |> 
+    filter(.imp == i) |> 
+    select(
+      -last_col(),
+      -last_col(offset = 1)
+      )
+  
+  imp_1_dfs[[as.character(i)]] <- imp_df
+}
 
 ## imp_2 (1968) ----
-imp_2.1 <- imp_2_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 1) |> 
-  select(1:48)
+imp_2_dfs <- list()
+m <- 1:5
 
-imp_2.2 <- imp_2_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 2) |> 
-  select(1:48)
-
-imp_2.3 <- imp_2_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 3) |> 
-  select(1:48)
-
-imp_2.4 <- imp_2_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 4) |> 
-  select(1:48)
-
-imp_2.5 <- imp_2_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 5) |> 
-  select(1:48)
+for(i in m){
+  imp_df <- imp_2_l1 |> 
+    mice::complete(
+      action = "long",
+      include = TRUE
+    ) |> 
+    filter(.imp == i) |> 
+    select(
+      -last_col(),
+      -last_col(offset = 1)
+    )
+  
+  imp_2_dfs[[as.character(i)]] <- imp_df
+}
 
 ## imp_3 (1977) ----
-imp_3.1 <- imp_3_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 1) |> 
-  select(1:48)
+imp_3_dfs <- list()
+m <- 1:5
 
-imp_3.2 <- imp_3_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 2) |> 
-  select(1:48)
-
-imp_3.3 <- imp_3_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 3) |> 
-  select(1:48)
-
-imp_3.4 <- imp_3_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 4) |> 
-  select(1:48)
-
-imp_3.5 <- imp_3_l1 |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-  ) |> 
-  filter(.imp == 5) |> 
-  select(1:48)
+for(i in m){
+  imp_df <- imp_3_l1 |> 
+    mice::complete(
+      action = "long",
+      include = TRUE
+    ) |> 
+    filter(.imp == i) |> 
+    select(
+      -last_col(),
+      -last_col(offset = 1)
+    )
+  
+  imp_3_dfs[[as.character(i)]] <- imp_df
+}
 
 # prep ----
 ## imp_1 ----
 ### get hr_score ----
-dep_1 <- imp_1.1 |> 
+dep_1 <- imp_1_dfs[[1]] |> 
   select(hr_score) |> 
-  mutate(row = 1:nrow(imp_1.1))
+  mutate(row = 1:nrow(imp_1_dfs[[1]]))
 
 ### get missing rows ----
-imp_1.na <- imp_1.1 |> 
+imp_1.na <- imp_1_dfs[[1]] |> 
   where_na() |> 
   as_tibble() |> 
   select(row) |> 
@@ -156,39 +99,52 @@ dep_1 <- dep_1 |>
 dep_1 <- dep_1$hr_score
 
 ### get covars ----
-#### 1.1
-imp_1.1_covars <- imp_1.1 |> 
-  select(-c(hr_score, inforce))
-imp_1.1_covars <- model.matrix(~ . - 1, data = imp_1.1_covars)
+#### cpr & esr ----
+treat_names <- imp_1_dfs[[1]] |> 
+  select(5:7, 9:11) |> 
+  names()
+m <- 1:5
+imp_1_covars <- list()
 
-#### 1.2
-imp_1.2_covars <- imp_1.2 |> 
-  select(-c(hr_score, inforce))
-imp_1.2_covars <- model.matrix(~ . - 1, data = imp_1.2_covars)
+for(i in m){
+  df <- imp_1_dfs[[i]]
+  for(name in treat_names){
+    df_small <- df |> 
+      select(!3:4 & !8 & !12 & !setdiff(treat_names, name))
+    imp_1_covars[[as.character(name)]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+  }
+}
 
-#### 1.3
-imp_1.3_covars <- imp_1.3 |> 
-  select(-c(hr_score, inforce))
-imp_1.3_covars <- model.matrix(~ . - 1, data = imp_1.3_covars)
+#### both ----
+#### cpr_mean & esr_mean
+for(i in m){
+  df_small <- imp_1_dfs[[i]] |> 
+    select(!3:4 & !6:8 & !10:12)
+  imp_1_covars[["both_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 1.4
-imp_1.4_covars <- imp_1.4 |> 
-  select(-c(hr_score, inforce))
-imp_1.4_covars <- model.matrix(~ . - 1, data = imp_1.4_covars)
+#### cpr_gdp & esr_gdp
+for(i in m){
+  df_small <- imp_1_dfs[[i]] |> 
+    select(!3:5 & !7:9 & !11:12)
+  imp_1_covars[["both_gdp_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 1.5
-imp_1.5_covars <- imp_1.5 |> 
-  select(-c(hr_score, inforce))
-imp_1.5_covars <- model.matrix(~ . - 1, data = imp_1.5_covars)
+#### cpr_gdppc & esr_gdppc
+for(i in m){
+  df_small <- imp_1_dfs[[i]] |> 
+    select(!3:6 & !8:10 & !12)
+  imp_1_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
 ## imp_2 ----
 ### get hr_score ----
-dep_2 <- imp_2.1 |> 
+dep_2 <- imp_2_dfs[[1]] |> 
   select(hr_score) |> 
-  mutate(row = 1:nrow(imp_2.1))
+  mutate(row = 1:nrow(imp_2_dfs[[1]]))
 
 ### get missing rows ----
-imp_2.na <- imp_2.1 |> 
+imp_2.na <- imp_2_dfs[[1]] |> 
   select(-inforce) |> 
   where_na() |> 
   as_tibble() |> 
@@ -201,39 +157,52 @@ dep_2 <- dep_2 |>
 dep_2 <- dep_2$hr_score
 
 ### get covars ----
-#### 2.1
-imp_2.1_covars <- imp_2.1 |> 
-  select(-c(hr_score, inforce))
-imp_2.1_covars <- model.matrix(~ . - 1, data = imp_2.1_covars)
+#### cpr & esr ----
+treat_names <- imp_2_dfs[[1]] |> 
+  select(5:7, 9:11) |> 
+  names()
+m <- 1:5
+imp_2_covars <- list()
 
-#### 2.2
-imp_2.2_covars <- imp_2.2 |> 
-  select(-c(hr_score, inforce))
-imp_2.2_covars <- model.matrix(~ . - 1, data = imp_2.2_covars)
+for(i in m){
+  df <- imp_2_dfs[[i]]
+  for(name in treat_names){
+    df_small <- df |> 
+      select(!3:4 & !8 & !12 & !setdiff(treat_names, name))
+    imp_2_covars[[as.character(name)]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+  }
+}
 
-#### 2.3
-imp_2.3_covars <- imp_2.3 |> 
-  select(-c(hr_score, inforce))
-imp_2.3_covars <- model.matrix(~ . - 1, data = imp_2.3_covars)
+#### both ----
+#### cpr_mean & esr_mean
+for(i in m){
+  df_small <- imp_2_dfs[[i]] |> 
+    select(!3:4 & !6:8 & !10:12)
+  imp_2_covars[["both_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 2.4
-imp_2.4_covars <- imp_2.4 |> 
-  select(-c(hr_score, inforce))
-imp_2.4_covars <- model.matrix(~ . - 1, data = imp_2.4_covars)
+#### cpr_gdp & esr_gdp
+for(i in m){
+  df_small <- imp_2_dfs[[i]] |> 
+    select(!3:5 & !7:9 & !11:12)
+  imp_2_covars[["both_gdp_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 2.5
-imp_2.5_covars <- imp_2.5 |> 
-  select(-c(hr_score, inforce))
-imp_2.5_covars <- model.matrix(~ . - 1, data = imp_2.5_covars)
+#### cpr_gdppc & esr_gdppc
+for(i in m){
+  df_small <- imp_2_dfs[[i]] |> 
+    select(!3:6 & !8:10 & !12)
+  imp_2_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
 ## imp_3 ----
 ### get hr_score ----
-dep_3 <- imp_3.1 |> 
+dep_3 <- imp_3_dfs[[1]] |> 
   select(hr_score) |> 
-  mutate(row = 1:nrow(imp_3.1))
+  mutate(row = 1:nrow(imp_3_dfs[[1]]))
 
 ### get missing rows ----
-imp_3.na <- imp_3.1 |> 
+imp_3.na <- imp_3_dfs[[1]] |> 
   select(-inforce) |> 
   where_na() |> 
   as_tibble() |> 
@@ -246,182 +215,199 @@ dep_3 <- dep_3 |>
 dep_3 <- dep_3$hr_score
 
 ### get covars ----
-#### 3.1
-imp_3.1_covars <- imp_3.1 |> 
-  select(-c(hr_score, inforce))
-imp_3.1_covars <- model.matrix(~ . - 1, data = imp_3.1_covars)
+#### cpr & esr ----
+treat_names <- imp_3_dfs[[1]] |> 
+  select(5:7, 9:11) |> 
+  names()
+m <- 1:5
+imp_3_covars <- list()
 
-#### 3.2
-imp_3.2_covars <- imp_3.2 |> 
-  select(-c(hr_score, inforce))
-imp_3.2_covars <- model.matrix(~ . - 1, data = imp_3.2_covars)
+for(i in m){
+  df <- imp_3_dfs[[i]]
+  for(name in treat_names){
+    df_small <- df |> 
+      select(!3:4 & !8 & !12 & !setdiff(treat_names, name))
+    imp_3_covars[[as.character(name)]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+  }
+}
 
-#### 3.3
-imp_3.3_covars <- imp_3.3 |> 
-  select(-c(hr_score, inforce))
-imp_3.3_covars <- model.matrix(~ . - 1, data = imp_3.3_covars)
+#### both ----
+#### cpr_mean & esr_mean
+for(i in m){
+  df_small <- imp_3_dfs[[i]] |> 
+    select(!3:4 & !6:8 & !10:12)
+  imp_3_covars[["both_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 3.4
-imp_3.4_covars <- imp_3.4 |> 
-  select(-c(hr_score, inforce))
-imp_3.4_covars <- model.matrix(~ . - 1, data = imp_3.4_covars)
+#### cpr_gdp & esr_gdp
+for(i in m){
+  df_small <- imp_3_dfs[[i]] |> 
+    select(!3:5 & !7:9 & !11:12)
+  imp_3_covars[["both_gdp_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
-#### 3.5
-imp_3.5_covars <- imp_3.5 |> 
-  select(-c(hr_score, inforce))
-imp_3.5_covars <- model.matrix(~ . - 1, data = imp_3.5_covars)
+#### cpr_gdppc & esr_gdppc
+for(i in m){
+  df_small <- imp_3_dfs[[i]] |> 
+    select(!3:6 & !8:10 & !12)
+  imp_3_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
 
 # cross validate (lambda) ----
 ## imp_1 ----
-### 1.1
-set.seed(15275)
-imp_1.1_cv_res <- cv.glmnet(
-  x = imp_1.1_covars,
-  y = dep_1,
-  alpha = 1
-)
+imp_1_cv_res <- list()
+covar_names <- names(imp_1_covars)
+m <- 1:5
 
-### 1.2
-set.seed(15275)
-imp_1.2_cv_res <- cv.glmnet(
-  x = imp_1.2_covars,
-  y = dep_1,
-  alpha = 1
-)
-
-### 1.3
-set.seed(15275)
-imp_1.3_cv_res <- cv.glmnet(
-  x = imp_1.3_covars,
-  y = dep_1,
-  alpha = 1
-)
-
-### 1.4
-set.seed(15275)
-imp_1.4_cv_res <- cv.glmnet(
-  x = imp_1.4_covars,
-  y = dep_1,
-  alpha = 1
-)
-
-### 1.5
-set.seed(15275)
-imp_1.5_cv_res <- cv.glmnet(
-  x = imp_1.5_covars,
-  y = dep_1,
-  alpha = 1
-)
+for(name in covar_names){
+  list <- imp_1_covars[[name]]
+  for(i in m){
+    set.seed(15275)
+    cv_res <- cv.glmnet(
+      x = list[[i]],
+      y = dep_1,
+      alpha = 1
+      )
+    imp_1_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
+  }
+}
 
 ## imp_2 ----
-### 2.1
-set.seed(15275)
-imp_2.1_cv_res <- cv.glmnet(
-  x = imp_2.1_covars,
-  y = dep_2,
-  alpha = 1
-)
+imp_2_cv_res <- list()
+covar_names <- names(imp_2_covars)
+m <- 1:5
 
-### 2.2
-set.seed(15275)
-imp_2.2_cv_res <- cv.glmnet(
-  x = imp_2.2_covars,
-  y = dep_2,
-  alpha = 1
-)
-
-### 2.3
-set.seed(15275)
-imp_2.3_cv_res <- cv.glmnet(
-  x = imp_2.3_covars,
-  y = dep_2,
-  alpha = 1
-)
-
-### 2.4
-set.seed(15275)
-imp_2.4_cv_res <- cv.glmnet(
-  x = imp_2.4_covars,
-  y = dep_2,
-  alpha = 1
-)
-
-### 2.5
-set.seed(15275)
-imp_2.5_cv_res <- cv.glmnet(
-  x = imp_2.5_covars,
-  y = dep_2,
-  alpha = 1
-)
+for(name in covar_names){
+  list <- imp_2_covars[[name]]
+  for(i in m){
+    set.seed(15275)
+    cv_res <- cv.glmnet(
+      x = list[[i]],
+      y = dep_2,
+      alpha = 1
+    )
+    imp_2_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
+  }
+}
 
 ## imp_3 ----
-### 3.1
-set.seed(15275)
-imp_3.1_cv_res <- cv.glmnet(
-  x = imp_3.1_covars,
-  y = dep_3,
-  alpha = 1
-)
+imp_3_cv_res <- list()
+covar_names <- names(imp_3_covars)
+m <- 1:5
 
-### 3.2
-set.seed(15275)
-imp_3.2_cv_res <- cv.glmnet(
-  x = imp_3.2_covars,
-  y = dep_3,
-  alpha = 1
-)
+for(name in covar_names){
+  list <- imp_3_covars[[name]]
+  for(i in m){
+    set.seed(15275)
+    cv_res <- cv.glmnet(
+      x = list[[i]],
+      y = dep_3,
+      alpha = 1
+    )
+    imp_3_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
+  }
+}
 
-### 3.3
-set.seed(15275)
-imp_3.3_cv_res <- cv.glmnet(
-  x = imp_3.3_covars,
-  y = dep_3,
-  alpha = 1
-)
-
-### 3.4
-set.seed(15275)
-imp_3.4_cv_res <- cv.glmnet(
-  x = imp_3.4_covars,
-  y = dep_3,
-  alpha = 1
-)
-
-### 3.5
-set.seed(15275)
-imp_3.5_cv_res <- cv.glmnet(
-  x = imp_3.5_covars,
-  y = dep_3,
-  alpha = 1
-)
-
-# get min lambds ----
+# get min lambdas ----
 ## imp_1 ----
-imp_1.1_min_lam <- imp_1.1_cv_res$lambda.min
-imp_1.2_min_lam <- imp_1.2_cv_res$lambda.min
-imp_1.3_min_lam <- imp_1.3_cv_res$lambda.min
-imp_1.4_min_lam <- imp_1.4_cv_res$lambda.min
-imp_1.5_min_lam <- imp_1.5_cv_res$lambda.min
+imp_1_lams <- list()
+covar_names <- names(imp_1_cv_res)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_1_cv_res[[name]]
+  for(i in m){
+    lam <- list[[i]]$lambda.min
+    imp_1_lams[[as.character(name)]][[as.character(i)]] <- lam
+  }
+}
 
 ## imp_2 ----
-imp_2.1_min_lam <- imp_2.1_cv_res$lambda.min
-imp_2.2_min_lam <- imp_2.2_cv_res$lambda.min
-imp_2.3_min_lam <- imp_2.3_cv_res$lambda.min
-imp_2.4_min_lam <- imp_2.4_cv_res$lambda.min
-imp_2.5_min_lam <- imp_2.5_cv_res$lambda.min
+imp_2_lams <- list()
+covar_names <- names(imp_2_cv_res)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_2_cv_res[[name]]
+  for(i in m){
+    lam <- list[[i]]$lambda.min
+    imp_2_lams[[as.character(name)]][[as.character(i)]] <- lam
+  }
+}
 
 ## imp_3 ----
-imp_3.1_min_lam <- imp_3.1_cv_res$lambda.min
-imp_3.2_min_lam <- imp_3.2_cv_res$lambda.min
-imp_3.3_min_lam <- imp_3.3_cv_res$lambda.min
-imp_3.4_min_lam <- imp_3.4_cv_res$lambda.min
-imp_3.5_min_lam <- imp_3.5_cv_res$lambda.min
+imp_3_lams <- list()
+covar_names <- names(imp_3_cv_res)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_3_cv_res[[name]]
+  for(i in m){
+    lam <- list[[i]]$lambda.min
+    imp_3_lams[[as.character(name)]][[as.character(i)]] <- lam
+  }
+}
+
+# standardize min lambdas ----
+## imp_1 ----
+imp_1_lams_mean <- list()
+covar_names <- names(imp_1_lams)
+
+for(name in covar_names){
+  list <- imp_1_lams[[name]]
+  lam_mean <- list |> 
+    unlist() |>
+    mean()
+  imp_1_lams_mean[[as.character(name)]] <- lam_mean
+}
+
+## imp_2 ----
+imp_2_lams_mean <- list()
+covar_names <- names(imp_2_lams)
+
+for(name in covar_names){
+  list <- imp_2_lams[[name]]
+  lam_mean <- list |> 
+    unlist() |>
+    mean()
+  imp_2_lams_mean[[as.character(name)]] <- lam_mean
+}
+
+## imp_3 ----
+imp_3_lams_mean <- list()
+covar_names <- names(imp_3_lams)
+
+for(name in covar_names){
+  list <- imp_3_lams[[name]]
+  lam_mean <- list |> 
+    unlist() |>
+    mean()
+  imp_3_lams_mean[[as.character(name)]] <- lam_mean
+}
+
+
+# save prep data ----
+## hr_score (dep) ----
+dep_list <- list("dep_1" = dep_1, "dep_2" = dep_2, "dep_3" = dep_3)
+dep_list |> save(file = here("data/ch1/results/imputations/dep_list.rda"))
+
+## covars ----
+imp_1_covars |> 
+  save(file = here("data/ch1/results/imputations/imp_1_covars.rda"))
+imp_2_covars |> 
+  save(file = here("data/ch1/results/imputations/imp_2_covars.rda"))
+imp_3_covars |> 
+  save(file = here("data/ch1/results/imputations/imp_3_covars.rda"))
+
+# save cv results ----
+imp_1_cv_res |> 
+  save(file = here("data/ch1/results/tunes/imp_1_cv_res.rda"))
+imp_2_cv_res |> 
+  save(file = here("data/ch1/results/tunes/imp_2_cv_res.rda"))
+imp_3_cv_res |> 
+  save(file = here("data/ch1/results/tunes/imp_3_cv_res.rda"))
 
 # save lambdas ----
-imp_1_lam <- imp_1.1_min_lam
-imp_2_lam <- imp_2.1_min_lam
-imp_3_lam <- imp_3.1_min_lam*0.8 + imp_3.5_min_lam*.2
-
-imp_1_lam |> save(file = here("data/ch1/results/tunes/imp_1_lam.rda"))
-imp_2_lam |> save(file = here("data/ch1/results/tunes/imp_2_lam.rda"))
-imp_3_lam |> save(file = here("data/ch1/results/tunes/imp_3_lam.rda"))
+imp_1_lams_mean |> save(file = here("data/ch1/results/tunes/imp_1_lams_mean.rda"))
+imp_2_lams_mean |> save(file = here("data/ch1/results/tunes/imp_2_lams_mean.rda"))
+imp_3_lams_mean |> save(file = here("data/ch1/results/tunes/imp_3_lams_mean.rda"))
