@@ -158,6 +158,21 @@ for(name in covar_names){
   }
 }
 
+### center covars ----
+### see https://cran.r-project.org/web/packages/selectiveInference/selectiveInference.pdf (p. 8)
+
+covar_names <- names(imp_1_covars)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_1_covars[[name]]
+  for(i in m){
+    center_mat <- list[[i]] |> 
+      scale(center = TRUE, scale = FALSE)
+    imp_1_covars[[as.character(name)]][[as.character(i)]] <- center_mat
+  }
+}
+
 ## imp_2 ----
 ### get hr_score ----
 dep_2 <- imp_2_dfs[[1]] |> 
@@ -233,6 +248,19 @@ for(name in covar_names){
       as_tibble() |> 
       select(!all_of(zvar_names)) |> 
       as.matrix()
+  }
+}
+
+### center covars ----
+covar_names <- names(imp_2_covars)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_2_covars[[name]]
+  for(i in m){
+    center_mat <- list[[i]] |> 
+      scale(center = TRUE, scale = FALSE)
+    imp_2_covars[[as.character(name)]][[as.character(i)]] <- center_mat
   }
 }
 
@@ -314,6 +342,19 @@ for(name in covar_names){
   }
 }
 
+### center covars ----
+covar_names <- names(imp_3_covars)
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_3_covars[[name]]
+  for(i in m){
+    center_mat <- list[[i]] |> 
+      scale(center = TRUE, scale = FALSE)
+    imp_3_covars[[as.character(name)]][[as.character(i)]] <- center_mat
+  }
+}
+
 # cross validate (lambda) ----
 ## imp_1 ----
 imp_1_cv_res <- list()
@@ -373,11 +414,6 @@ for(name in covar_names){
 }
 
 # get min lambdas ----
-## load cv results if needed ----
-load(here("data/ch1/results/tunes/imp_1_cv_res.rda"))
-load(here("data/ch1/results/tunes/imp_2_cv_res.rda"))
-load(here("data/ch1/results/tunes/imp_3_cv_res.rda"))
-
 ## imp_1 ----
 imp_1_lams <- list()
 covar_names <- names(imp_1_cv_res)
@@ -453,7 +489,6 @@ for(name in covar_names){
     mean()
   imp_3_lams_mean[[as.character(name)]] <- lam_mean
 }
-
 
 # save prep data ----
 ## hr_score (dep) ----
