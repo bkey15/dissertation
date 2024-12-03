@@ -8,6 +8,7 @@ library(glmnet)
 library(naniar)
 library(parallel)
 library(doMC)
+library(caret)
 
 # load data ----
 load(here("data/ch1/results/imputations/imp_1_l1.rda"))
@@ -137,6 +138,26 @@ for(i in m){
   imp_1_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
 }
 
+### omit zero-var covars ----
+covar_names <- names(imp_1_covars)
+zvar_names <- imp_1_covars[["cpr_mean"]][[1]] |> 
+  nearZeroVar(saveMetrics = TRUE) |> 
+  rownames_to_column(var = "var") |> 
+  filter(zeroVar == TRUE) |> 
+  select(var)
+zvar_names <- zvar_names$var
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_1_covars[[name]]
+  for(i in m){
+    imp_1_covars[[as.character(name)]][[as.character(i)]] <- list[[i]] |> 
+      as_tibble() |> 
+      select(!all_of(zvar_names)) |> 
+      as.matrix()
+  }
+}
+
 ## imp_2 ----
 ### get hr_score ----
 dep_2 <- imp_2_dfs[[1]] |> 
@@ -193,6 +214,26 @@ for(i in m){
   df_small <- imp_2_dfs[[i]] |> 
     select(!3:6 & !8:10 & !12)
   imp_2_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
+}
+
+### omit zero-var covars ----
+covar_names <- names(imp_2_covars)
+zvar_names <- imp_2_covars[["cpr_mean"]][[1]] |> 
+  nearZeroVar(saveMetrics = TRUE) |> 
+  rownames_to_column(var = "var") |> 
+  filter(zeroVar == TRUE) |> 
+  select(var)
+zvar_names <- zvar_names$var
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_2_covars[[name]]
+  for(i in m){
+    imp_2_covars[[as.character(name)]][[as.character(i)]] <- list[[i]] |> 
+      as_tibble() |> 
+      select(!all_of(zvar_names)) |> 
+      as.matrix()
+  }
 }
 
 ## imp_3 ----
@@ -253,6 +294,26 @@ for(i in m){
   imp_3_covars[["both_gdppc_mean"]][[as.character(i)]] <- model.matrix(~ . - 1, data = df_small)
 }
 
+### omit zero-var covars ----
+covar_names <- names(imp_3_covars)
+zvar_names <- imp_3_covars[["cpr_mean"]][[1]] |> 
+  nearZeroVar(saveMetrics = TRUE) |> 
+  rownames_to_column(var = "var") |> 
+  filter(zeroVar == TRUE) |> 
+  select(var)
+zvar_names <- zvar_names$var
+m <- 1:5
+
+for(name in covar_names){
+  list <- imp_3_covars[[name]]
+  for(i in m){
+    imp_3_covars[[as.character(name)]][[as.character(i)]] <- list[[i]] |> 
+      as_tibble() |> 
+      select(!all_of(zvar_names)) |> 
+      as.matrix()
+  }
+}
+
 # cross validate (lambda) ----
 ## imp_1 ----
 imp_1_cv_res <- list()
@@ -266,7 +327,8 @@ for(name in covar_names){
     cv_res <- cv.glmnet(
       x = list[[i]],
       y = dep_1,
-      alpha = 1
+      alpha = 1,
+      parallel = TRUE
       )
     imp_1_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
   }
@@ -284,7 +346,8 @@ for(name in covar_names){
     cv_res <- cv.glmnet(
       x = list[[i]],
       y = dep_2,
-      alpha = 1
+      alpha = 1,
+      parallel = TRUE
     )
     imp_2_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
   }
@@ -302,7 +365,8 @@ for(name in covar_names){
     cv_res <- cv.glmnet(
       x = list[[i]],
       y = dep_3,
-      alpha = 1
+      alpha = 1,
+      parallel = TRUE
     )
     imp_3_cv_res[[as.character(name)]][[as.character(i)]] <- cv_res
   }

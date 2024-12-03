@@ -4,6 +4,7 @@ library(here)
 library(naniar)
 
 # load data ----
+load(here("data/ch1/preprocessed/ptas_panel.rda"))
 load(here("data/ch1/preprocessed/ptas_final.rda"))
 load(here("data/ch1/preprocessed/ptas_final_l1.rda"))
 
@@ -153,3 +154,72 @@ ptas_final |>
   mutate(hr_lag = lag(hr_score)) |> 
   ggplot(aes(x = hr_lag, y = hr_score)) +
   geom_point()
+
+# n ptas ----
+## see if countries accede to more after fisc. crisis
+ptas_count <- ptas_panel |> 
+  mutate(
+    base_treaty_inforce = if_else(
+      base_treaty*inforce == 0, NA, base_treaty*inforce
+      )
+    ) |> 
+  summarize(
+    n_ptas = n_distinct(
+      base_treaty_inforce,
+      na.rm = TRUE
+      ),
+    .by = c(cow, year)
+    ) |> 
+  arrange(cow, year)
+
+## asian financial crisis ----
+### indonesia ----
+ptas_count |> 
+  filter(cow == 850) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+### malaysia ----
+ptas_count |> 
+  filter(cow == 820) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+### thailand ----
+ptas_count |> 
+  filter(cow == 800) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+### s korea ----
+ptas_count |> 
+  filter(cow == 732) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+## peso crisis ----
+### mexico ----
+ptas_count |> 
+  filter(cow == 70) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+## other in s. america ----
+### argentina ----
+ptas_count |> 
+  filter(cow == 160) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+### brazil ----
+ptas_count |> 
+  filter(cow == 140) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()
+
+## other ----
+### russia ----
+ptas_count |> 
+  filter(cow == 365) |> 
+  ggplot(aes(x = year, y = n_ptas)) +
+  geom_col()

@@ -8,6 +8,7 @@ library(mice)
 library(glmnet)
 library(selectiveInference)
 library(hdi)
+library(parallel)
 
 # load data ----
 ## hr_score ----
@@ -24,7 +25,7 @@ for(file in covars){
 }
 
 ## lambdas ----
-lambdas <- dir("data/ch1/results/tunes", pattern = "lams_mean", full.names = TRUE)
+lambdas <- dir("data/ch1/results/tunes", pattern = "\\lams.rda$", full.names = TRUE)
 
 for(file in lambdas){
   data <- load(here(file))
@@ -44,14 +45,20 @@ for(file in cvs){
 }
 
 # test lasso ----
+n <- detectCores() - 1
+infer <- lasso.proj(
+  x = imp_1_covars[["both_gdppc_mean"]][[1]],
+  y = dep_list[[1]],
+  ncores = n
+  )
+
+
 ## get betas ----
 beta <- coef.glmnet(
   object = imp_1_cv_res[["both_gdppc_mean"]][[1]],
-  s = imp_2_lams_mean[["both_gdppc_mean"]]/length(dep_list[[3]]))[-1]
+  s = imp_1_lams[["both_gdppc_mean"]][[1]]/length(dep_list[[1]]))[-1]
 
-infer <- fixedLassoInf(
-  x = imp_2_covars[["both_gdppc_mean"]][[1]],
-  y = dep_list[[2]],
-  beta = beta2,
-  lambda = imp_2_lams_mean[["both_gdppc_mean"]]
-  )
+## infer ----
+
+
+test <- nearZeroVar(imp_1_covars[["both_gdppc_mean"]][[1]], saveMetrics = T)
