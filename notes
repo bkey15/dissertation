@@ -19,3 +19,8 @@
 
 -In Hafner-Burton (2005, p. 615), check note 87. Doesn't seem to be a way of telling how the autocorrelative "binary indicators" were computed.
 -Add HRAs var to imputation models.
+
+#12/4/24#
+
+-The partially linear regression model (PLR), when lasso is used at steps 1 & 2, corresponds to the double lasso proposed in Belloni et al. (2014). See https://docs.doubleml.org/stable/guide/models.html.
+-Not using `use_other_treat_as_covariate = FALSE` (default is TRUE) in `double_ml_data_from_data_frame()`. Am assuming treatment 1 (e.g., cpr_mean) is correlated with treatment 2 (esr_mean), which probably bears out in the data.
