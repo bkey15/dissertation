@@ -20,24 +20,44 @@ ptas_1968 <- ptas_final |>
   filter(year > 1967) |> 
   mutate(
     across(
-      6:13,
+      c(6:13, starts_with("ns_")),
       ~ if_else(
         is.na(.x), 0, .x
         )
+      ),
+    across(
+      starts_with("ss_"),
+      ~ if_else(
+        glb_s == 1 & is.na(.x), 0, .x)
+      ),
+    across(
+      starts_with("nn_"),
+      ~ if_else(
+        glb_s == 0 & is.na(.x), 0, .x)
       )
     )
 
-## 1977 (spilker & böhmelt) ----
+ ## 1977 (spilker & böhmelt) ----
 ptas_1977 <- ptas_final |> 
   filter(year > 1976) |> 
   mutate(
     across(
-      6:13,
+      c(6:13, starts_with("ns_")),
       ~ if_else(
         is.na(.x), 0, .x
-        )
       )
+    ),
+    across(
+      starts_with("ss_"),
+      ~ if_else(
+        glb_s == 1 & is.na(.x), 0, .x)
+    ),
+    across(
+      starts_with("nn_"),
+      ~ if_else(
+        glb_s == 0 & is.na(.x), 0, .x)
     )
+  )
 
 ## save ----
 ptas_1968 |> 

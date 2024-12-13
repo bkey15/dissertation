@@ -25,10 +25,10 @@ imps_no_start <- ptas_final |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 47), ~ FALSE
+      c(1:36, 72), ~ FALSE
       ),
     across(
-      c(13:46, 48),
+      c(37:71, 73),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -47,17 +47,17 @@ imps_1968 <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 47), ~ FALSE
-      ),
+      c(1:36, 72), ~ FALSE
+    ),
     across(
-      c(13:46, 48),
+      c(37:71, 73),
       ~ if_else(
         is.na(.x),
         TRUE,
         FALSE
-        )
       )
     )
+  )
 
 ### check success
 for(var in imps_1968){
@@ -69,17 +69,17 @@ imps_1977 <- ptas_1977 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:12, 47), ~ FALSE
-      ),
+      c(1:36, 72), ~ FALSE
+    ),
     across(
-      c(13:46, 48),
+      c(37:71, 73),
       ~ if_else(
         is.na(.x),
         TRUE,
         FALSE
-        )
       )
     )
+  )
 
 ### check success
 for(var in imps_1977){
@@ -93,7 +93,7 @@ ptas_mice_no_start <- ptas_final |>
   select(-1) |> 
   mutate(
     across(
-      c(1:2, 4),
+      c(cow, year, inforce, glb_s),
       ~ as_factor(.x)
     )
   )
@@ -103,7 +103,7 @@ ptas_mice_1968 <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:2, 4),
+      c(cow, year, inforce, glb_s),
       ~ as_factor(.x)
     )
   )
@@ -113,7 +113,7 @@ ptas_mice_1977 <- ptas_1977 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:2, 4),
+      c(cow, year, inforce, glb_s),
       ~ as_factor(.x)
     )
   )

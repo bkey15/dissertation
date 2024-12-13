@@ -1,5 +1,5 @@
 # Lag covars
-## note: when grouping by specified vars (e.g., by cow and .imp), these are treated as "outside" of the dataset, hence why the mutations refer to a truncated version of the dataset
+## note: when grouping by specified vars (e.g., by cow and .imp), these are treated as "outside" of the dataset, hence why the column positions called in the mutations refer to a truncated version of the dataset
 
 # load packages ----
 library(tidyverse)
@@ -21,7 +21,7 @@ ptas_final_l1 <- ptas_final |>
   group_by(cow) |> 
   mutate(
     across(
-      c(1, 3:47),
+      c(1, 3:72),
       ~ lag(.x)
       )
     ) |> 
@@ -33,7 +33,7 @@ ptas_1968_l1 <- ptas_1968 |>
   group_by(cow) |> 
   mutate(
     across(
-      c(1, 3:47),
+      c(1, 3:72),
       ~ lag(.x)
       )
     ) |> 
@@ -45,7 +45,7 @@ ptas_1977_l1 <- ptas_1977 |>
   group_by(cow) |> 
   mutate(
     across(
-      c(1, 3:47),
+      c(1, 3:72),
       ~ lag(.x)
       )
     ) |> 
@@ -61,7 +61,7 @@ imp_1_l1 <- imp_1 |>
   group_by(cow, .imp) |> 
   mutate(
     across(
-      c(2, 4:48),
+      c(2, 4:73),
       ~ lag(.x)
       )
     ) |> 
@@ -78,7 +78,7 @@ imp_2_l1 <- imp_2 |>
   group_by(cow, .imp) |> 
   mutate(
     across(
-      c(2, 4:48),
+      c(2, 4:73),
       ~ lag(.x)
       )
     ) |> 
@@ -95,7 +95,7 @@ imp_3_l1 <- imp_3 |>
   group_by(cow, .imp) |> 
   mutate(
     across(
-      c(2, 4:48),
+      c(2, 4:73),
       ~ lag(.x)
       )
     ) |> 
@@ -104,12 +104,15 @@ imp_3_l1 <- imp_3 |>
 
 # save ----
 ## L1 ----
+### no imp ----
 ptas_final_l1 |> 
   save(file = here("data/ch1/preprocessed/ptas_final_l1.rda"))
 ptas_1968_l1 |> 
   save(file = here("data/ch1/preprocessed/ptas_1968_l1.rda"))
 ptas_1977_l1 |> 
   save(file = here("data/ch1/preprocessed/ptas_1977_l1.rda"))
+
+### imp ----
 imp_1_l1 |> 
   save(file = here("data/ch1/results/imputations/imp_1_l1.rda"))
 imp_2_l1 |> 

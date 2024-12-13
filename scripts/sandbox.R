@@ -91,6 +91,8 @@ desta <- read_delim(
 
 sb <- read.dta(file = here("replication_files/ch1/spilker_bohmelt/11558_2012_9155_MOESM2_ESM/01_RIO shapefile.dta"))
 
+by <- read.dta(file = here("replication_files/ch2/bodea_ye/BJPS_replication_bodea_ye.dta"))
+
 # old tuning code (pre-for loops)
 imp_1.1_covars_cprmean <- imp_1.1 |> 
   select(!3:4 & !6:12)

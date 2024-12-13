@@ -24,3 +24,25 @@
 
 -The partially linear regression model (PLR), when lasso is used at steps 1 & 2, corresponds to the double lasso proposed in Belloni et al. (2014). See https://docs.doubleml.org/stable/guide/models.html.
 -Not using `use_other_treat_as_covariate = FALSE` (default is TRUE) in `double_ml_data_from_data_frame()`. Am assuming treatment 1 (e.g., cpr_mean) is correlated with treatment 2 (esr_mean), which probably bears out in the data.
+
+#12/11/24#
+
+-For PTA text, see https://edit.wti.org/document/investment-treaty/search
+
+-Common Market for Eastern and Southern Africa (COMESA):
+  -Hafner-Burton (2005) gives this as an example of a soft PTA. But is it?
+  -She gives Article 6 (Fundamental Principles) as the key soft provision. This appears in Chapter 3: Aims and Objectives.
+  -Chapter 4 (Organs of the Common Market) enumerates entities charged with ensuring that objectives/aims of COMESA are being met (e.g., the secretary general).
+  -Chapter 5 (The Court of Justice) describes how the foregeoing entities can bring charges of treaty violations for review, and how Court judgments are binding, in that "[a] Member State or the Council shall take, without delay, the measures required to implement a judgment of the Court" (Article 34).
+  -Article 50 allows member states to "introduce or continue or execute restrictions or prohibitions affecting," inter alia, "arms" and "the protection of human [...] life."
+  -Chapter 31 discusses sanctions, which may be imposed when a member state "defaults in performing an obligation under this Treaty" or "whose conduct [...] is prejudicial to the existence or the attainment of the objectives of the Common Market." Violations of Article 6 seem sanctionable.
+  -Perhaps this may be seen as a "harder" (if not "hardest") PTA.
+  
+-Cotonou Agreement:
+  -Hafner-Burton (2005) gives this as an example of a hard PTA. It is definitely "harder," and this is reflected in the higher Lechner scores.
+-United States Vietnam:
+  -Perhaps a PTA to mention in discussing something that doesn't mention NTIs (i.e., not at all "hard").
+  
+-Mexico - EC Cooperation Agreement:
+  -Mentions commitments to democracy and human rights in the preamble and Article 1. Article 3 calls for nebulous "political dialogue" on the basis of Article 1 principles and to cover "all [...] matters of mutual interest." The "enforcement mechanism" outlined in Part IV is very weak.
+  -Perhaps a good example of a PTA that is in fact "soft."

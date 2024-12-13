@@ -4,7 +4,6 @@ library(here)
 library(vdemdata)
 library(naniar)
 library(states)
-library(readxl)
 
 # load data ----
 ## standardized Lechner scores
@@ -181,7 +180,7 @@ merge_base <- merge_base |>
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
-  relocate(46:54, .after = hr_score)
+  relocate(47:79, .after = hr_score)
 
 # fix inforce ----
 merge_base <- merge_base |> 
@@ -193,6 +192,4 @@ merge_base <- merge_base |>
 
 # save ----
 merge_base |> 
-  save(
-    file = here("data/ch1/preprocessed/merge_base.rda")
-    )
+  save(file = here("data/ch1/preprocessed/merge_base.rda"))

@@ -3,6 +3,7 @@ library(tidyverse)
 library(here)
 library(countrycode)
 library(states)
+library(naniar)
 
 # load data ----
 ## ptas panel
@@ -30,23 +31,28 @@ pop_dat <- read_rds(
     )
   )
 
-# prep gdp, gdppc, & pop vars ----
-## filter latent estimates & recent obs
-### gdp
+## world bank income groups
+wb_grp <- read_csv(here("data/common/raw/wb/world-bank-income-groups.csv")) |> 
+  janitor::clean_names()
+
+# prep standard vars ----
+## gdp, gdpppc, pop----
+### filter latent estimates & recent obs
+#### gdp
 gdp_dat <- gdp_dat |> 
   filter(indicator == "latent_gdp" & year > 1945)
 
-### gdppc
+#### gdppc
 gdppc_dat <- gdppc_dat |> 
   filter(indicator == "latent_gdppc" & year > 1945)
 
-### pop
+#### pop
 pop_dat <- pop_dat |> 
   filter(indicator == "latent_pop" & year > 1945)
 
-## convert gwno codes to cow codes (use `states` package to get & compare the code sets; some codes will need to be converted manually)
+### convert gwno codes to cow codes (use `states` package to get & compare the code sets; some codes will need to be converted manually)
 
-### gdp
+#### gdp
 gdp_dat <- gdp_dat |> 
   mutate(
     cow = countrycode(
@@ -71,7 +77,7 @@ gdp_dat <- gdp_dat |>
     ) |> 
   arrange(cow, year)
 
-### gdppc
+#### gdppc
 gdppc_dat <- gdppc_dat |> 
   mutate(
     cow = countrycode(
@@ -95,7 +101,7 @@ gdppc_dat <- gdppc_dat |>
     gwno != 817
     )
 
-### pop
+#### pop
 pop_dat <- pop_dat |> 
   mutate(
     cow = countrycode(
@@ -120,7 +126,7 @@ pop_dat <- pop_dat |>
     ) |> 
   arrange(cow, year)
 
-## shrink
+### shrink
 gdp_small <- gdp_dat |> 
   select(cow, year, mean, mean_log10) |> 
   rename(
@@ -142,12 +148,93 @@ pop_small <- pop_dat |>
     pop_log10 = mean_log10
     )
 
-## merge
+### merge
 standards <- gdp_small |> 
   left_join(gdppc_small) |> 
   left_join(pop_small)
 
-## change cow codes for czechia & yemen (will prevent most important cases of missingness [where inforce == 1] later on & prep alignment w/ HR scores)
+## glb_s ----
+## "Global South" indicator (generally following procedure set forth in Bodea & Ye, 2018, p. 964, footnote 68)
+### get cow codes
+wb_grp <- wb_grp |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = code,
+      origin = "wb",
+      destination = "cown"
+      ),
+    cow = case_when(
+      code == "OWID_CZS" ~ 316,
+      code == "OWID_KOS" ~ 347,
+      code == "OWID_SRM" ~ 345,
+      code == "OWID_USS" ~ 365,
+      code == "OWID_YGS" ~ 345,
+      code == "SRB" ~ 345,
+      .default = cow
+      )
+    ) |> 
+  select(cow, year, classification) |> 
+  filter(!is.na(cow)) |> 
+  arrange(cow)
+
+### expand
+years_hrs <- tibble(year = 1946:2021)
+
+wb_small <- wb_grp |> 
+  full_join(years_hrs)
+wb_small <- wb_small |> 
+  expand(cow, year)
+
+wb_grp <- wb_small |> 
+  left_join(wb_grp)
+
+### fill missing data w/ obs most recent to them
+wb_grp <- wb_grp |> 
+  group_by(cow) |> 
+  fill(classification, .direction = "up") |> 
+  ungroup()
+
+### filter to date range
+### (for now, 1977-2021; most ptas signed more recently)
+wb_grp <- wb_grp |> 
+  filter(year > 1976 & year < 2022)
+
+### count number of years each country is "high income"
+grp_n <- wb_grp |> 
+  count(cow, classification)
+
+### filter to non-high-income countries
+grp_n <- grp_n |> 
+  filter(classification != "High-income countries")
+
+### create indicator
+glb_s <- grp_n |> 
+  summarize(
+    sum = sum(n),
+    .by = cow
+    ) |> 
+  mutate(
+    glb_s = if_else(sum > 22, 1, 0)
+    ) |> 
+  select(cow, glb_s)
+
+### reintroduce high-income countries; set to 0
+all_cow <- unique(wb_grp$cow) |> 
+  as_tibble_col(column_name = "cow") |> 
+  filter(!is.na(cow))
+
+glb_s <- glb_s |> 
+  right_join(all_cow) |> 
+  mutate(glb_s = impute_zero(glb_s)) |> 
+  arrange(cow)
+
+## merge ----
+standards <- standards |> 
+  left_join(glb_s) |> 
+  relocate(glb_s, .after = year)
+
+## miss fix ----
+### change cow codes for czechia & yemen (will prevent most important cases of missingness [where inforce == 1] later on & prep alignment w/ HR scores)
 standards <- standards |> 
   mutate(
     cow = case_when(
@@ -157,11 +244,16 @@ standards <- standards |>
       )
     )
 
-### save standards
-standards |> 
-  save(
-    file = here("data/ch1/preprocessed/standards.rda")
-    )
+### fix missingness in glb_s (for countries appearing in ptas_panel)
+standards <- standards |> 
+  mutate(
+    glb_s = case_when(
+      cow == 316 ~ 1,
+      cow == 679 ~ 1,
+      .default = glb_s
+      )
+    ) |> 
+  filter(!is.na(glb_s))
 
 # standardize Lechner vars ----
 ## merge to get gdp & gdppc of partner countries
@@ -169,9 +261,18 @@ ptas_panel <- ptas_panel |>
   left_join(
     standards,
     by = c(
-      "cow_partner" = "cow", "year" = "year"
+      "cow_partner" = "cow",
+      "year" = "year"
       )
-    )
+    ) |> 
+  rename(glb_s_partner = glb_s) |> 
+  relocate(glb_s_partner, .after = iso_partner)
+
+ptas_panel <- standards |> 
+  select(cow, year, glb_s) |> 
+  right_join(ptas_panel) |> 
+  relocate(glb_s, .after = iso) |> 
+  arrange(cow, cow_partner, base_treaty)
 
 ## interact
 ptas_panel <- ptas_panel |> 
@@ -188,7 +289,7 @@ ptas_panel <- ptas_panel |>
 ptas_panel <- ptas_panel |> 
   mutate(
     across(
-      c(9:11, 19:24),
+      c(11:13, 21:26),
       ~ case_when(
         .x == 0 & inforce == 1 ~ 0,
         .x == 0 & inforce == 0 ~ NA,
@@ -198,7 +299,8 @@ ptas_panel <- ptas_panel |>
     )
 
 ## standardize
-ptas_standard <- ptas_panel |> 
+### general ----
+ptas_gen <- ptas_panel |> 
   summarize(
     cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
     cpr_gdp_mean = mean(cpr_gdp, na.rm = TRUE),
@@ -224,8 +326,99 @@ ptas_standard <- ptas_panel |>
   arrange(cow, year) |> 
   relocate(inforce, .after = year)
 
-# save ----
-ptas_standard |> 
-  save(
-    file = here("data/ch1/preprocessed/ptas_standard.rda")
+### south-south ----
+ptas_ss <- ptas_panel |> 
+  filter(glb_s == 1 & glb_s_partner == 1) |> 
+  summarize(
+    ss_cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
+    ss_cpr_gdp_mean = mean(cpr_gdp, na.rm = TRUE),
+    ss_cpr_gdppc_mean = mean(cpr_gdppc, na.rm = TRUE),
+    ss_cpr_pop_mean = mean(cpr_pop, na.rm = TRUE),
+    ss_esr_mean = mean(esr_all_lta, na.rm = TRUE),
+    ss_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
+    ss_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
+    ss_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    .by = c(cow, year)
+  ) |> 
+  mutate(
+    across(
+      3:10,
+      ~ if_else(
+        is.nan(.x), NA, .x
+      )
+    ),
+    inforce = if_else(
+      is.na(ss_cpr_mean) | is.na(ss_esr_mean), 0, 1
     )
+  ) |> 
+  arrange(cow, year) |> 
+  relocate(inforce, .after = year)
+
+### north-south ----
+ptas_ns <- ptas_panel |> 
+  filter((glb_s == 1 & glb_s_partner == 0) | (glb_s == 0 & glb_s_partner == 1)) |> 
+  summarize(
+    ns_cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
+    ns_cpr_gdp_mean = mean(cpr_gdp, na.rm = TRUE),
+    ns_cpr_gdppc_mean = mean(cpr_gdppc, na.rm = TRUE),
+    ns_cpr_pop_mean = mean(cpr_pop, na.rm = TRUE),
+    ns_esr_mean = mean(esr_all_lta, na.rm = TRUE),
+    ns_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
+    ns_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
+    ns_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    .by = c(cow, year)
+  ) |> 
+  mutate(
+    across(
+      3:10,
+      ~ if_else(
+        is.nan(.x), NA, .x
+      )
+    ),
+    inforce = if_else(
+      is.na(ns_cpr_mean) | is.na(ns_esr_mean), 0, 1
+    )
+  ) |> 
+  arrange(cow, year) |> 
+  relocate(inforce, .after = year)
+
+### north-north ----
+ptas_nn <- ptas_panel |> 
+  filter(glb_s == 0 & glb_s_partner == 0) |> 
+  summarize(
+    nn_cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
+    nn_cpr_gdp_mean = mean(cpr_gdp, na.rm = TRUE),
+    nn_cpr_gdppc_mean = mean(cpr_gdppc, na.rm = TRUE),
+    nn_cpr_pop_mean = mean(cpr_pop, na.rm = TRUE),
+    nn_esr_mean = mean(esr_all_lta, na.rm = TRUE),
+    nn_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
+    nn_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
+    nn_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    .by = c(cow, year)
+  ) |> 
+  mutate(
+    across(
+      3:10,
+      ~ if_else(
+        is.nan(.x), NA, .x
+      )
+    ),
+    inforce = if_else(
+      is.na(nn_cpr_mean) | is.na(nn_esr_mean), 0, 1
+    )
+  ) |> 
+  arrange(cow, year) |> 
+  relocate(inforce, .after = year)
+
+### merge ----
+ptas_standard <- ptas_gen |> 
+  left_join(ptas_ss) |> 
+  left_join(ptas_ns) |> 
+  left_join(ptas_nn)
+
+# save ----
+standards |> 
+  save(file = here("data/ch1/preprocessed/standards.rda"))
+
+ptas_standard |> 
+  save(file = here("data/ch1/preprocessed/ptas_standard.rda"))

@@ -45,6 +45,4 @@ ptas_final <- ptas_final |>
 
 # save ----
 ptas_final |> 
-  save(
-    file = here("data/ch1/preprocessed/ptas_final.rda")
-    )
+  save(file = here("data/ch1/preprocessed/ptas_final.rda"))
