@@ -9,7 +9,7 @@ load(here("data/ch1/preprocessed/ptas_final.rda"))
 load(here("data/ch1/preprocessed/ptas_final_l1.rda"))
 
 # quick mean checks ----
-## ss ----
+## sout-south ----
 ptas_final_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ss_cpr_mean, na.rm = T))
@@ -17,7 +17,7 @@ ptas_final_l1 |>
   filter(glb_s == 1) |> 
   summarize(mean = mean(ss_esr_mean, na.rm = T))
 
-## sn ----
+## south-north ----
 ptas_final_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ns_cpr_mean, na.rm = T))
@@ -25,7 +25,7 @@ ptas_final_l1 |>
   filter(glb_s == 1) |> 
   summarize(mean = mean(ns_esr_mean, na.rm = T))
 
-## ns ----
+## north-south ----
 ptas_final_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(ns_cpr_mean, na.rm = T))
@@ -33,7 +33,7 @@ ptas_final_l1 |>
   filter(glb_s == 0) |> 
   summarize(mean = mean(ns_esr_mean, na.rm = T))
 
-## nn ----
+## north-north ----
 ptas_final_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(nn_cpr_mean, na.rm = T))
