@@ -190,7 +190,7 @@ for(i in m){
     imp_2_dml_south_2fe_dats[[paste(as.character(k), as.character(l), as.character(m), as.character(n), sep = "_AND_")]][[as.character(i)]] <- df |> 
       double_ml_data_from_data_frame(
         x_cols = covar_names,
-        d_cols = c(k, l),
+        d_cols = c(k, l, m, n),
         y_col = "hr_score"
       )
   }
@@ -321,7 +321,7 @@ for(i in m){
     imp_3_dml_south_2fe_dats[[paste(as.character(k), as.character(l), as.character(m), as.character(n), sep = "_AND_")]][[as.character(i)]] <- df |> 
       double_ml_data_from_data_frame(
         x_cols = covar_names,
-        d_cols = c(k, l),
+        d_cols = c(k, l, m, n),
         y_col = "hr_score"
       )
   }

@@ -2,6 +2,10 @@
 data/ch1/results/fits/dml_lasso/dml_final/imp_1_dml_fits_2fe.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_fits_2fe.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_fits_2fe.rda
+data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_south_2fe_fits.rda
+data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_south_2fe_fits.rda
+data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_north_2fe_fits.rda
+data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_north_2fe_fits.rda
 data/ch4/mdb_speeches.feather
 data/ch4/every_single_word/every_single_word.RData
 

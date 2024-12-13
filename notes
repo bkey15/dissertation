@@ -37,6 +37,7 @@
   -Article 50 allows member states to "introduce or continue or execute restrictions or prohibitions affecting," inter alia, "arms" and "the protection of human [...] life."
   -Chapter 31 discusses sanctions, which may be imposed when a member state "defaults in performing an obligation under this Treaty" or "whose conduct [...] is prejudicial to the existence or the attainment of the objectives of the Common Market." Violations of Article 6 seem sanctionable.
   -Perhaps this may be seen as a "harder" (if not "hardest") PTA.
+  -Also: the International Justice Resource Center (IJRC) gives the COMESA Court of Justice as an example of a court/tribunal with "competence to decide individual complaints arising under domestic or community law, which may involve fundamental rights." See https://ijrcenter.org/regional-communities/.
   
 -Cotonou Agreement:
   -Hafner-Burton (2005) gives this as an example of a hard PTA. It is definitely "harder," and this is reflected in the higher Lechner scores.
@@ -55,5 +56,13 @@
   -North-South PTAS: none (ibid.)
   -South-North PTAS: present (latter has leverage over former)
 -This could obviously be a 2x2 table.
--Also think about Helsinki Final Act as example of agreement that human rights disrespectors will sign on to.
+-Also think about the Helsinki Final Act as an example of an agreement that human rights disrespectors signed on to.
+
+#12/13/24#
+
+-See the STADL article (p. 60, footnote 6) for a discussion of why a first-order time lag (L1) should probably suffice.
+-Also in the STADL article (p. 63): spatial autocorrelation (SAR) models need instrumental variables or systems maximum likelihood.
+-Not including a lagged dependent variable (LDV) for now (i.e., hr_score_l1 as a regressor) because it's leading to overfitting (put differently, it's sucking up all of the statistical significance). And, in any case, a lot of the other covariates reasonably predict future human rights respect. For further evidence, see autocorrelation plot in EDA script.
+
+-IJRC gives the Economic Community of West African States (ECOWAS) Court of Justice as an example of a PTA-founded court/tribunal with clear jurisdiction over human rights issues (supported with case law). See https://ijrcenter.org/regional-communities/economic-community-of-west-african-states-court-of-justice/
   
