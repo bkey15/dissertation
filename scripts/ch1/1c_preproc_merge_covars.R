@@ -190,6 +190,26 @@ merge_base <- merge_base |>
       )
     )
 
+# fix glb_s ----
+# Armenia (371) & Bhutan (760) have some missing vals b/c of mismatch between datasets as to when they start appearing. Also manually coding to South former countries GDR (265), S. Vietnam (817), Zanzibar (511), S. Yemen (680)
+merge_base <- merge_base |> 
+  mutate(
+    glb_s = case_when(
+      cow == 265 ~ 1,
+      cow == 371 ~ 1,
+      cow == 511 ~ 1,
+      cow == 680 ~ 1,
+      cow == 760 ~ 1,
+      cow == 817 ~ 1,
+      .default = glb_s
+      )
+    )
+
+# filter out 2020+ years ----
+# IMPORTANT: doing this for now b/c treatments are NA (Fariss standards end in 2019); don't want to mistakenly fill them with a val of 0; also will aid in imputation computation time
+merge_base <- merge_base |> 
+  filter(year < 2020)
+
 # save ----
 merge_base |> 
   save(file = here("data/ch1/preprocessed/merge_base.rda"))

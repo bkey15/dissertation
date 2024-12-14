@@ -65,4 +65,7 @@
 -Not including a lagged dependent variable (LDV) for now (i.e., hr_score_l1 as a regressor) because it's leading to overfitting (put differently, it's sucking up all of the statistical significance). And, in any case, a lot of the other covariates reasonably predict future human rights respect. For further evidence, see autocorrelation plot in EDA script.
 
 -IJRC gives the Economic Community of West African States (ECOWAS) Court of Justice as an example of a PTA-founded court/tribunal with clear jurisdiction over human rights issues (supported with case law). See https://ijrcenter.org/regional-communities/economic-community-of-west-african-states-court-of-justice/
+
+-In light of results, perhaps 2x2 table could be framed in terms of "likehihood" of harder HR conditions improving HR respect. Maybe SS is "low", NS & NN are "medium," and SN is "high"?
+-2x2 draft: https://docs.google.com/drawings/d/1XDVoTLSHDuMfO1plwrx0aUjp3bDxBAvMbghNC58WMr8/edit
   

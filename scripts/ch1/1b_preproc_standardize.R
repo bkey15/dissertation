@@ -252,8 +252,7 @@ standards <- standards |>
       cow == 679 ~ 1,
       .default = glb_s
       )
-    ) |> 
-  filter(!is.na(glb_s))
+    )
 
 # standardize Lechner vars ----
 ## merge to get gdp & gdppc of partner countries

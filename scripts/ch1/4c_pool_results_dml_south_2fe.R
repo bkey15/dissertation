@@ -41,13 +41,13 @@ for(name in treat_names){
 }
 
 ## imp_3 ----
-imp_3_dml_fits_pool_2fe <- list()
-treat_names <- imp_3_dml_fits_2fe |> 
+imp_3_dml_south_2fe_fits_pool <- list()
+treat_names <- imp_3_dml_south_2fe_fits |> 
   names()
 m <- 1:5
 
 for(name in treat_names){
-  list <- imp_3_dml_fits_2fe[[name]]
+  list <- imp_3_dml_south_2fe_fits[[name]]
   prepool_tbl <- tibble()
   
   for(i in m){
@@ -66,7 +66,7 @@ for(name in treat_names){
   
   pool_res <- prepool_tbl |> 
     pool.table()
-  imp_3_dml_fits_pool_2fe[[as.character(name)]] <- pool_res
+  imp_3_dml_south_2fe_fits_pool[[as.character(name)]] <- pool_res
 }
 
 # save ----

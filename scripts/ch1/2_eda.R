@@ -7,6 +7,8 @@ library(naniar)
 load(here("data/ch1/preprocessed/ptas_panel.rda"))
 load(here("data/ch1/preprocessed/ptas_final.rda"))
 load(here("data/ch1/preprocessed/ptas_final_l1.rda"))
+load(here("data/ch1/results/imputations/imp_2_l1.rda"))
+load(here("data/ch1/results/imputations/imp_3_l1.rda"))
 
 # quick mean checks ----
 ## sout-south ----
@@ -157,6 +159,35 @@ ptas_final_l1 |>
 
 ptas_final_l1 |> 
   ggplot(aes(x = esr_gdppc_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+## north-north ----
+imp_2_l1 |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  filter(
+    .imp == 5,
+    glb_s == 0
+    ) |> 
+  ggplot(aes(x = nn_esr_mean, y = hr_score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+## south-south ----
+imp_2_l1 |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+  ) |> 
+  filter(
+    .imp == 1,
+    glb_s == 1
+  ) |>
+  select(-.imp, -.id)
+  ggplot(aes(x = ss_esr_gdp_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 

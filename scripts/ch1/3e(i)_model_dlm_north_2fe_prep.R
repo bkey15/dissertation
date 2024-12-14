@@ -74,7 +74,7 @@ covar_names <- model.matrix(
   select(
     starts_with("cow"),
     starts_with("year"),
-    115:150
+    113:148
     ) |> 
   names()
 m <- 1:5
@@ -205,7 +205,7 @@ covar_names <- model.matrix(
   select(
     starts_with("cow"),
     starts_with("year"),
-    106:141
+    104:139
     ) |> 
   names()
 m <- 1:5
