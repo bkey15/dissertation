@@ -68,4 +68,9 @@
 
 -In light of results, perhaps 2x2 table could be framed in terms of "likehihood" of harder HR conditions improving HR respect. Maybe SS is "low", NS & NN are "medium," and SN is "high"?
 -2x2 draft: https://docs.google.com/drawings/d/1XDVoTLSHDuMfO1plwrx0aUjp3bDxBAvMbghNC58WMr8/edit
+
+#12/15/24#
+
+-After new imputation process, only true missing values are on a few former/partially recognized countries (Kosovo, Taiwan, S. Yemen, S. Vietnam).
+-In mice::pool.table(), dfcom = Inf. According to help file, this can be safely assumed when n > 1000. My smallest dataset (North states, 1977+) is about 1400 observations (once Taiwan, which has missing wdi values, is removed), so the assumption is met.
   

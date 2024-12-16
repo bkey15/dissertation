@@ -11,7 +11,7 @@ load(here("data/ch1/results/imputations/imp_2_l1.rda"))
 load(here("data/ch1/results/imputations/imp_3_l1.rda"))
 
 # quick mean checks ----
-## sout-south ----
+## south-south ----
 ptas_final_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ss_cpr_mean, na.rm = T))

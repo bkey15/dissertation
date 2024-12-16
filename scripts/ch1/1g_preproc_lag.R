@@ -25,7 +25,8 @@ ptas_final_l1 <- ptas_final |>
       ~ lag(.x)
       )
     ) |> 
-  ungroup()
+  ungroup() |> 
+  filter(!is.na(year))
 
 ## ptas_1968 ----
 ptas_1968_l1 <- ptas_1968 |> 
@@ -37,7 +38,8 @@ ptas_1968_l1 <- ptas_1968 |>
       ~ lag(.x)
       )
     ) |> 
-  ungroup()
+  ungroup() |> 
+  filter(!is.na(year))
 
 ## ptas_1977 ----
 ptas_1977_l1 <- ptas_1977 |> 
@@ -49,7 +51,8 @@ ptas_1977_l1 <- ptas_1977 |>
       ~ lag(.x)
       )
     ) |> 
-  ungroup()
+  ungroup() |> 
+  filter(!is.na(year))
 
 ## imp_1 (ptas_final) ----
 imp_1_l1 <- imp_1 |> 
@@ -66,6 +69,7 @@ imp_1_l1 <- imp_1 |>
       )
     ) |> 
   ungroup() |> 
+  filter(!is.na(year)) |> 
   as.mids()
 
 ## imp_2 (ptas_1968) ----
@@ -83,6 +87,7 @@ imp_2_l1 <- imp_2 |>
       )
     ) |> 
   ungroup() |> 
+  filter(!is.na(year)) |> 
   as.mids()
 
 ## imp_3 (ptas_1977) ----
@@ -100,6 +105,7 @@ imp_3_l1 <- imp_3 |>
       )
     ) |> 
   ungroup() |> 
+  filter(!is.na(year)) |> 
   as.mids()
 
 # save ----
