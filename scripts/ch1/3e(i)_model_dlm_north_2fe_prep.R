@@ -74,7 +74,7 @@ covar_names <- model.matrix(
   select(
     starts_with("cow"),
     starts_with("year"),
-    113:148
+    124:159
     ) |> 
   names()
 m <- 1:5
@@ -107,6 +107,30 @@ for(i in m){
       double_ml_data_from_data_frame(
         x_cols = covar_names,
         d_cols = c(k, l),
+        y_col = "hr_score"
+      )
+  }
+}
+
+### lech general ----
+treat_names_lech <- imp_2_dfs[[1]] |> 
+  select(
+    starts_with("lech_hr"),
+    -ends_with("pop_mean")
+    ) |> 
+  names()
+
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_2_dfs[[i]]
+  ) |> 
+    as.data.table()
+  for(j in seq_along(treat_names_lech)){
+    k <- treat_names_lech[[j]]
+    imp_2_dml_north_2fe_dats[[as.character(k)]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names,
+        d_cols = k,
         y_col = "hr_score"
       )
   }
@@ -185,12 +209,44 @@ for(i in m){
   for(j in seq_along(treat_names_nn_cpr)){
     k <- treat_names_nn_cpr[[j]]
     l <- treat_names_ns_cpr[[j]]
-    m <- treat_names_nn_esr[[j]]
-    n <- treat_names_ns_esr[[j]]
-    imp_2_dml_north_2fe_dats[[paste(as.character(k), as.character(l), as.character(m), as.character(n), sep = "_AND_")]][[as.character(i)]] <- df |> 
+    n <- treat_names_nn_esr[[j]]
+    o <- treat_names_ns_esr[[j]]
+    imp_2_dml_north_2fe_dats[[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
       double_ml_data_from_data_frame(
         x_cols = covar_names,
-        d_cols = c(k, l, m, n),
+        d_cols = c(k, l, n, o),
+        y_col = "hr_score"
+      )
+  }
+}
+
+### lechner north ----
+treat_names_nn_lech <- imp_2_dfs[[1]] |> 
+  select(
+    starts_with("nn_lech"),
+    -ends_with("pop_mean")
+  ) |> 
+  names()
+
+treat_names_ns_lech <- imp_2_dfs[[1]] |> 
+  select(
+    starts_with("ns_lech"),
+    -ends_with("pop_mean")
+  ) |> 
+  names()
+
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_2_dfs[[i]]
+  ) |> 
+    as.data.table()
+  for(j in seq_along(treat_names_nn_lech)){
+    k <- treat_names_nn_lech[[j]]
+    l <- treat_names_ns_lech[[j]]
+    imp_2_dml_north_2fe_dats[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names,
+        d_cols = c(k, l),
         y_col = "hr_score"
       )
   }
@@ -205,7 +261,7 @@ covar_names <- model.matrix(
   select(
     starts_with("cow"),
     starts_with("year"),
-    104:139
+    115:150
     ) |> 
   names()
 m <- 1:5
@@ -238,6 +294,30 @@ for(i in m){
       double_ml_data_from_data_frame(
         x_cols = covar_names,
         d_cols = c(k, l),
+        y_col = "hr_score"
+      )
+  }
+}
+
+### lech general ----
+treat_names_lech <- imp_3_dfs[[1]] |> 
+  select(
+    starts_with("lech_hr"),
+    -ends_with("pop_mean")
+  ) |> 
+  names()
+
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_3_dfs[[i]]
+  ) |> 
+    as.data.table()
+  for(j in seq_along(treat_names_lech)){
+    k <- treat_names_lech[[j]]
+    imp_3_dml_north_2fe_dats[[as.character(k)]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names,
+        d_cols = k,
         y_col = "hr_score"
       )
   }
@@ -316,12 +396,44 @@ for(i in m){
   for(j in seq_along(treat_names_nn_cpr)){
     k <- treat_names_nn_cpr[[j]]
     l <- treat_names_ns_cpr[[j]]
-    m <- treat_names_nn_esr[[j]]
-    n <- treat_names_ns_esr[[j]]
-    imp_3_dml_north_2fe_dats[[paste(as.character(k), as.character(l), as.character(m), as.character(n), sep = "_AND_")]][[as.character(i)]] <- df |> 
+    n <- treat_names_nn_esr[[j]]
+    o <- treat_names_ns_esr[[j]]
+    imp_3_dml_north_2fe_dats[[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
       double_ml_data_from_data_frame(
         x_cols = covar_names,
-        d_cols = c(k, l, m, n),
+        d_cols = c(k, l, n, o),
+        y_col = "hr_score"
+      )
+  }
+}
+
+### lechner north ----
+treat_names_nn_lech <- imp_3_dfs[[1]] |> 
+  select(
+    starts_with("nn_lech"),
+    -ends_with("pop_mean")
+  ) |> 
+  names()
+
+treat_names_ns_lech <- imp_3_dfs[[1]] |> 
+  select(
+    starts_with("ns_lech"),
+    -ends_with("pop_mean")
+  ) |> 
+  names()
+
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_3_dfs[[i]]
+  ) |> 
+    as.data.table()
+  for(j in seq_along(treat_names_nn_lech)){
+    k <- treat_names_nn_lech[[j]]
+    l <- treat_names_ns_lech[[j]]
+    imp_3_dml_north_2fe_dats[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names,
+        d_cols = c(k, l),
         y_col = "hr_score"
       )
   }

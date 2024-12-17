@@ -26,16 +26,42 @@ miss_vars_nst <- miss_var_summary(ptas_final)
 miss_vars_1968 <- miss_var_summary(ptas_1968)
 miss_vars_1977 <- miss_var_summary(ptas_1977)
 
+# drop high miss states ----
+# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
+ptas_final <- ptas_final |> 
+  filter(
+    cow != 347,
+    cow != 680,
+    cow != 713,
+    cow != 817
+    )
+
+ptas_1968 <- ptas_1968 |> 
+  filter(
+    cow != 347,
+    cow != 680,
+    cow != 713,
+    cow != 817
+    )
+
+ptas_1977 <- ptas_1977 |> 
+  filter(
+    cow != 347,
+    cow != 680,
+    cow != 713,
+    cow != 817
+    )
+
 # specify imputation vals (T/F) ----
 ## no start year specified ----
 imps_no_start <- ptas_final |> 
   select(-1) |> 
   mutate(
     across(
-      c(1:36, 72), ~ FALSE
+      c(1:52, glb_s, hras), ~ FALSE
       ),
     across(
-      c(37:71, 73),
+      !c(1:52, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -54,10 +80,10 @@ imps_1968 <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:36, 72), ~ FALSE
+      c(1:52, glb_s, hras), ~ FALSE
     ),
     across(
-      c(37:71, 73),
+      !c(1:52, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -76,10 +102,10 @@ imps_1977 <- ptas_1977 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:36, 72), ~ FALSE
+      c(1:52, glb_s, hras), ~ FALSE
     ),
     across(
-      c(37:71, 73),
+      !c(1:52, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -100,8 +126,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 73,
-  ncol = 73,
+  nrow = 89,
+  ncol = 89,
   dimnames = dim_names
   )
 
@@ -117,6 +143,7 @@ pred_mat <- pred_mat |>
       c(
         starts_with("ss_"),
         starts_with("nn_"),
+        contains("lech_hr"),
         bop_pct_gdp,
         wdi_trade,
         inv
@@ -130,16 +157,6 @@ pred_mat <- pred_mat |>
 
 # impute ----
 ## prep data ----
-### no start ----
-ptas_mice_no_start <- ptas_final |> 
-  select(-1) |> 
-  mutate(
-    across(
-      c(cow, year, inforce, glb_s),
-      ~ as_factor(.x)
-    )
-  )
-
 ### 1968 ----
 ptas_mice_1968 <- ptas_1968 |> 
   select(-1) |> 
@@ -161,15 +178,6 @@ ptas_mice_1977 <- ptas_1977 |>
   )
 
 ## complete ----
-### no start ----
-set.seed(96243214)
-imp_1 <- ptas_mice_no_start |> 
-  mice(
-    method = "rf",
-    where = imps_no_start,
-    predictorMatrix = pred_mat
-    )
-
 ### 1968 ----
 set.seed(96243214)
 imp_2 <- ptas_mice_1968 |> 
@@ -189,11 +197,6 @@ imp_3 <- ptas_mice_1977 |>
   )
 
 ### save ----
-imp_1 |> 
-  save(
-    file = here("data/ch1/results/imputations/imp_1.rda")
-    )
-
 imp_2 |> 
   save(
     file = here("data/ch1/results/imputations/imp_2.rda")

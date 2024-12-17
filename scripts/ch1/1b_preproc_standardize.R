@@ -325,6 +325,14 @@ ptas_gen <- ptas_panel |>
   arrange(cow, year) |> 
   relocate(inforce, .after = year)
 
+ptas_gen <- ptas_gen |> 
+  mutate(
+    lech_hr_mean = (cpr_mean + esr_mean)/2,
+    lech_hr_gdp_mean = (cpr_gdp_mean + esr_gdp_mean)/2,
+    lech_hr_gdppc_mean = (cpr_gdppc_mean + esr_gdppc_mean)/2,
+    lech_hr_pop_mean = (cpr_pop_mean + esr_pop_mean)/2
+    )
+
 ### south-south ----
 ptas_ss <- ptas_panel |> 
   filter(glb_s == 1 & glb_s_partner == 1) |> 
@@ -352,6 +360,14 @@ ptas_ss <- ptas_panel |>
   ) |> 
   arrange(cow, year) |> 
   relocate(inforce, .after = year)
+
+ptas_ss <- ptas_ss |> 
+  mutate(
+    ss_lech_hr_mean = (ss_cpr_mean + ss_esr_mean)/2,
+    ss_lech_hr_gdp_mean = (ss_cpr_gdp_mean + ss_esr_gdp_mean)/2,
+    ss_lech_hr_gdppc_mean = (ss_cpr_gdppc_mean + ss_esr_gdppc_mean)/2,
+    ss_lech_hr_pop_mean = (ss_cpr_pop_mean + ss_esr_pop_mean)/2
+  )
 
 ### north-south ----
 ptas_ns <- ptas_panel |> 
@@ -381,6 +397,14 @@ ptas_ns <- ptas_panel |>
   arrange(cow, year) |> 
   relocate(inforce, .after = year)
 
+ptas_ns <- ptas_ns |> 
+  mutate(
+    ns_lech_hr_mean = (ns_cpr_mean + ns_esr_mean)/2,
+    ns_lech_hr_gdp_mean = (ns_cpr_gdp_mean + ns_esr_gdp_mean)/2,
+    ns_lech_hr_gdppc_mean = (ns_cpr_gdppc_mean + ns_esr_gdppc_mean)/2,
+    ns_lech_hr_pop_mean = (ns_cpr_pop_mean + ns_esr_pop_mean)/2
+  )
+
 ### north-north ----
 ptas_nn <- ptas_panel |> 
   filter(glb_s == 0 & glb_s_partner == 0) |> 
@@ -408,6 +432,14 @@ ptas_nn <- ptas_panel |>
   ) |> 
   arrange(cow, year) |> 
   relocate(inforce, .after = year)
+
+ptas_nn <- ptas_nn |> 
+  mutate(
+    nn_lech_hr_mean = (nn_cpr_mean + nn_esr_mean)/2,
+    nn_lech_hr_gdp_mean = (nn_cpr_gdp_mean + nn_esr_gdp_mean)/2,
+    nn_lech_hr_gdppc_mean = (nn_cpr_gdppc_mean + nn_esr_gdppc_mean)/2,
+    nn_lech_hr_pop_mean = (nn_cpr_pop_mean + nn_esr_pop_mean)/2
+  )
 
 ### merge ----
 ptas_standard <- ptas_gen |> 

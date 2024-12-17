@@ -44,7 +44,10 @@ for(name in treat_names){
       n_folds = 5,
       n_rep = 3
     )
-    fit <- spec$fit()
+    fit <- spec$fit(
+      store_predictions = TRUE,
+      store_models = TRUE
+    )
     imp_2_dml_north_2fe_fits[[as.character(name)]][[as.character(i)]] <- fit
   }
 }
@@ -73,7 +76,10 @@ for(name in treat_names){
       n_folds = 5,
       n_rep = 3
     )
-    fit <- spec$fit()
+    fit <- spec$fit(
+      store_predictions = TRUE,
+      store_models = TRUE
+    )
     imp_3_dml_north_2fe_fits[[as.character(name)]][[as.character(i)]] <- fit
   }
 }

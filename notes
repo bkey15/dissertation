@@ -71,6 +71,10 @@
 
 #12/15/24#
 
--After new imputation process, only true missing values are on a few former/partially recognized countries (Kosovo, Taiwan, S. Yemen, S. Vietnam).
+-After new imputation process, only true missing values come from a few former/partially recognized countries (Kosovo, Taiwan, S. Yemen, S. Vietnam). Of these, only Kosovo & Taiwan signed PTAs.
 -In mice::pool.table(), dfcom = Inf. According to help file, this can be safely assumed when n > 1000. My smallest dataset (North states, 1977+) is about 1400 observations (once Taiwan, which has missing wdi values, is removed), so the assumption is met.
+
+#12/16/24#
+
+-The foregoing 4 countries can't be removed post-imputation (i.e., at the lag step) because doing so creates unequal .imp group sizes, which throws an error during as.mids(). Just note that these rows (n = 91 for 1968) are effectively removed in the regressions that follow.
   

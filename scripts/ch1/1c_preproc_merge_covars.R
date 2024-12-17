@@ -180,7 +180,7 @@ merge_base <- merge_base |>
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
-  relocate(47:79, .after = hr_score)
+  relocate(47:95, .after = hr_score)
 
 # fix inforce ----
 merge_base <- merge_base |> 
@@ -191,7 +191,7 @@ merge_base <- merge_base |>
     )
 
 # fix glb_s ----
-# Armenia (371) & Bhutan (760) have some missing vals b/c of mismatch between datasets as to when they start appearing. Also manually coding to South former countries GDR (265), S. Vietnam (817), Zanzibar (511), S. Yemen (680)
+# Armenia (371) & Bhutan (760) have some missing vals b/c of mismatch between datasets as to when they start appearing. Also manually coding to South former countries GDR (265), S. Vietnam (817), Zanzibar (511), S. Yemen (680). These won't matter anyways b/c they'll be filtered out due to inability to impute all vars at next step.
 merge_base <- merge_base |> 
   mutate(
     glb_s = case_when(
