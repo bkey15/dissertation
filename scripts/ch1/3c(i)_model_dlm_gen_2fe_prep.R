@@ -8,7 +8,6 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1_l1.rda"))
 load(here("data/ch1/results/imputations/imp_2_l1.rda"))
 load(here("data/ch1/results/imputations/imp_3_l1.rda"))
 
@@ -77,11 +76,12 @@ covar_names <- model.matrix(
 m <- 1:5
 imp_2_dml_dats_2fe <- list()
 
-### cpr & esr ----
+### cpr, esr, lech ----
 treat_names <- imp_2_dfs[[1]] |> 
   select(
     starts_with("cpr_"),
     starts_with("esr_"),
+    starts_with("lech_"),
     -contains("pop_mean")
   ) |> 
   names()
@@ -200,17 +200,18 @@ covar_names <- model.matrix(
   select(
     starts_with("cow"),
     starts_with("year"),
-    229:264
+    230:265
   ) |> 
   names()
 m <- 1:5
 imp_3_dml_dats_2fe <- list()
 
-### cpr & esr ----
+### cpr, esr, lech ----
 treat_names <- imp_3_dfs[[1]] |> 
   select(
     starts_with("cpr_"),
     starts_with("esr_"),
+    starts_with("lech_"),
     -contains("pop_mean")
   ) |> 
   names()

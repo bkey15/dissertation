@@ -135,8 +135,9 @@ gen_res_1968 <- list(
 list_small <- imp_2_dml_south_2fe_fits_pool[c(
   "ss_cpr_mean_AND_ns_cpr_mean",
   "ss_esr_mean_AND_ns_esr_mean",
-  "ss_cpr_mean_AND_ns_cpr_mean_AND_ss_esr_mean_AND_ns_esr_mean"
-  )]
+  "ss_cpr_mean_AND_ns_cpr_mean_AND_ss_esr_mean_AND_ns_esr_mean",
+  "ss_lech_hr_mean_AND_ns_lech_hr_mean"
+)]
 mod <- seq_along(list_small)
 
 for(i in mod){
@@ -157,30 +158,74 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_mean", "ns_esr_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_mean",
+      "ns_esr_mean",
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_mean", "ns_cpr_mean"),
+    term = c(
+      "ss_cpr_mean",
+      "ns_cpr_mean"
+    ),
     .before = 1
-    ) |> 
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
+  ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_mean_res_1968 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_mean",
+      "ns_cpr_mean",
+      "ss_esr_mean",
+      "ns_esr_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_mean_res_1968 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### gdp mean ----
 list_small <- imp_2_dml_south_2fe_fits_pool[c(
   "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean",
   "ss_esr_gdp_mean_AND_ns_esr_gdp_mean",
-  "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean_AND_ss_esr_gdp_mean_AND_ns_esr_gdp_mean"
+  "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean_AND_ss_esr_gdp_mean_AND_ns_esr_gdp_mean",
+  "ss_lech_hr_gdp_mean_AND_ns_lech_hr_gdp_mean"
 )]
 mod <- seq_along(list_small)
 
@@ -202,30 +247,74 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_gdp_mean", "ns_esr_gdp_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_gdp_mean",
+      "ns_esr_gdp_mean",
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_gdp_mean", "ns_cpr_gdp_mean"),
+    term = c(
+      "ss_cpr_gdp_mean",
+      "ns_cpr_gdp_mean"
+    ),
     .before = 1
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
   ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_gdp_mean_res_1968 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_gdp_mean",
+      "ns_cpr_gdp_mean",
+      "ss_esr_gdp_mean",
+      "ns_esr_gdp_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_gdp_mean_res_1968 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### gdppc mean ----
 list_small <- imp_2_dml_south_2fe_fits_pool[c(
   "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean",
   "ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean",
-  "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean_AND_ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean"
+  "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean_AND_ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean",
+  "ss_lech_hr_gdppc_mean_AND_ns_lech_hr_gdppc_mean"
 )]
 mod <- seq_along(list_small)
 
@@ -247,24 +336,67 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_gdppc_mean", "ns_esr_gdppc_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_gdppc_mean",
+      "ns_esr_gdppc_mean",
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_gdppc_mean", "ns_cpr_gdppc_mean"),
+    term = c(
+      "ss_cpr_gdppc_mean",
+      "ns_cpr_gdppc_mean"
+    ),
     .before = 1
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
   ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_gdppc_mean_res_1968 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_gdppc_mean",
+      "ns_cpr_gdppc_mean",
+      "ss_esr_gdppc_mean",
+      "ns_esr_gdppc_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_gdppc_mean_res_1968 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### combine ----
 south_res_1968 <- list(
@@ -670,7 +802,8 @@ gen_res_1977 <- list(
 list_small <- imp_3_dml_south_2fe_fits_pool[c(
   "ss_cpr_mean_AND_ns_cpr_mean",
   "ss_esr_mean_AND_ns_esr_mean",
-  "ss_cpr_mean_AND_ns_cpr_mean_AND_ss_esr_mean_AND_ns_esr_mean"
+  "ss_cpr_mean_AND_ns_cpr_mean_AND_ss_esr_mean_AND_ns_esr_mean",
+  "ss_lech_hr_mean_AND_ns_lech_hr_mean"
 )]
 mod <- seq_along(list_small)
 
@@ -692,30 +825,74 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_mean", "ns_esr_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_mean",
+      "ns_esr_mean",
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_mean", "ns_cpr_mean"),
+    term = c(
+      "ss_cpr_mean",
+      "ns_cpr_mean"
+    ),
     .before = 1
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
   ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_mean",
+      "ns_lech_hr_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_mean_res_1977 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_mean",
+      "ns_cpr_mean",
+      "ss_esr_mean",
+      "ns_esr_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_mean_res_1977 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### gdp mean ----
 list_small <- imp_3_dml_south_2fe_fits_pool[c(
   "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean",
   "ss_esr_gdp_mean_AND_ns_esr_gdp_mean",
-  "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean_AND_ss_esr_gdp_mean_AND_ns_esr_gdp_mean"
+  "ss_cpr_gdp_mean_AND_ns_cpr_gdp_mean_AND_ss_esr_gdp_mean_AND_ns_esr_gdp_mean",
+  "ss_lech_hr_gdp_mean_AND_ns_lech_hr_gdp_mean"
 )]
 mod <- seq_along(list_small)
 
@@ -737,30 +914,74 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_gdp_mean", "ns_esr_gdp_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_gdp_mean",
+      "ns_esr_gdp_mean",
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_gdp_mean", "ns_cpr_gdp_mean"),
+    term = c(
+      "ss_cpr_gdp_mean",
+      "ns_cpr_gdp_mean"
+    ),
     .before = 1
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
   ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdp_mean",
+      "ns_lech_hr_gdp_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_gdp_mean_res_1977 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_gdp_mean",
+      "ns_cpr_gdp_mean",
+      "ss_esr_gdp_mean",
+      "ns_esr_gdp_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_gdp_mean_res_1977 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### gdppc mean ----
 list_small <- imp_3_dml_south_2fe_fits_pool[c(
   "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean",
   "ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean",
-  "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean_AND_ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean"
+  "ss_cpr_gdppc_mean_AND_ns_cpr_gdppc_mean_AND_ss_esr_gdppc_mean_AND_ns_esr_gdppc_mean",
+  "ss_lech_hr_gdppc_mean_AND_ns_lech_hr_gdppc_mean"
 )]
 mod <- seq_along(list_small)
 
@@ -782,24 +1003,67 @@ for(i in mod){
 }
 
 mod_1 <- list_small[[1]] |> 
-  add_row(term = c("ss_esr_gdppc_mean", "ns_esr_gdppc_mean")) |> 
+  add_row(
+    term = c(
+      "ss_esr_gdppc_mean",
+      "ns_esr_gdppc_mean",
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
+  ) |> 
   rename(mod_1 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_2 <- list_small[[2]] |> 
   add_row(
-    term = c("ss_cpr_gdppc_mean", "ns_cpr_gdppc_mean"),
+    term = c(
+      "ss_cpr_gdppc_mean",
+      "ns_cpr_gdppc_mean"
+    ),
     .before = 1
+  ) |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
   ) |> 
   rename(mod_2 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
+
 mod_3 <- list_small[[3]] |> 
+  add_row(
+    term = c(
+      "ss_lech_hr_gdppc_mean",
+      "ns_lech_hr_gdppc_mean"
+    )
+  ) |> 
   rename(mod_3 = estimate) |> 
   remove_rownames() |> 
   column_to_rownames(var = "term")
 
-south_gdppc_mean_res_1977 <- cbind(mod_1, mod_2, mod_3)
+mod_4 <- list_small[[4]] |> 
+  add_row(
+    term = c(
+      "ss_cpr_gdppc_mean",
+      "ns_cpr_gdppc_mean",
+      "ss_esr_gdppc_mean",
+      "ns_esr_gdppc_mean"
+    ),
+    .before = 1
+  ) |> 
+  rename(mod_4 = estimate) |> 
+  remove_rownames() |> 
+  column_to_rownames(var = "term")
+
+south_gdppc_mean_res_1977 <- cbind(
+  mod_1,
+  mod_2,
+  mod_3,
+  mod_4
+)
 
 ### combine ----
 south_res_1977 <- list(
