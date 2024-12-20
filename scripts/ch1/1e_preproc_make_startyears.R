@@ -59,6 +59,24 @@ ptas_1977 <- ptas_final |>
     )
   )
 
+# drop high miss states ----
+# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
+ptas_1968 <- ptas_1968 |> 
+  filter(
+    cow != 347,
+    cow != 680,
+    cow != 713,
+    cow != 817
+  )
+
+ptas_1977 <- ptas_1977 |> 
+  filter(
+    cow != 347,
+    cow != 680,
+    cow != 713,
+    cow != 817
+  )
+
 ## save ----
 ptas_1968 |> 
   save(file = here("data/ch1/preprocessed/ptas_1968.rda"))
