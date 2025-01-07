@@ -25,12 +25,14 @@ imp_2 <- imp_2 |>
 lags_dat_1968 <- lags_dat_1968 |> 
   mutate(
     cow = as.factor(cow),
+    region = as.factor(region),
     year = as.factor(year)
     )
 
 imp_2_sp_l1 <- imp_2 |> 
   left_join(lags_dat_1968) |> 
-  filter(cow != "265")
+  filter(cow != "265") |> 
+  relocate(region, .after = cow)
 
 ## imp_3 ----
 imp_3 <- imp_3 |> 
@@ -43,12 +45,14 @@ imp_3 <- imp_3 |>
 lags_dat_1977 <- lags_dat_1977 |> 
   mutate(
     cow = as.factor(cow),
+    region = as.factor(region),
     year = as.factor(year)
     )
 
 imp_3_sp_l1 <- imp_3 |> 
   left_join(lags_dat_1977) |> 
-  filter(cow != "265")
+  filter(cow != "265") |> 
+  relocate(region, .after = cow)
 
 # L1 (t-1) ----
 ## imp_2 (ptas_1968) ----
