@@ -82,7 +82,7 @@ world <- world |>
       .default = cow
       )
     ) |> 
-  select(cow) |> 
+  select(cow, region_wb) |> 
   arrange(cow)
 
 ## replicate polygons for all years ----
@@ -136,7 +136,7 @@ imp_3_spt <- world_years  |>
 
 # make neighborhood weight matrices ----
 ## get raw polygon distance matrices ----
-## Note: the for loop below will take a whie to run
+## Note: the for loop below will take a while to run
 years <- 1968:2019
 dist_mats <- list()
 
@@ -223,7 +223,7 @@ years <- nb_lists |>
   names()
 var_names <- imp_2_spt |> 
   select(
-    -c(.imp, .id, cow, year, inforce, glb_s)
+    -c(.imp, .id, cow, region_wb, year, inforce, glb_s)
     ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]
@@ -250,9 +250,12 @@ for(imp in m){
     }
     yr_i_cow <- yr_i |> 
       pull(cow)
+    yr_i_region <- yr_i |> 
+      pull(region_wb)
     yr_i_ids <- tibble(
       .imp = imp,
       cow = yr_i_cow,
+      region = yr_i_region,
       year = as.numeric(i)
     )
     lags_dat_1968[[as.character(imp)]][[i]] <- bind_cols(yr_i_ids, lags_dat_1968[[as.character(imp)]][[i]])
@@ -271,7 +274,7 @@ years <- nb_lists_small |>
   names()
 var_names <- imp_3_spt |> 
   select(
-    -c(.imp, .id, cow, year, inforce, glb_s)
+    -c(.imp, .id, cow, region_wb, year, inforce, glb_s)
   ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]
@@ -298,11 +301,14 @@ for(imp in m){
     }
     yr_i_cow <- yr_i |> 
       pull(cow)
+    yr_i_region <- yr_i |> 
+      pull(region_wb)
     yr_i_ids <- tibble(
       .imp = imp,
       cow = yr_i_cow,
+      region = yr_i_region,
       year = as.numeric(i)
-    )
+      )
     lags_dat_1977[[as.character(imp)]][[i]] <- bind_cols(yr_i_ids, lags_dat_1977[[as.character(imp)]][[i]])
   }
   lags_dat_1977[[as.character(imp)]] <- bind_rows(lags_dat_1977[[imp]])
