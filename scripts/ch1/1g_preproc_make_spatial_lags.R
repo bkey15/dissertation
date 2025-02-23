@@ -58,6 +58,17 @@ imp_3 <- imp_3 |>
       )
     )
 
+## impose n_ptas == 0 for South Sudan (cow == 626) ----
+## note: S. Sudan ptas don't appear until 2019 and are thus not included in the Lechner dataset. Need to coerce to 0 in order to compute spatial lags on n_ptas for S. Sudan's neighbors.
+imp_2 <- imp_2 |> 
+  mutate(
+    n_ptas = if_else(cow == 626, 0, n_ptas)
+    )
+imp_3 <- imp_3 |> 
+  mutate(
+    n_ptas = if_else(cow == 626, 0, n_ptas)
+    )
+
 # prep spatial data ----
 ## get world country polygons ----
 world <- ne_countries(
@@ -315,6 +326,39 @@ for(imp in m){
 }
 
 lags_dat_1977 <- bind_rows(lags_dat_1977)
+
+# clean region names ----
+# IMPORTANT: this is necessary b/c dml models will otherwise drop region vars during the fitting step, making the results identical to those not including the region FE
+
+## 1968 start ----
+lags_dat_1968 <- lags_dat_1968 |> 
+  mutate(
+    region = case_when(
+      region == "North America" ~ "north_america",
+      region == "Latin America & Caribbean" ~ "latin_america_and_caribbean",
+      region == "Europe & Central Asia" ~ "europe_and_central_asia",
+      region == "Middle East & North Africa" ~ "middle_east_and_north_africa",
+      region == "Sub-Saharan Africa" ~ "sub_suharan_africa",
+      region == "South Asia" ~ "south_asia",
+      region == "East Asia & Pacific" ~ "east_asia_and_pacific",
+      .default = region
+      )
+    )
+
+## 1977 start ----
+lags_dat_1977 <- lags_dat_1977 |> 
+  mutate(
+    region = case_when(
+      region == "North America" ~ "north_america",
+      region == "Latin America & Caribbean" ~ "latin_america_and_caribbean",
+      region == "Europe & Central Asia" ~ "europe_and_central_asia",
+      region == "Middle East & North Africa" ~ "middle_east_and_north_africa",
+      region == "Sub-Saharan Africa" ~ "sub_suharan_africa",
+      region == "South Asia" ~ "south_asia",
+      region == "East Asia & Pacific" ~ "east_asia_and_pacific",
+      .default = region
+      )
+    )
 
 # save ----
 lags_dat_1968 |> 

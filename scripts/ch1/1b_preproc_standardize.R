@@ -297,6 +297,14 @@ ptas_panel <- ptas_panel |>
       )
     )
 
+## prep n_ptas var (to be used for spatial regressions)
+ptas_panel <- ptas_panel |> 
+  mutate(
+    base_treaty_inforce = if_else(
+      base_treaty*inforce == 0, NA, base_treaty*inforce
+      )
+    )
+
 ## standardize
 ### general ----
 ptas_gen <- ptas_panel |> 
@@ -309,11 +317,12 @@ ptas_gen <- ptas_panel |>
     esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
   mutate(
     across(
-      3:10,
+      !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
         )
@@ -323,7 +332,7 @@ ptas_gen <- ptas_panel |>
       )
     ) |> 
   arrange(cow, year) |> 
-  relocate(inforce, .after = year)
+  relocate(inforce, n_ptas, .after = year)
 
 ptas_gen <- ptas_gen |> 
   mutate(
@@ -349,7 +358,7 @@ ptas_ss <- ptas_panel |>
   ) |> 
   mutate(
     across(
-      3:10,
+      !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
       )
@@ -385,7 +394,7 @@ ptas_ns <- ptas_panel |>
   ) |> 
   mutate(
     across(
-      3:10,
+      !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
       )
@@ -421,7 +430,7 @@ ptas_nn <- ptas_panel |>
   ) |> 
   mutate(
     across(
-      3:10,
+      !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
       )

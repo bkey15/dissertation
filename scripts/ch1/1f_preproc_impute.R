@@ -32,10 +32,10 @@ imps_no_start <- ptas_final |>
   select(-1) |> 
   mutate(
     across(
-      c(1:52, glb_s, hras), ~ FALSE
+      c(1:53, glb_s, hras), ~ FALSE
       ),
     across(
-      !c(1:52, glb_s, hras),
+      !c(1:53, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -54,10 +54,10 @@ imps_1968 <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:52, glb_s, hras), ~ FALSE
+      c(1:53, glb_s, hras), ~ FALSE
     ),
     across(
-      !c(1:52, glb_s, hras),
+      !c(1:53, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -76,10 +76,10 @@ imps_1977 <- ptas_1977 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:52, glb_s, hras), ~ FALSE
+      c(1:53, glb_s, hras), ~ FALSE
     ),
     across(
-      !c(1:52, glb_s, hras),
+      !c(1:53, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -100,12 +100,13 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 89,
-  ncol = 89,
+  nrow = 90,
+  ncol = 90,
   dimnames = dim_names
   )
 
 ## convert to tibble, specify predictor cols, convert back to matrix
+## note: leaving n_ptas out as predictor b/c I created it relatively late in project and don't want to re-run all the models. Also won't be used as predictor in non-spatial models.
 pred_mat <- pred_mat |> 
   as_tibble() |> 
   mutate(
@@ -120,7 +121,8 @@ pred_mat <- pred_mat |>
         contains("lech_hr"),
         bop_pct_gdp,
         wdi_trade,
-        inv
+        inv,
+        n_ptas
         ),
       ~ 0
       ),

@@ -15,7 +15,7 @@ load(here("data/ch1/results/imputations/imp_3.rda"))
 # L1 (t-1) ----
 ## ptas_1968 ----
 ptas_1968_l1 <- ptas_1968 |> 
-  select(-1) |> 
+  select(-1, -n_ptas) |> 
   group_by(cow) |> 
   mutate(
     across(
@@ -28,7 +28,7 @@ ptas_1968_l1 <- ptas_1968 |>
 
 ## ptas_1977 ----
 ptas_1977_l1 <- ptas_1977 |> 
-  select(-1) |> 
+  select(-1, -n_ptas) |> 
   group_by(cow) |> 
   mutate(
     across(
@@ -45,6 +45,7 @@ imp_2_l1 <- imp_2 |>
     action = "long",
     include = TRUE
     ) |> 
+  select(-n_ptas) |> 
   relocate(.imp, .id) |> 
   group_by(cow, .imp) |> 
   mutate(
@@ -63,6 +64,7 @@ imp_3_l1 <- imp_3 |>
     action = "long",
     include = TRUE
     ) |> 
+  select(-n_ptas) |> 
   relocate(.imp, .id) |> 
   group_by(cow, .imp) |> 
   mutate(

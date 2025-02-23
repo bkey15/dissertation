@@ -20,7 +20,7 @@ ptas_1968 <- ptas_final |>
   filter(year > 1967) |> 
   mutate(
     across(
-      c(6:17, starts_with("ns_")),
+      c(7:18, starts_with("ns_")),
       ~ if_else(
         is.na(.x), 0, .x
         )
@@ -42,7 +42,7 @@ ptas_1977 <- ptas_final |>
   filter(year > 1976) |> 
   mutate(
     across(
-      c(6:17, starts_with("ns_")),
+      c(7:18, starts_with("ns_")),
       ~ if_else(
         is.na(.x), 0, .x
       )
