@@ -57,7 +57,7 @@ pool_gen_gdppc_mean_1968 <- pool(gen_gdppc_mean_1968)
 sum_gen_gdppc_mean_1968 <- summary(pool_gen_gdppc_mean_1968)
 
 ### combine ----
-general <- list(
+general_1968 <- list(
   mean = sum_gen_mean_1968,
   gdp = sum_gen_gdp_mean_1968,
   gdppc = sum_gen_gdppc_mean_1968
@@ -92,7 +92,7 @@ pool_cpr_gdppc_mean_1968 <- pool(cpr_gdppc_mean_1968)
 sum_cpr_gdppc_mean_1968 <- summary(pool_cpr_gdppc_mean_1968)
 
 ### combine ----
-cpr <- list(
+cpr_1968 <- list(
   mean = sum_cpr_mean_1968,
   gdp = sum_cpr_gdp_mean_1968,
   gdppc = sum_cpr_gdppc_mean_1968
@@ -127,11 +127,11 @@ pool_esr_gdppc_mean_1968 <- pool(esr_gdppc_mean_1968)
 sum_esr_gdppc_mean_1968 <- summary(pool_esr_gdppc_mean_1968)
 
 ### combine ----
-esr <- list(
+esr_1968 <- list(
   mean = sum_esr_mean_1968,
   gdp = sum_esr_gdp_mean_1968,
   gdppc = sum_esr_gdppc_mean_1968
-)
+  )
 
 ## both ----
 ### mean ----
@@ -162,18 +162,18 @@ pool_both_gdppc_mean_1968 <- pool(both_gdppc_mean_1968)
 sum_both_gdppc_mean_1968 <- summary(pool_both_gdppc_mean_1968)
 
 ### combine ----
-both <- list(
+both_1968 <- list(
   mean = sum_both_mean_1968,
   gdp = sum_both_gdp_mean_1968,
   gdppc = sum_both_gdppc_mean_1968
-)
+  )
 
 ## all combine ----
 imp_2_hb_res_south <- list(
-  general = general,
-  cpr = cpr,
-  esr = esr,
-  both = both
+  general = general_1968,
+  cpr = cpr_1968,
+  esr = esr_1968,
+  both = both_1968
   )
 
 # start 1977 ----
@@ -207,11 +207,11 @@ pool_gen_gdppc_mean_1977 <- pool(gen_gdppc_mean_1977)
 sum_gen_gdppc_mean_1977 <- summary(pool_gen_gdppc_mean_1977)
 
 ### combine ----
-general <- list(
+general_1977 <- list(
   mean = sum_gen_mean_1977,
   gdp = sum_gen_gdp_mean_1977,
   gdppc = sum_gen_gdppc_mean_1977
-)
+  )
 
 ## cpr ----
 ### mean ----
@@ -242,11 +242,11 @@ pool_cpr_gdppc_mean_1977 <- pool(cpr_gdppc_mean_1977)
 sum_cpr_gdppc_mean_1977 <- summary(pool_cpr_gdppc_mean_1977)
 
 ### combine ----
-cpr <- list(
+cpr_1977 <- list(
   mean = sum_cpr_mean_1977,
   gdp = sum_cpr_gdp_mean_1977,
   gdppc = sum_cpr_gdppc_mean_1977
-)
+  )
 
 ## esr ----
 ### mean ----
@@ -277,11 +277,11 @@ pool_esr_gdppc_mean_1977 <- pool(esr_gdppc_mean_1977)
 sum_esr_gdppc_mean_1977 <- summary(pool_esr_gdppc_mean_1977)
 
 ### combine ----
-esr <- list(
+esr_1977 <- list(
   mean = sum_esr_mean_1977,
   gdp = sum_esr_gdp_mean_1977,
   gdppc = sum_esr_gdppc_mean_1977
-)
+  )
 
 ## both ----
 ### mean ----
@@ -312,19 +312,19 @@ pool_both_gdppc_mean_1977 <- pool(both_gdppc_mean_1977)
 sum_both_gdppc_mean_1977 <- summary(pool_both_gdppc_mean_1977)
 
 ### combine ----
-both <- list(
+both_1977 <- list(
   mean = sum_both_mean_1977,
   gdp = sum_both_gdp_mean_1977,
   gdppc = sum_both_gdppc_mean_1977
-)
+  )
 
 ## all combine ----
 imp_3_hb_res_south <- list(
-  general = general,
-  cpr = cpr,
-  esr = esr,
-  both = both
-)
+  general = general_1977,
+  cpr = cpr_1977,
+  esr = esr_1977,
+  both = both_1977
+  )
 
 # save ----
 imp_2_hb_res_south |> 
