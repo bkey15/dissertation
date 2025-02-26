@@ -77,4 +77,13 @@
 #12/16/24#
 
 -The foregoing 4 countries can't be removed post-imputation (i.e., at the lag step) because doing so creates unequal .imp group sizes, which throws an error during as.mids(). Just note that these rows (n = 91 for 1968) are effectively removed in the regressions that follow.
+
+# 2/25/25 #
+-Description of BIT-scraping process:
+  1. "Inspect" HTML code from UNCTAD's "International Investment Agreements Navigator": https://investmentpolicy.unctad.org/international-investment-agreements
+  2. W/n the inspect element, select the "Network" tab. Scroll down the webpage to "fetch" a new page from the data table (`recent-treaties`).
+  3. Right-click the fetch and copy as "cURL". Paste this code into the following cURL converter: https://curlconverter.com/r-httr2/
+  4. Copy the translated code and paste in R. Follow the scrape script file from here.
+-This process was necessary because the data table was interactive, and could only be accessed in full one "page" at a time. An `RSelenium` workflow might've helped automate some of this, but I struggled to establish a connection with the server.
+-The total number of pages (157 on 2/25/25) was found through trial and error.
   
