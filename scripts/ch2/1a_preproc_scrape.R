@@ -9,6 +9,7 @@ library(rvest)
 library(httr2)
 
 # scrape ----
+## note: page_nums must be set manually
 page_nums <- 1:157
 bits_raw <- tibble()
 
@@ -47,23 +48,51 @@ for(page in page_nums){
 }
 
 # clean ----
+## var names
 bits_raw <- bits_raw |> 
   janitor::clean_names()
 
-cols <- colnames(bits_raw)
+## find failed parse dates
+failed_parses <- bits_raw |> 
+  mutate(
+    parse_dos = dmy(date_of_signature),
+    parse_deif = dmy(date_of_entry_into_force),
+    parse_dt = dmy(termination_date),
+    fail_parse_dos = is.na(parse_dos) & !is.na(date_of_signature),
+    fail_parse_deif = is.na(parse_deif) & !is.na(date_of_entry_into_force),
+    fail_parse_dt = is.na(parse_dt) & !is.na(termination_date)
+  )
 
+failed_parse_dos <- failed_parses |> 
+  filter(fail_parse_dos == T)
+failed_parse_deif <- failed_parses |> 
+  filter(fail_parse_deif == T)
+failed_parse_dt <- failed_parses |> 
+  filter(fail_parse_dt == T)
+
+## fix date errors
+### sources: https://edit.wti.org/document/investment-treaty/search (see agreement metadata)
+bits_raw <- bits_raw |> 
+  mutate(
+    date_of_signature = if_else(no == 379, "01/01/2015", date_of_signature),
+    date_of_entry_into_force = if_else(no == 3725, "01/02/1988", date_of_entry_into_force),
+    termination_date = if_else(no == 3253, "07/08/2018", termination_date)
+    )
+
+## finish clean
+cols <- colnames(bits_raw)
 bits_raw <- bits_raw |> 
   select(-no) |> 
   mutate(
     across(
       any_of(cols),
       ~ na_if(.x, "")
-      ),
+    ),
     across(
       contains("date"),
       ~ dmy(.x)
-      )
     )
+  )
 
 # save ----
 bits_raw |> 
