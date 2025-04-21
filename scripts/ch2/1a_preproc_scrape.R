@@ -80,6 +80,7 @@ bits_raw <- bits_raw |>
     )
 
 ## finish clean
+### no == treaty_id == position of treaty in scraped list (most to least recent)
 cols <- colnames(bits_raw)
 bits_raw <- bits_raw |> 
   select(-no) |> 
@@ -91,8 +92,10 @@ bits_raw <- bits_raw |>
     across(
       contains("date"),
       ~ dmy(.x)
-    )
-  )
+    ),
+    treaty_id = 1:nrow(bits_raw)
+  ) |> 
+  relocate(treaty_id)
 
 # save ----
 bits_raw |> 

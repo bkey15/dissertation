@@ -12,6 +12,7 @@ load(here("data/ch2/raw/bits_raw.rda"))
 bits <- bits_raw |> 
   filter(type == "BITs") |> 
   select(
+    treaty_id,
     short_title,
     status,
     date_of_entry_into_force,
@@ -90,7 +91,7 @@ bleu <- bits |>
     ) |> 
   filter(cow1 != 211)
 
-### add Luxembourg rows
+### add Luxembourg rows, delete missing COW rows
 bits <- bits |> 
   rbind(bleu) |> 
   filter(
@@ -133,7 +134,7 @@ bits_long <- bits_long |>
     )
 
 ### create BIT "in force" indicator
-#### note: in .default = 0, BITs with a "terminated" status but that don't feature an in-force date are assigned a value of 0 for all observations. This applies to 40-some BITs.
+#### note: in case_when(.default = 0), BITs that have a "terminated" status but not an in-force date are assigned a value of 0 for all observations. This applies to 40-some BITs.
 bits_long <- bits_long |> 
   mutate(
     inforce = case_when(
@@ -210,7 +211,7 @@ bits_panel <- bits_panel |>
 
 ### select only essential vars
 bits_panel <- bits_panel |> 
-  select(1:5, inforce)
+  select(1:5, treaty_id, inforce)
 
 ## save ----
 bits_panel |> 
