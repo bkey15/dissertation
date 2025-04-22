@@ -86,4 +86,13 @@
   4. Copy the translated code and paste in R. Follow the scrape script file from here.
 -This process was necessary because the data table was interactive, and could only be accessed in full one "page" at a time. An `RSelenium` workflow might've helped automate some of this, but I struggled to establish a connection with the server.
 -The total number of pages (157 on 2/25/25) was found through trial and error.
+
+# 4/21/25 #
+-BITs controls:
+  -Not including HRAs or hard/soft PTA indicators for reasons outlined in prospectus (no clear relationship with treatment).
+  -Not including interstate or civil war in view of 1) unclear relationships with the treatment, and 2) lack of quality data.
+  -Using V-Dem's pro-democracy mobilization variable in lieu of political dissent, for reason's outlined in my Social Movements research paper.
+  -For now, I will include (unlike Bodea & Ye) FDI outflows in addition to inflows.
+
+-For the PTAs chapter, I realized I didn't use the "absolute values" of FDI outflows and inflows in computing the investment variable. This issue only affected about 10% of the observations, but I'm running everything again nonetheless.
   

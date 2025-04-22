@@ -25,9 +25,6 @@ wdi <- read_csv(
   file = here("data/common/raw/qog/qog_bas_ts_jan24.csv")
   )
 
-## hras
-load(here("data/ch1/preprocessed/hras.rda"))
-
 ## bop
 load(here("data/ch1/preprocessed/bop_panel.rda"))
 
@@ -36,7 +33,7 @@ load(here("data/ch1/preprocessed/bop_panel.rda"))
 ### note 1: use only high- and mid-level
 ### note 2: avoid v2x_clphy, v2cltort, v2clkill for now; too much missingness in the small countries
 vdem_small <- vdem |> 
-  select(1:117, e_polity2) |> 
+  select(1:117, v2cademmob, e_polity2) |> 
   filter(year > 1945) |> 
   rename(cow = COWcode) |> 
   relocate(cow, .before = year) |> 
@@ -57,6 +54,7 @@ vdem_small <- vdem |>
     -ends_with("_codelow"),
     -ends_with("_codehigh"),
     -ends_with("_sd"),
+    v2cademmob,
     e_polity2
     ) |> 
   arrange(cow, year)
@@ -169,24 +167,20 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(standards)
 
-## merge_base & hras
-merge_base <- merge_base |> 
-  left_join(hras)
-
 ## merge_base & bop_panel
 merge_base <- merge_base |> 
   left_join(bop_panel)
 
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
-  left_join(ptas_standard) |> 
-  relocate(47:96, .after = hr_score)
+  left_join(bits_standard) |> 
+  relocate(46:59, .after = hr_score)
 
-# fix inforce ----
+# fix any_inforce ----
 merge_base <- merge_base |> 
   mutate(
-    inforce = if_else(
-      is.na(inforce), 0, inforce
+    any_inforce = if_else(
+      is.na(any_inforce), 0, any_inforce
       )
     )
 
@@ -212,4 +206,4 @@ merge_base <- merge_base |>
 
 # save ----
 merge_base |> 
-  save(file = here("data/ch1/preprocessed/merge_base.rda"))
+  save(file = here("data/ch2/preprocessed/merge_base.rda"))

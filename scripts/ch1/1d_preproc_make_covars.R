@@ -10,9 +10,9 @@ load(here("data/ch1/preprocessed/merge_base.rda"))
 ptas_final <- merge_base |> 
   mutate(
     inv = case_when(
-      is.na(wdi_fdiin) & !is.na(wdi_fdiout) ~ wdi_fdiout,
-      !is.na(wdi_fdiin) & is.na(wdi_fdiout) ~ wdi_fdiin,
-      .default = wdi_fdiin + wdi_fdiout
+      is.na(wdi_fdiin) & !is.na(wdi_fdiout) ~ abs(wdi_fdiout),
+      !is.na(wdi_fdiin) & is.na(wdi_fdiout) ~ abs(wdi_fdiin),
+      .default = abs(wdi_fdiin) + abs(wdi_fdiout)
       )
     ) |> 
   select(-c(wdi_fdiin, wdi_fdiout))

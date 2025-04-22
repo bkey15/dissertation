@@ -37,7 +37,7 @@ ptas_1968 <- ptas_final |>
       )
     )
 
- ## 1977 (spilker & böhmelt) ----
+## 1977 (spilker & böhmelt) ----
 ptas_1977 <- ptas_final |> 
   filter(year > 1976) |> 
   mutate(
