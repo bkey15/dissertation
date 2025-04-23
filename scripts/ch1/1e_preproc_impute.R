@@ -13,11 +13,14 @@ load(here("data/ch1/preprocessed/ptas_final.rda"))
 ## note: selecting 1949 (1st inforce pta) as start year yields same results, b/c all countries have NAs on hras pre-1968 (am not imputing b/c no country could have logically received "treatment" prior to that point), hence why I don't provide the code for it
 ## note: will create a version of the dataset starting at 1977 (spilker & böhmelt) later
 
-ptas_final <- ptas_final |> 
+ptas_1968 <- ptas_final |> 
   filter(year > 1967)
 
 # set NA --> 0 ----
-ptas_final <- ptas_final |> 
+## note: S. Sudan ptas don't appear until 2019 and are thus not included in the Lechner dataset. Need to coerce to 0 in order to compute spatial lags on n_ptas for S. Sudan's neighbors.
+## note: GDR is other country where n_ptas is coerced to 0. This will help w/ imputations, but GDR will not feature in final dataset due to spatial lags (no polygon for it exists).
+
+ptas_1968 <- ptas_1968 |> 
   mutate(
     across(
       c(7:18, starts_with("ns_"), n_ptas),
@@ -39,7 +42,8 @@ ptas_final <- ptas_final |>
 
 # drop high miss states ----
 # note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
-ptas_final <- ptas_final |> 
+
+ptas_1968 <- ptas_1968 |> 
   filter(
     cow != 347,
     cow != 680,
@@ -49,11 +53,10 @@ ptas_final <- ptas_final |>
 
 # missingness check ----
 # IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. See specify prediction cols section, below
-miss_vars_1968 <- miss_var_summary(ptas_final)
+miss_vars_1968 <- miss_var_summary(ptas_1968)
 
 # specify imputation vals (T/F) ----
-## 1968 ----
-imp_vals <- ptas_final |> 
+imp_vals <- ptas_1968 |> 
   select(-1) |> 
   mutate(
     across(
@@ -114,7 +117,7 @@ pred_mat <- pred_mat |>
 
 # impute ----
 ## prep data ----
-ptas_mice <- ptas_final |> 
+ptas_mice <- ptas_1968 |> 
   select(-1) |> 
   mutate(
     across(
@@ -126,7 +129,7 @@ ptas_mice <- ptas_final |>
 ## complete ----
 ## note: setting n.core == m (5), since imputed datasets are completed by core 
 set.seed(96243214)
-imp_start_1968 <- ptas_mice |> 
+imp_base <- ptas_mice |> 
   futuremice(
     n.core = 5,
     method = "rf",
@@ -135,7 +138,12 @@ imp_start_1968 <- ptas_mice |>
   )
 
 ### save ----
-imp_start_1968 |> 
+ptas_1968 |> 
   save(
-    file = here("data/ch1/results/imputations/imp_start_1968.rda")
+    file = here("data/ch1/preprocessed/ptas_1968.rda")
+    )
+
+imp_base |> 
+  save(
+    file = here("data/ch1/results/imputations/imp_base.rda")
     )
