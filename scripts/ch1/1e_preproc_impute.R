@@ -18,7 +18,7 @@ ptas_1968 <- ptas_final |>
 
 # set NA --> 0 ----
 ## note: S. Sudan ptas don't appear until 2019 and are thus not included in the Lechner dataset. Need to coerce to 0 in order to compute spatial lags on n_ptas for S. Sudan's neighbors.
-## note: GDR is other country where n_ptas is coerced to 0. This will help w/ imputations, but GDR will not feature in final dataset due to spatial lags (no polygon for it exists).
+## note: GDR is other country where n_ptas is coerced to 0. This will help w/ imputations, but GDR will not feature in final models due to spatial lags (no polygon for it exists).
 
 ptas_1968 <- ptas_1968 |> 
   mutate(
@@ -41,15 +41,16 @@ ptas_1968 <- ptas_1968 |>
     )
 
 # drop high miss states ----
+# LEAVE OUT THIS STEP FOR NOW
 # note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
 
-ptas_1968 <- ptas_1968 |> 
-  filter(
-    cow != 347,
-    cow != 680,
-    cow != 713,
-    cow != 817
-    )
+# ptas_1968 <- ptas_1968 |> 
+  # filter(
+   # cow != 347,
+   # cow != 680,
+   # cow != 713,
+   # cow != 817
+   # )
 
 # missingness check ----
 # IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. See specify prediction cols section, below
@@ -90,7 +91,6 @@ pred_mat <- matrix(
   )
 
 ## convert to tibble, specify predictor cols, convert back to matrix
-## note: leaving n_ptas out as predictor b/c I created it relatively late in project and don't want to re-run all the models. Also won't be used as predictor in non-spatial models.
 pred_mat <- pred_mat |> 
   as_tibble() |> 
   mutate(
@@ -105,8 +105,7 @@ pred_mat <- pred_mat |>
         contains("lech_hr"),
         bop_pct_gdp,
         wdi_trade,
-        inv,
-        n_ptas
+        inv
         ),
       ~ 0
       ),
