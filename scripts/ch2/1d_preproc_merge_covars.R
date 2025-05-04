@@ -174,7 +174,7 @@ merge_base <- merge_base |>
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(bits_standard) |> 
-  relocate(46:59, .after = hr_score)
+  relocate(46:62, .after = hr_score)
 
 # fix any_inforce ----
 merge_base <- merge_base |> 

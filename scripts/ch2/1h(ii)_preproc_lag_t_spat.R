@@ -44,6 +44,11 @@ imp_1962_sp_l1 <- imp_1962_sp_l1 |>
   group_by(cow, .imp) |> 
   mutate(
     across(
+      contains("n_bits") | contains("partner_"),
+      ~ .x * e_polity2,
+      .names = "e_polity2_x_{.col}"
+      ),
+    across(
       !c(.id, hr_score),
       ~ lag(.x)
       )

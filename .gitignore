@@ -6,6 +6,10 @@ data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_dats_2fe.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_south_2fe_dats.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_south_2fe_dats.rda
 
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_north.rda
+
 ### Spatial (no regional FE)
 data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_gen_spat_dats.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_gen_spat_dats.rda
@@ -31,6 +35,10 @@ data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_south_2fe_fits.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_south_2fe_fits.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_north_2fe_fits.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_north_2fe_fits.rda
+
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_gen.rda
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_south.rda
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_north.rda
 
 ### Spatial (no regional FE)
 data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_spat_fits.rda

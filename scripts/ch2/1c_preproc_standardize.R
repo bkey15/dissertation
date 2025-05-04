@@ -54,10 +54,10 @@ bits_panel <- bits_panel |>
 ## general ----
 bits_gen <- bits_panel |> 
   summarize(
+    n_bits = n_distinct(treaty_id_inforce, na.rm = TRUE),
     partner_mean_gdp = mean(inforce_gdp, na.rm = TRUE),
     partner_mean_gdppc = mean(inforce_gdppc, na.rm = TRUE),
     partner_mean_pop = mean(inforce_pop, na.rm = TRUE),
-    n_bits = n_distinct(treaty_id_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
   mutate(
@@ -78,6 +78,7 @@ bits_gen <- bits_panel |>
 bits_ss <- bits_panel |> 
   filter(glb_s == 1 & glb_s_partner == 1) |> 
   summarize(
+    ss_n_bits = n_distinct(treaty_id_inforce, na.rm = TRUE),
     ss_partner_mean_gdp = mean(inforce_gdp, na.rm = TRUE),
     ss_partner_mean_gdppc = mean(inforce_gdppc, na.rm = TRUE),
     ss_partner_mean_pop = mean(inforce_pop, na.rm = TRUE),
@@ -97,6 +98,7 @@ bits_ss <- bits_panel |>
 bits_ns <- bits_panel |> 
   filter((glb_s == 1 & glb_s_partner == 0) | (glb_s == 0 & glb_s_partner == 1)) |> 
   summarize(
+    ns_n_bits = n_distinct(treaty_id_inforce, na.rm = TRUE),
     ns_partner_mean_gdp = mean(inforce_gdp, na.rm = TRUE),
     ns_partner_mean_gdppc = mean(inforce_gdppc, na.rm = TRUE),
     ns_partner_mean_pop = mean(inforce_pop, na.rm = TRUE),
@@ -116,6 +118,7 @@ bits_ns <- bits_panel |>
 bits_nn <- bits_panel |> 
   filter(glb_s == 0 & glb_s_partner == 0) |> 
   summarize(
+    nn_n_bits = n_distinct(treaty_id_inforce, na.rm = TRUE),
     nn_partner_mean_gdp = mean(inforce_gdp, na.rm = TRUE),
     nn_partner_mean_gdppc = mean(inforce_gdppc, na.rm = TRUE),
     nn_partner_mean_pop = mean(inforce_pop, na.rm = TRUE),
@@ -136,6 +139,8 @@ bits_standard <- bits_gen |>
   left_join(bits_ss) |> 
   left_join(bits_ns) |> 
   left_join(bits_nn)
+
+# note: first nn BIT doesn't appear until 1950, so 
 
 # save ----
 bits_standard |> 

@@ -48,10 +48,10 @@ imp_vals <- bits_1962 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:17, glb_s), ~ FALSE
+      c(1:20, glb_s), ~ FALSE
       ),
     across(
-      !c(1:17, glb_s),
+      !c(1:20, glb_s),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -72,8 +72,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 55,
-  ncol = 55,
+  nrow = 58,
+  ncol = 58,
   dimnames = dim_names
   )
 

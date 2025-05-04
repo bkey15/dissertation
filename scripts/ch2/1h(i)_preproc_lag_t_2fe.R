@@ -13,9 +13,14 @@ load(here("data/ch2/results/imputations/imp_base.rda"))
 # L1 (t-1) ----
 ## 1962 ----
 bits_1962_l1 <- bits_1962 |> 
-  select(-1, -n_bits) |> 
+  select(-1) |> 
   group_by(cow) |> 
   mutate(
+    across(
+      contains("n_bits") | contains("partner_"),
+      ~ .x * e_polity2,
+      .names = "e_polity2_x_{.col}"
+      ),
     across(
       !hr_score,
       ~ lag(.x)
@@ -38,10 +43,14 @@ imp_1962_l1 <- imp_base |>
     action = "long",
     include = TRUE
     ) |> 
-  select(-n_bits) |> 
   relocate(.imp, .id) |> 
   group_by(cow, .imp) |> 
   mutate(
+    across(
+      contains("n_bits") | contains("partner_"),
+      ~ .x * e_polity2,
+      .names = "e_polity2_x_{.col}"
+      ),
     across(
       !c(.id, hr_score),
       ~ lag(.x)
