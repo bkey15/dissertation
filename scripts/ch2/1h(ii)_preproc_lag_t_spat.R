@@ -40,6 +40,8 @@ imp_1962_sp_l1 <- imp_base |>
 
 # L1 (t-1) ----
 ## 1962 ----
+## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+
 imp_1962_sp_l1 <- imp_1962_sp_l1 |> 
   group_by(cow, .imp) |> 
   mutate(
@@ -54,23 +56,34 @@ imp_1962_sp_l1 <- imp_1962_sp_l1 |>
       )
     ) |> 
   ungroup() |> 
-  filter(!is.na(year))
+  filter(!is.na(year)) |> 
+  mutate(year = as.numeric(levels(year))[year]) |> 
+  mutate(year = as.factor(year))
 
 ## 1981 ----
+## note: re-leveling cow codes to account for countries dropping out of the dataset
 imp_1981_sp_l1 <- imp_1962_sp_l1 |> 
   mutate(
-    year = as.numeric(levels(year))[year]
+    year = as.numeric(levels(year))[year],
+    cow = as.numeric(levels(cow))[cow]
     ) |> 
   filter(year > 1980) |> 
-  mutate(year = as.factor(year))
+  mutate(
+    year = as.factor(year),
+    cow = as.factor(cow)
+    )
 
 ## 1990 ----
 imp_1990_sp_l1 <- imp_1962_sp_l1 |> 
   mutate(
-    year = as.numeric(levels(year))[year]
+    year = as.numeric(levels(year))[year],
+    cow = as.numeric(levels(cow))[cow]
   ) |> 
   filter(year > 1989) |> 
-  mutate(year = as.factor(year))
+  mutate(
+    year = as.factor(year),
+    cow = as.factor(cow)
+    )
 
 ## as.mids() ----
 imp_1962_sp_l1 <- imp_1962_sp_l1 |> 

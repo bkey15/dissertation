@@ -22,8 +22,7 @@ registerDoMC(cores = n)
 imp_dml_fits_2fe_south <- list()
 interact_stat <- names(imp_dml_dats_2fe_south)
 start_yrs <- names(imp_dml_dats_2fe_south[[1]])
-treat_names <- names(imp_dml_dats_2fe_south[[1]][[1]])
-m <- 1:5
+m <- 1:length(imp_dml_dats_2fe_south[[1]][[1]][[1]])
 
 for(stat in interact_stat){
   list_1 <- imp_dml_dats_2fe_south[[stat]]

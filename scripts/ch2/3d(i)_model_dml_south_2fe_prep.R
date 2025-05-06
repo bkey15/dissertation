@@ -16,8 +16,9 @@ load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
 ## 1962 ----
 ## IMPORTANT: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
 ## IMPORTANT: drop out unused cow levels. Unwanted columns will appear after initializing model.matrix otherwise.
+
 imp_1962_dfs <- list()
-m <- 1:5
+m <- 1:imp_1962_l1$m
 
 for(i in m){
   imp_df <- imp_1962_l1 |> 
@@ -32,6 +33,7 @@ for(i in m){
     select(
       -contains("nn_"),
       -glb_s,
+      -any_inforce,
       -last_col(),
       -last_col(offset = 1)
       ) |> 
@@ -56,6 +58,7 @@ for(i in m){
     select(
       -contains("nn_"),
       -glb_s,
+      -any_inforce,
       -last_col(),
       -last_col(offset = 1)
     ) |> 
@@ -80,6 +83,7 @@ for(i in m){
     select(
       -contains("nn_"),
       -glb_s,
+      -any_inforce,
       -last_col(),
       -last_col(offset = 1)
     ) |> 
@@ -92,16 +96,15 @@ for(i in m){
 ## no interactions ----
 ### 1962 ----
 #### get initial specs ----
+### important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lasso
 covar_names_1962 <- model.matrix(
-  ~ . - 1,
-  data = imp_1962_dfs[[1]]
+  ~ . - 1, data = imp_1962_dfs[[1]]
   ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    215:251
-    ) |> 
+    -1,
+    -contains(c("n_bits", "partner", "hr_score"))
+    )|> 
   names()
 
 treat_names_gen <- imp_1962_dfs[[1]] |> 
@@ -115,7 +118,6 @@ treat_names_ns <- imp_1962_dfs[[1]] |>
   names()
 
 start_1962 <- list()
-m <- 1:5
 
 #### finalize ----
 ##### general ----
@@ -156,15 +158,19 @@ for(i in m){
 ### 1981 ----
 #### get initial specs ----
 covar_names_1981 <- model.matrix(
-  ~ . - 1,
-  data = imp_1981_dfs[[1]]
-) |> 
+  ~ . - 1, data = imp_1981_dfs[[1]]
+  ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    193:229
-  ) |> 
+    -1,
+    -contains(
+      c(
+        "n_bits",
+        "partner",
+        "hr_score"
+        )
+      )
+    )|> 
   names()
 
 start_1981 <- list()
@@ -208,15 +214,19 @@ for(i in m){
 ### 1990 ----
 #### get initial specs ----
 covar_names_1990 <- model.matrix(
-  ~ . - 1,
-  data = imp_1990_dfs[[1]]
+  ~ . - 1, data = imp_1990_dfs[[1]]
   ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    182:218
-    ) |> 
+    -1,
+    -contains(
+      c(
+        "n_bits",
+        "partner",
+        "hr_score"
+        )
+      )
+    )|> 
   names()
 
 start_1990 <- list()

@@ -26,6 +26,10 @@ data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_north_spat_dats_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_south_spat_dats_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_south_spat_dats_regfe.rda
 
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
+data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_north.rda
+
 ## Fits
 ### 2FE
 data/ch1/results/fits/dml_lasso/dml_final/imp_1_dml_fits_2fe.rda
@@ -55,6 +59,10 @@ data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_north_spat_fits_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_south_spat_fits_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_north_spat_fits_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_south_spat_fits_regfe.rda
+
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_gen.rda
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_south.rda
+data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_north.rda
 
 ## Other
 data/ch4/mdb_speeches.feather

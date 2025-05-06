@@ -15,7 +15,7 @@ load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
 # get imputed datasets ----
 ## 1962 ----
 imp_1962_dfs <- list()
-m <- 1:5
+m <- 1:imp_1962_l1$m
 
 for(i in m){
   imp_df <- imp_1962_l1 |> 
@@ -72,25 +72,30 @@ for(i in m){
 ## no interactions ----
 ### 1962 ----
 #### get initial specs ----
-### IMPORTANT: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets
+### IMPORTANT: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
+### also important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
+
 imp_1962_df1 <- imp_1962_dfs[[1]] |> 
   select(
-    -contains("ss_"),
-    -contains("ns_"),
-    -contains("nn_"),
+    -contains(c("ss_", "ns_", "nn_")),
     -glb_s
     )
 
 covar_names_1962 <- model.matrix(
-  ~ . - 1,
-  data = imp_1962_df1
+  ~ . - 1, data = imp_1962_df1
   ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    242:278
-    ) |> 
+    -1,
+    -contains(
+      c(
+        "n_bits",
+        "partner",
+        "hr_score",
+        "any_inforce"
+        )
+      )
+    )|> 
   names()
 
 treat_names <- imp_1962_df1 |> 
@@ -101,15 +106,12 @@ treat_names <- imp_1962_df1 |>
   names()
 
 start_1962 <- list()
-m <- 1:5
 
 #### finalize ----
 for(i in m){
   df <- imp_1962_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -starts_with("e_polity2_x_"),
       -glb_s
       )
@@ -132,22 +134,25 @@ for(i in m){
 #### get initial specs ----
 imp_1981_df1 <- imp_1981_dfs[[1]] |> 
   select(
-    -contains("ss_"),
-    -contains("ns_"),
-    -contains("nn_"),
+    -contains(c("ss_", "ns_", "nn_")),
     -glb_s
     )
 
 covar_names_1981 <- model.matrix(
-  ~ . - 1,
-  data = imp_1981_df1
+  ~ . - 1, data = imp_1981_df1
   ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    222:258
-    ) |> 
+    -1,
+    -contains(
+      c(
+        "n_bits",
+        "partner",
+        "hr_score",
+        "any_inforce"
+        )
+      )
+    )|> 
   names()
 
 start_1981 <- list()
@@ -156,9 +161,7 @@ start_1981 <- list()
 for(i in m){
   df <- imp_1981_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -starts_with("e_polity2_x_"),
       -glb_s
     )
@@ -181,22 +184,25 @@ for(i in m){
 #### get initial specs ----
 imp_1990_df1 <- imp_1990_dfs[[1]] |> 
   select(
-    -contains("ss_"),
-    -contains("ns_"),
-    -contains("nn_"),
+    -contains(c("ss_", "ns_", "nn_")),
     -glb_s
   )
 
 covar_names_1990 <- model.matrix(
-  ~ . - 1,
-  data = imp_1990_df1
+  ~ . - 1, data = imp_1990_df1
   ) |> 
   as_tibble() |> 
   select(
-    starts_with("cow"),
-    starts_with("year"),
-    213:242
-  ) |> 
+    -1,
+    -contains(
+      c(
+        "n_bits",
+        "partner",
+        "hr_score",
+        "any_inforce"
+        )
+      )
+    )|> 
   names()
 
 start_1990 <- list()
@@ -205,9 +211,7 @@ start_1990 <- list()
 for(i in m){
   df <- imp_1990_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -starts_with("e_polity2_x_"),
       -glb_s
     )
@@ -246,9 +250,7 @@ start_1962 <- list()
 for(i in m){
   df <- imp_1962_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -glb_s
       )
   df <- model.matrix(
@@ -277,9 +279,7 @@ start_1981 <- list()
 for(i in m){
   df <- imp_1981_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -glb_s
       )
   df <- model.matrix(
@@ -308,9 +308,7 @@ start_1990 <- list()
 for(i in m){
   df <- imp_1990_dfs[[i]] |> 
     select(
-      -contains("ss_"),
-      -contains("ns_"),
-      -contains("nn_"),
+      -contains(c("ss_", "ns_", "nn_")),
       -glb_s
     )
   df <- model.matrix(
