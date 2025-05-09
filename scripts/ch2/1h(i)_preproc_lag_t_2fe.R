@@ -39,6 +39,7 @@ bits_1990_l1 <- bits_1962_l1  |>
 
 ## imp_1962 ----
 ## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## note: also creating interaction vars.
 
 imp_1962_l1 <- imp_base |> 
   mice::complete(

@@ -6,12 +6,12 @@ library(here)
 library(mice)
 
 # load data ----
-load(here("data/ch2/results/imputations/imp_1962_l1.rda"))
-load(here("data/ch2/results/imputations/imp_1981_l1.rda"))
-load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
+load(here("data/ch2/results/imputations/imp_1962_sp_l1.rda"))
+load(here("data/ch2/results/imputations/imp_1981_sp_l1.rda"))
+load(here("data/ch2/results/imputations/imp_1990_sp_l1.rda"))
 
 # filter to north ----
-imp_1962_l1_north <- imp_1962_l1 |> 
+imp_1962_sp_l1_north <- imp_1962_sp_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -20,44 +20,62 @@ imp_1962_l1_north <- imp_1962_l1 |>
 
 ## get treat names
 ### general
-treat_names_gen <- imp_1962_l1_north |> 
-  select(n_bits, starts_with("partner_")) |> 
-  names()
-
-### partner type (nn & ns)
-treat_names_nn <- imp_1962_l1_north |> 
-  select(starts_with("nn_")) |> 
-  names()
-
-treat_names_ns <- imp_1962_l1_north |> 
-  select(starts_with("ns_")) |> 
-  names()
-
-## get interaction names
-### general
-interact_names_gen <- imp_1962_l1_north |> 
+treat_names_gen <- imp_1962_sp_l1_north |> 
   select(
-    starts_with("e_polity2_x_") & !contains(
-      c("ss", "ns", "nn")
-      )
+    n_bits,
+    starts_with("partner_"),
+    -ends_with("sp_lag")
     ) |> 
   names()
 
 ### partner type (nn & ns)
-interact_names_nn <- imp_1962_l1_north |> 
-  select(starts_with("e_polity2_x_nn")) |> 
+treat_names_nn <- imp_1962_sp_l1_north |> 
+  select(
+    starts_with("nn_"),
+    -ends_with("sp_lag")
+    ) |> 
   names()
 
-interact_names_ns <- imp_1962_l1_north |> 
-  select(starts_with("e_polity2_x_ns")) |> 
+treat_names_ns <- imp_1962_sp_l1_north |> 
+  select(
+    starts_with("ns_"),
+    -ends_with("sp_lag")
+    ) |> 
+  names()
+
+## get interaction names
+### general
+interact_names_gen <- imp_1962_sp_l1_north |> 
+  select(
+    starts_with("e_polity2_x_"),
+    -contains(
+      c("ss", "ns", "nn")
+      ),
+    -ends_with("sp_lag")
+    ) |> 
+  names()
+
+### partner type (nn & ns)
+interact_names_nn <- imp_1962_sp_l1_north |> 
+  select(
+    starts_with("e_polity2_x_nn"),
+    -ends_with("sp_lag")
+    ) |> 
+  names()
+
+interact_names_ns <- imp_1962_sp_l1_north |> 
+  select(
+    starts_with("e_polity2_x_ns"),
+    -ends_with("sp_lag")
+    ) |> 
   names()
 
 ## as.mids()
-imp_1962_l1_north <- imp_1962_l1_north |> 
+imp_1962_sp_l1_north <- imp_1962_sp_l1_north |> 
   as.mids()
 
 ## continue filter
-imp_1981_l1_north <- imp_1981_l1 |> 
+imp_1981_sp_l1_north <- imp_1981_sp_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -65,7 +83,7 @@ imp_1981_l1_north <- imp_1981_l1 |>
   filter(glb_s == 0) |> 
   as.mids()
 
-imp_1990_l1_north <- imp_1990_l1 |> 
+imp_1990_sp_l1_north <- imp_1990_sp_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -78,15 +96,15 @@ imp_1990_l1_north <- imp_1990_l1 |>
 start_1962 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
     name,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1962_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -104,10 +122,10 @@ for(i in seq_along(treat_names_nn)){
     j,
     " + ",
     k,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1962_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -119,15 +137,15 @@ for(i in seq_along(treat_names_nn)){
 start_1981 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
     name,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1981_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -145,10 +163,10 @@ for(i in seq_along(treat_names_nn)){
     j,
     " + ",
     k,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1981_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -160,15 +178,15 @@ for(i in seq_along(treat_names_nn)){
 start_1990 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
     name,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1990_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -186,10 +204,10 @@ for(i in seq_along(treat_names_nn)){
     j,
     " + ",
     k,
-    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1990_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -209,7 +227,7 @@ no_interactions <- list(
 start_1962 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(i in seq_along(treat_names_gen)){
   j <- treat_names_gen[[i]]
   k <- interact_names_gen[[i]]
@@ -219,10 +237,10 @@ for(i in seq_along(treat_names_gen)){
     j,
     " + e_polity2 + ",
     k,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1962_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -246,10 +264,10 @@ for(i in seq_along(treat_names_nn)){
     l,
     " + ",
     n,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1962_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -261,7 +279,7 @@ for(i in seq_along(treat_names_nn)){
 start_1981 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(i in seq_along(treat_names_gen)){
   j <- treat_names_gen[[i]]
   k <- interact_names_gen[[i]]
@@ -271,10 +289,10 @@ for(i in seq_along(treat_names_gen)){
     j,
     " + e_polity2 + ",
     k,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1981_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -298,10 +316,10 @@ for(i in seq_along(treat_names_nn)){
     l,
     " + ",
     n,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1981_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -313,7 +331,7 @@ for(i in seq_along(treat_names_nn)){
 start_1990 <- list()
 
 ### general ----
-### i.e., no consideration for ns, nn, nn bits
+### i.e., no consideration for ns, ss, nn bits
 for(i in seq_along(treat_names_gen)){
   j <- treat_names_gen[[i]]
   k <- interact_names_gen[[i]]
@@ -323,10 +341,10 @@ for(i in seq_along(treat_names_gen)){
     j,
     " + e_polity2 + ",
     k,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1990_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -350,10 +368,10 @@ for(i in seq_along(treat_names_nn)){
     l,
     " + ",
     n,
-    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + n_bits_sp_lag + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
+  fit <- with(imp_1990_sp_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -369,12 +387,12 @@ has_interactions <- list(
   )
 
 # all combine ----
-imp_by_rep_res_north <- list(
+imp_by_rep_res_north_sp <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
 
 
 # save ----
-imp_by_rep_res_north |> 
-  save(file = here("data/ch2/results/fits/by_rep/mice/imp_by_rep_res_north.rda"))
+imp_by_rep_res_north_sp |> 
+  save(file = here("data/ch2/results/fits/by_rep/mice/imp_by_rep_res_north_sp.rda"))

@@ -95,4 +95,13 @@
   -For now, I will include (unlike Bodea & Ye) FDI outflows in addition to inflows.
 
 -For the PTAs chapter, I realized I didn't use the "absolute values" of FDI outflows and inflows in computing the investment variable. This issue only affected about 10% of the observations, but I'm running everything again nonetheless.
+
+# 5/6/25 #
+-All DML fits feature cluster-robust SEs. See https://docs.doubleml.org/stable/examples/R_double_ml_multiway_cluster.html.
+-glmnet::cv.glmnet() (called for in DoubleMLPLR$new(ml_* = lrn())) chooses its own lambda sequences and picks the lambda with the smallest cross-validation error (s = "lambda.min"). Sequence (lambda) & smallest lambda (lambda.min) for each regression (outcome as final outcome or treatment, respectively), and from each repetition-fold, can be found in the "models" tab of the fit object.
+
+# 5/9/25 #
+-For Ch. 2, truest Bodea-Ye replications (scripts 3(a)) yield same results as their paper (negative & significant coefficient on n_ptas, positive and significant coefficient on e_polity2*n_ptas).
+-Results begin to vary once imputations are used.
+-"Logged event" after as.mids() in north/south models is glb_s (is constant after filtering to glb_s == 1 or glb_s == 0). Not an issue, because the variable isn't included in the model.
   

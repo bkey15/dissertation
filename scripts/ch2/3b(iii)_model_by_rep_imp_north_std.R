@@ -1,4 +1,4 @@
-# Replicate Bodea-Ye (2018) w/ two-way fixed effects & multiple imputation (`mice`). Fit models w/ imputed vals (& lagged covars). Limited to developing ("Global South") countries, as is the B-Y paper.
+# Replicate Bodea-Ye (2018) w/ two-way fixed effects & multiple imputation (`mice`). Fit models w/ imputed vals (& lagged covars). Limited to developed ("Global north") countries.
 
 # load packages ----
 library(tidyverse)
@@ -10,32 +10,32 @@ load(here("data/ch2/results/imputations/imp_1962_l1.rda"))
 load(here("data/ch2/results/imputations/imp_1981_l1.rda"))
 load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
 
-# filter to south ----
-imp_1962_l1_south <- imp_1962_l1 |> 
+# filter to north ----
+imp_1962_l1_north <- imp_1962_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  filter(glb_s == 1)
+  filter(glb_s == 0)
 
 ## get treat names
 ### general
-treat_names_gen <- imp_1962_l1_south |> 
+treat_names_gen <- imp_1962_l1_north |> 
   select(n_bits, starts_with("partner_")) |> 
   names()
 
-### partner type (ss & ns)
-treat_names_ss <- imp_1962_l1_south |> 
-  select(starts_with("ss_")) |> 
+### partner type (nn & ns)
+treat_names_nn <- imp_1962_l1_north |> 
+  select(starts_with("nn_")) |> 
   names()
 
-treat_names_ns <- imp_1962_l1_south |> 
+treat_names_ns <- imp_1962_l1_north |> 
   select(starts_with("ns_")) |> 
   names()
 
 ## get interaction names
 ### general
-interact_names_gen <- imp_1962_l1_south |> 
+interact_names_gen <- imp_1962_l1_north |> 
   select(
     starts_with("e_polity2_x_") & !contains(
       c("ss", "ns", "nn")
@@ -43,34 +43,34 @@ interact_names_gen <- imp_1962_l1_south |>
     ) |> 
   names()
 
-### partner type (ss & ns)
-interact_names_ss <- imp_1962_l1_south |> 
-  select(starts_with("e_polity2_x_ss")) |> 
+### partner type (nn & ns)
+interact_names_nn <- imp_1962_l1_north |> 
+  select(starts_with("e_polity2_x_nn")) |> 
   names()
 
-interact_names_ns <- imp_1962_l1_south |> 
+interact_names_ns <- imp_1962_l1_north |> 
   select(starts_with("e_polity2_x_ns")) |> 
   names()
 
 ## as.mids()
-imp_1962_l1_south <- imp_1962_l1_south |> 
+imp_1962_l1_north <- imp_1962_l1_north |> 
   as.mids()
 
 ## continue filter
-imp_1981_l1_south <- imp_1981_l1 |> 
+imp_1981_l1_north <- imp_1981_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  filter(glb_s == 1) |> 
+  filter(glb_s == 0) |> 
   as.mids()
 
-imp_1990_l1_south <- imp_1990_l1 |> 
+imp_1990_l1_north <- imp_1990_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  filter(glb_s == 1) |> 
+  filter(glb_s == 0) |> 
   as.mids()
 
 # no interaction terms ----
@@ -78,7 +78,7 @@ imp_1990_l1_south <- imp_1990_l1 |>
 start_1962 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
+### i.e., no consideration for ns, nn, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
@@ -86,7 +86,7 @@ for(name in treat_names_gen){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -94,9 +94,9 @@ for(name in treat_names_gen){
   start_1962[[as.character(name)]] <- sum
 }
 
-### BITs by partner-type (SS & NS) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
   
   formula <- paste0(
@@ -107,7 +107,7 @@ for(i in seq_along(treat_names_ss)){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -119,7 +119,7 @@ for(i in seq_along(treat_names_ss)){
 start_1981 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
+### i.e., no consideration for ns, nn, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
@@ -127,7 +127,7 @@ for(name in treat_names_gen){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -135,9 +135,9 @@ for(name in treat_names_gen){
   start_1981[[as.character(name)]] <- sum
 }
 
-### BITs by partner-type (SS & NS) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
   
   formula <- paste0(
@@ -148,7 +148,7 @@ for(i in seq_along(treat_names_ss)){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -160,7 +160,7 @@ for(i in seq_along(treat_names_ss)){
 start_1990 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
+### i.e., no consideration for ns, nn, nn bits
 for(name in treat_names_gen){
   formula <- paste0(
     "hr_score ~ ",
@@ -168,7 +168,7 @@ for(name in treat_names_gen){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -176,9 +176,9 @@ for(name in treat_names_gen){
   start_1990[[as.character(name)]] <- sum
 }
 
-### BITs by partner-type (SS & NS) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
   
   formula <- paste0(
@@ -189,7 +189,7 @@ for(i in seq_along(treat_names_ss)){
     " + e_polity2 + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -209,7 +209,7 @@ no_interactions <- list(
 start_1962 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
+### i.e., no consideration for ns, nn, nn bits
 for(i in seq_along(treat_names_gen)){
   j <- treat_names_gen[[i]]
   k <- interact_names_gen[[i]]
@@ -220,9 +220,9 @@ for(i in seq_along(treat_names_gen)){
     " + e_polity2 + ",
     k,
     " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
-    )
+  )
   
-  fit <- with(imp_1962_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -230,11 +230,11 @@ for(i in seq_along(treat_names_gen)){
   start_1962[[as.character(j)]] <- sum
 }
 
-### BITs by partner-type (ss & ns) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
-  l <- interact_names_ss[[i]]
+  l <- interact_names_nn[[i]]
   n <- interact_names_ns[[i]]
   
   formula <- paste0(
@@ -249,7 +249,7 @@ for(i in seq_along(treat_names_ss)){
     " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1962_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1962_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -261,7 +261,7 @@ for(i in seq_along(treat_names_ss)){
 start_1981 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
+### i.e., no consideration for ns, nn, nn bits
 for(i in seq_along(treat_names_gen)){
   j <- treat_names_gen[[i]]
   k <- interact_names_gen[[i]]
@@ -274,7 +274,7 @@ for(i in seq_along(treat_names_gen)){
     " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -282,11 +282,11 @@ for(i in seq_along(treat_names_gen)){
   start_1981[[as.character(j)]] <- sum
 }
 
-### BITs by partner-type (ss & ns) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
-  l <- interact_names_ss[[i]]
+  l <- interact_names_nn[[i]]
   n <- interact_names_ns[[i]]
   
   formula <- paste0(
@@ -301,7 +301,7 @@ for(i in seq_along(treat_names_ss)){
     " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1981_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1981_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -313,29 +313,33 @@ for(i in seq_along(treat_names_ss)){
 start_1990 <- list()
 
 ### general ----
-### i.e., no consideration for ns, ss, nn bits
-for(name in treat_names_gen){
+### i.e., no consideration for ns, nn, nn bits
+for(i in seq_along(treat_names_gen)){
+  j <- treat_names_gen[[i]]
+  k <- interact_names_gen[[i]]
+  
   formula <- paste0(
     "hr_score ~ ",
-    name,
+    j,
     " + e_polity2 + ",
-    name,
-    "*e_polity2 + ",
-    "wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    k,
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
   
-  start_1990[[as.character(name)]] <- sum
+  start_1990[[as.character(j)]] <- sum
 }
 
-### BITs by partner-type (SS & NS) ----
-for(i in seq_along(treat_names_ss)){
-  j <- treat_names_ss[[i]]
+### BITs by partner-type (nn & ns) ----
+for(i in seq_along(treat_names_nn)){
+  j <- treat_names_nn[[i]]
   k <- treat_names_ns[[i]]
+  l <- interact_names_nn[[i]]
+  n <- interact_names_ns[[i]]
   
   formula <- paste0(
     "hr_score ~ ",
@@ -343,14 +347,13 @@ for(i in seq_along(treat_names_ss)){
     " + ",
     k,
     " + e_polity2 + ",
-    j,
-    "*e_polity2 + ",
-    k,
-    "*e_polity2 + ",
-    "wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
+    l,
+    " + ",
+    n,
+    " + wdi_fdiin + wdi_trade + p_durable + gdppc_log10 + wdi_popden + v2cademmob + factor(cow) + factor(year)"
   )
   
-  fit <- with(imp_1990_l1_south, lm(as.formula(formula)))
+  fit <- with(imp_1990_l1_north, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -366,12 +369,12 @@ has_interactions <- list(
   )
 
 # all combine ----
-imp_by_rep_res_south <- list(
+imp_by_rep_res_north_std <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
 
 
 # save ----
-imp_by_rep_res_south |> 
-  save(file = here("data/ch2/results/fits/by_rep/mice/imp_by_rep_res_south.rda"))
+imp_by_rep_res_north_std |> 
+  save(file = here("data/ch2/results/fits/by_rep/mice/imp_by_rep_res_north_std.rda"))
