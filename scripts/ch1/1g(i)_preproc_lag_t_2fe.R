@@ -10,6 +10,22 @@ library(mice)
 load(here("data/ch1/preprocessed/ptas_1968.rda"))
 load(here("data/ch1/results/imputations/imp_base.rda"))
 
+# drop high miss states ----
+# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). Dropping these cases are important in preventing zero-variance variables at the dml-prep step. See notes for more.
+
+imp_1968_l1 <- imp_base |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  filter(
+    cow != "347",
+    cow != "680",
+    cow != "713",
+    cow != "817"
+    ) |> 
+  mutate(cow = droplevels(cow))
+
 # L1 (t-1) ----
 ## 1968 ----
 ptas_1968_l1 <- ptas_1968 |> 
@@ -30,11 +46,7 @@ ptas_1977_l1 <- ptas_1968_l1  |>
 
 ## imp_1968 ----
 ## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
-imp_1968_l1 <- imp_base |> 
-  mice::complete(
-    action = "long",
-    include = TRUE
-    ) |> 
+imp_1968_l1 <- imp_1968_l1 |> 
   select(-n_ptas) |> 
   relocate(.imp, .id) |> 
   group_by(cow, .imp) |> 
@@ -46,11 +58,11 @@ imp_1968_l1 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = as.numeric(levels(year))[year]) |> 
-  mutate(year = as.factor(year))
+  mutate(year = droplevels(year))
 
 ## imp_1977 ----
 ## note: re-leveling cow codes to account for countries dropping out of the dataset
+## note: in this case, no countries drop out
 imp_1977_l1 <- imp_1968_l1 |> 
   mutate(
     year = as.numeric(levels(year))[year],

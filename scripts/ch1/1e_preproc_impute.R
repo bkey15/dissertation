@@ -40,18 +40,6 @@ ptas_1968 <- ptas_1968 |>
       )
     )
 
-# drop high miss states ----
-# LEAVE OUT THIS STEP FOR NOW
-# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
-
-# ptas_1968 <- ptas_1968 |> 
-  # filter(
-   # cow != 347,
-   # cow != 680,
-   # cow != 713,
-   # cow != 817
-   # )
-
 # missingness check ----
 # IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. See specify prediction cols section, below
 miss_vars_1968 <- miss_var_summary(ptas_1968)

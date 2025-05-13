@@ -403,6 +403,17 @@ for(i in m){
   }
 }
 
+# check for zero variance ----
+zerovar_1968 <- caret::nearZeroVar(
+  start_1968[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1977 <- caret::nearZeroVar(
+  start_1977[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
 # combine ----
 imp_dml_dats_spat_south <- list(
   start_1968 = start_1968,

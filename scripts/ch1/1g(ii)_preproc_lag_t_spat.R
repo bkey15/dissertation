@@ -27,12 +27,14 @@ sp_lag_base <- sp_lag_base |>
     )
 
 # merge data ----
-## note: GDR, S. Yemen, & S. Vietnam are in imp_base but not sp_lag_base (no extant polygons), meaning these countries have missing values on all spatially-laged variables
+## note: dropping high miss states and/or ones with no extant polygons
 imp_1968_sp_l1 <- imp_base |> 
   left_join(sp_lag_base) |> 
   filter(
     cow != "265",
+    cow != "347",
     cow != "680",
+    cow != "713",
     cow != "817"
     ) |> 
   relocate(region, .after = cow) |> 
@@ -40,7 +42,7 @@ imp_1968_sp_l1 <- imp_base |>
 
 # L1 (t-1) ----
 ## 1968 ----
-## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## note: re-leveling "year" in imp_1968 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 imp_1968_sp_l1 <- imp_1968_sp_l1 |> 
   group_by(cow, .imp) |> 
   mutate(
@@ -51,12 +53,11 @@ imp_1968_sp_l1 <- imp_1968_sp_l1 |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = as.numeric(levels(year))[year]) |> 
-  mutate(year = as.factor(year))
+  mutate(year = droplevels(year))
 
 ## 1977 ----
 ## note: re-leveling cow codes to account for countries dropping out of the dataset
-## note: in this instance, no countries drop out (S. Vietnam has already been filtered out)
+## note: in this instance, no countries drop out
 imp_1977_sp_l1 <- imp_1968_sp_l1 |> 
   mutate(
     year = as.numeric(levels(year))[year],
