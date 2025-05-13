@@ -6,40 +6,40 @@ library(naniar)
 # load data ----
 load(here("data/ch1/preprocessed/ptas_panel.rda"))
 load(here("data/ch1/preprocessed/ptas_final.rda"))
-load(here("data/ch1/preprocessed/ptas_final_l1.rda"))
-load(here("data/ch1/results/imputations/imp_2_l1.rda"))
-load(here("data/ch1/results/imputations/imp_3_l1.rda"))
+load(here("data/ch1/preprocessed/ptas_1968_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1968_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1977_l1.rda"))
 
 # quick mean checks ----
 ## south-south ----
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ss_cpr_mean, na.rm = T))
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ss_esr_mean, na.rm = T))
 
 ## south-north ----
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ns_cpr_mean, na.rm = T))
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 1) |> 
   summarize(mean = mean(ns_esr_mean, na.rm = T))
 
 ## north-south ----
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(ns_cpr_mean, na.rm = T))
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(ns_esr_mean, na.rm = T))
 
 ## north-north ----
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(nn_cpr_mean, na.rm = T))
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   filter(glb_s == 0) |> 
   summarize(mean = mean(nn_esr_mean, na.rm = T))
 
@@ -116,17 +116,17 @@ ptas_final |>
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = cpr_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = cpr_gdp_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = cpr_gdppc_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
@@ -147,23 +147,23 @@ ptas_final |>
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = esr_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = esr_gdp_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = esr_gdppc_mean, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")
 
 ## north-north ----
-imp_2_l1 |> 
+imp_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -177,7 +177,7 @@ imp_2_l1 |>
   geom_smooth(method = "lm")
 
 ## south-south ----
-imp_2_l1 |> 
+imp_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -201,7 +201,7 @@ ptas_final |>
   geom_point() +
   geom_smooth(method = "lm")
 
-ptas_final_l1 |> 
+ptas_1968_l1 |> 
   ggplot(aes(x = bop_pct_gdp, y = hr_score)) +
   geom_point() +
   geom_smooth(method = "lm")

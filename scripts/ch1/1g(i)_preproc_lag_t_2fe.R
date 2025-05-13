@@ -29,6 +29,7 @@ ptas_1977_l1 <- ptas_1968_l1  |>
   filter(year > 1976)
 
 ## imp_1968 ----
+## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 imp_1968_l1 <- imp_base |> 
   mice::complete(
     action = "long",
@@ -44,15 +45,22 @@ imp_1968_l1 <- imp_base |>
       )
     ) |> 
   ungroup() |> 
-  filter(!is.na(year))
+  filter(!is.na(year)) |> 
+  mutate(year = as.numeric(levels(year))[year]) |> 
+  mutate(year = as.factor(year))
 
 ## imp_1977 ----
+## note: re-leveling cow codes to account for countries dropping out of the dataset
 imp_1977_l1 <- imp_1968_l1 |> 
   mutate(
-    year = as.numeric(levels(year))[year]
+    year = as.numeric(levels(year))[year],
+    cow = as.numeric(levels(cow))[cow]
     ) |> 
   filter(year > 1976) |> 
-  mutate(year = as.factor(year))
+  mutate(
+    year = as.factor(year),
+    cow = as.factor(cow)
+    )
 
 ## as.mids() ----
 imp_1968_l1 <- imp_1968_l1 |> 

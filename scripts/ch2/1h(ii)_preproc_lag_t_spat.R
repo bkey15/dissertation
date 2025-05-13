@@ -36,7 +36,8 @@ imp_1962_sp_l1 <- imp_base |>
     cow != "680",
     cow != "817"
     ) |> 
-  relocate(region, .after = cow)
+  relocate(region, .after = cow) |> 
+  mutate(cow = droplevels(cow))
 
 # L1 (t-1) ----
 ## 1962 ----

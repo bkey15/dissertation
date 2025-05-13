@@ -10,16 +10,16 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_2_sp_l1.rda"))
-load(here("data/ch1/results/imputations/imp_3_sp_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1968_sp_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1977_sp_l1.rda"))
 
 # get imputed datasets ----
-## imp_2 (1968) ----
-imp_2_dfs <- list()
-m <- 1:imp_2_sp_l1$m
+## 1968 ----
+imp_1968_dfs <- list()
+m <- 1:imp_1968_sp_l1$m
 
 for(i in m){
-  imp_df <- imp_2_sp_l1 |> 
+  imp_df <- imp_1968_sp_l1 |> 
     mice::complete(
       action = "long",
       include = TRUE
@@ -36,15 +36,14 @@ for(i in m){
       -n_ptas
     )
   
-  imp_2_dfs[[as.character(i)]] <- imp_df
+  imp_1968_dfs[[as.character(i)]] <- imp_df
 }
 
-## imp_3 (1977) ----
-imp_3_dfs <- list()
-m <- 1:imp_3_sp_l1$m
+## 1977 ----
+imp_1977_dfs <- list()
 
 for(i in m){
-  imp_df <- imp_3_sp_l1 |> 
+  imp_df <- imp_1977_sp_l1 |> 
     mice::complete(
       action = "long",
       include = TRUE
@@ -61,19 +60,19 @@ for(i in m){
       -n_ptas
     )
   
-  imp_3_dfs[[as.character(i)]] <- imp_df
+  imp_1977_dfs[[as.character(i)]] <- imp_df
 }
 
 # initialize data backend ----
-## imp_2 ----
+## 1968 ----
 ### get initial specs ----
-m <- 1:imp_2_sp_l1$m
-imp_2_dml_gen_spat_dats <- list()
-covar_names <- model.matrix(
-  ~ . - 1, data = imp_2_dfs[[1]]
+covar_names_1968 <- model.matrix(
+  ~ . - 1,
+  data = imp_1968_dfs[[1]]
   ) |> 
   as_tibble() |> 
   select(
+    -1,
     -starts_with(
       c(
         "hr_score",
@@ -87,71 +86,74 @@ covar_names <- model.matrix(
     ) |> 
   names()
 
-### general ----
-treat_names_cpr <- imp_2_dfs[[1]] |> 
-  select(
-    starts_with("cpr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-    ) |> 
-  names()
-
-treat_names_esr <- imp_2_dfs[[1]] |> 
-  select(
-    starts_with("esr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-  ) |> 
-  names()
-
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1, data = imp_2_dfs[[i]]
-    ) |> 
-    as.data.table()
-  for(j in seq_along(treat_names_cpr)){
-    k <- treat_names_cpr[[j]]
-    l <- treat_names_esr[[j]]
-    imp_2_dml_gen_spat_dats[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names,
-        d_cols = c(k, l),
-        y_col = "hr_score"
-      )
-  }
-}
-
-### lech general ----
-treat_names_lech <- imp_2_dfs[[1]] |> 
+treat_names_lech <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("lech_hr"),
     -ends_with(c("pop_mean", "sp_lag"))
     ) |> 
   names()
 
+treat_names_cpr <- imp_1968_dfs[[1]] |> 
+  select(
+    starts_with("cpr"),
+    -ends_with(c("pop_mean", "sp_lag"))
+    ) |> 
+  names()
+
+treat_names_esr <- imp_1968_dfs[[1]] |> 
+  select(
+    starts_with("esr"),
+    -ends_with(c("pop_mean", "sp_lag"))
+    ) |> 
+  names()
+
+start_1968 <- list()
+
+### lechner ----
 for(i in m){
   df <- model.matrix(
-    ~ . - 1, data = imp_2_dfs[[i]]
+    ~ . - 1,
+    data = imp_1968_dfs[[i]]
     ) |> 
     as.data.table()
-  for(j in seq_along(treat_names_lech)){
-    k <- treat_names_lech[[j]]
-    imp_2_dml_gen_spat_dats[[as.character(k)]][[as.character(i)]] <- df |>
+  for(name in treat_names_lech){
+    start_1968[[as.character(name)]][[as.character(i)]] <- df |>
       double_ml_data_from_data_frame(
-        x_cols = covar_names,
-        d_cols = k,
+        x_cols = covar_names_1968,
+        d_cols = name,
         y_col = "hr_score"
       )
   }
 }
 
-## imp_3 ----
+### cpr & esr ----
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_1968_dfs[[i]]
+    ) |> 
+    as.data.table()
+  for(j in seq_along(treat_names_cpr)){
+    k <- treat_names_cpr[[j]]
+    l <- treat_names_esr[[j]]
+    
+    start_1968[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names_1968,
+        d_cols = c(k, l),
+        y_col = "hr_score"
+      )
+  }
+}
+
+## 1977 ----
 ### get initial specs ----
-m <- 1:imp_3_sp_l1$m
-imp_3_dml_gen_spat_dats <- list()
-covar_names <- model.matrix(
-  ~ . - 1, data = imp_3_dfs[[1]]
+covar_names_1977 <- model.matrix(
+  ~ . - 1,
+  data = imp_1977_dfs[[1]]
   ) |> 
   as_tibble() |> 
   select(
+    -1,
     -starts_with(
       c(
         "hr_score",
@@ -160,69 +162,55 @@ covar_names <- model.matrix(
         "lech_",
         "ns_",
         "ss_"
-        )
       )
-    ) |> 
-  names()
-
-### general ----
-treat_names_cpr <- imp_3_dfs[[1]] |> 
-  select(
-    starts_with("cpr"),
-    -ends_with(c("pop_mean", "sp_lag"))
+    )
   ) |> 
   names()
 
-treat_names_esr <- imp_3_dfs[[1]] |> 
-  select(
-    starts_with("esr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-  ) |> 
-  names()
+start_1977 <- list()
 
+### lechner ----
 for(i in m){
   df <- model.matrix(
-    ~ . - 1, data = imp_3_dfs[[i]]
+    ~ . - 1,
+    data = imp_1977_dfs[[i]]
   ) |> 
+    as.data.table()
+  for(name in treat_names_lech){
+    start_1977[[as.character(name)]][[as.character(i)]] <- df |>
+      double_ml_data_from_data_frame(
+        x_cols = covar_names_1977,
+        d_cols = name,
+        y_col = "hr_score"
+      )
+  }
+}
+
+### cpr & esr ----
+for(i in m){
+  df <- model.matrix(
+    ~ . - 1, data = imp_1977_dfs[[i]]
+    ) |> 
     as.data.table()
   for(j in seq_along(treat_names_cpr)){
     k <- treat_names_cpr[[j]]
     l <- treat_names_esr[[j]]
-    imp_3_dml_gen_spat_dats[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+    
+    start_1977[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
       double_ml_data_from_data_frame(
-        x_cols = covar_names,
+        x_cols = covar_names_1977,
         d_cols = c(k, l),
         y_col = "hr_score"
       )
-  }
+    }
 }
 
-### lech general ----
-treat_names_lech <- imp_3_dfs[[1]] |> 
-  select(
-    starts_with("lech_hr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-  ) |> 
-  names()
-
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1, data = imp_3_dfs[[i]]
-  ) |> 
-    as.data.table()
-  for(j in seq_along(treat_names_lech)){
-    k <- treat_names_lech[[j]]
-    imp_3_dml_gen_spat_dats[[as.character(k)]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names,
-        d_cols = k,
-        y_col = "hr_score"
-      )
-  }
-}
+# combine ----
+imp_dml_dats_spat_gen <- list(
+  start_1968 = start_1968,
+  start_1977 = start_1977
+  )
 
 # save initialized data ----
-imp_2_dml_gen_spat_dats |> 
-  save(file = here("data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_gen_spat_dats.rda"))
-imp_3_dml_gen_spat_dats |> 
-  save(file = here("data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_gen_spat_dats.rda"))
+imp_dml_dats_spat_gen |> 
+  save(file = here("data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_gen.rda"))

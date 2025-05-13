@@ -1,30 +1,24 @@
 # Big files
 ## Initialized data
 ### 2FE
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_dats_2fe.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_dats_2fe.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_south_2fe_dats.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_south_2fe_dats.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
 
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_north.rda
 
 ### Spatial (no regional FE)
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_gen_spat_dats.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_gen_spat_dats.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_north_spat_dats.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_gen.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_south.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_north_spat_dats.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_south_spat_dats.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_south_spat_dats.rda
 
 ### Spatial (regional FE)
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_gen_spat_dats_regfe.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_gen_spat_dats_regfe.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
+data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
+
 data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_north_spat_dats_regfe.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_north_spat_dats_regfe.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_2_dml_south_spat_dats_regfe.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_3_dml_south_spat_dats_regfe.rda
 
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
