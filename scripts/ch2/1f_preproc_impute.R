@@ -35,10 +35,6 @@ bits_1962 <- bits_1962 |>
       )
     )
 
-# drop high miss states ----
-## NOTE: LEAVE OUT STEP OR NOW. COPY FROM CH 1 FILE
-# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). See notes for more.
-
 # missingness check ----
 # IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. See specify prediction cols section, below
 miss_vars_1962 <- miss_var_summary(bits_1962)

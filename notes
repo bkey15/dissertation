@@ -104,4 +104,14 @@
 -For Ch. 2, truest Bodea-Ye replications (scripts 3(a)) yield same results as their paper (negative & significant coefficient on n_ptas, positive and significant coefficient on e_polity2*n_ptas).
 -Results begin to vary once imputations are used.
 -"Logged event" after as.mids() in north/south models is glb_s (is constant after filtering to glb_s == 1 or glb_s == 0). Not an issue, because the variable isn't included in the model.
-  
+
+# 5/13/25 #
+-Seek out information on how to handle multicollinearity for inferential lasso models. May be less important given use of double ML (de-biasing) approach. Can turn to tidymodels recipes if needed.
+-We know fits are using the lasso model because in lrn("regr.cv_glmnet"), the default elastic-net mixing parameter is: alpha = 1. (1 for lasso, 0 for ridge.) See https://mlr3learners.mlr-org.com/reference/mlr_learners_regr.cv_glmnet.html. Also see https://cran.r-project.org/web/packages/glmnet/glmnet.pdf.
+
+# 5/14/25 #
+-From double_ml_data_from_data_frame help file (function used to complete data backend initialization): use_other_treat_as_covariate = TRUE
+-In fit step, "parallel = TRUE" argument is a cv.glmnet parameter recognized by lrn(). See https://www.rdocumentation.org/packages/glmnet/versions/4.1-8/topics/cv.glmnet and https://cran.r-project.org/web/packages/mlr3learners/mlr3learners.pdf.
+-Viewing lambda sequence tested and the minimum lambda selected for each learner requires models to be saved in fit step (within lrn() function). If saved (will yield very large files), access via: imp fit # --> models --> learner (ml_l or ml_m) --> treatment name --> repetition # --> fold # --> model --> $lambda (sequence) or $lambda.min (selected)
+-Note that the length of the lambda sequence is fairly large (~ 80; varies by fold).
+

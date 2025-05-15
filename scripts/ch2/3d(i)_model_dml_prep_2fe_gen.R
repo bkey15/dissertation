@@ -221,6 +221,22 @@ for(i in m){
   }
 }
 
+### check for zero variance ----
+zerovar_1962 <- caret::nearZeroVar(
+  start_1962[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1981 <- caret::nearZeroVar(
+  start_1981[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1990 <- caret::nearZeroVar(
+  start_1990[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
 ### combine ----
 no_interactions <- list(
   start_1962 = start_1962,
@@ -305,6 +321,22 @@ for(i in m){
   }
 }
 
+### check for zero variance ----
+zerovar_1962 <- caret::nearZeroVar(
+  start_1962[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1981 <- caret::nearZeroVar(
+  start_1981[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1990 <- caret::nearZeroVar(
+  start_1990[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
 ### combine ----
 has_interactions <- list(
   start_1962 = start_1962,
@@ -321,4 +353,3 @@ imp_dml_dats_2fe_gen <- list(
 # save initialized data ----
 imp_dml_dats_2fe_gen |> 
   save(file = here("data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda"))
-

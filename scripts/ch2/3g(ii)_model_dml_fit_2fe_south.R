@@ -48,10 +48,7 @@ for(stat in interact_stat){
           n_folds = 5,
           n_rep = 3
           )
-        fit <- spec$fit(
-          store_predictions = TRUE,
-          store_models = TRUE
-          )
+        fit <- spec$fit()
         imp_dml_fits_2fe_south[[as.character(stat)]][[as.character(year)]][[as.character(name)]][[as.character(i)]] <- fit
     }
     }

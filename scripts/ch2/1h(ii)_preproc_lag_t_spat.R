@@ -27,13 +27,15 @@ sp_lag_base <- sp_lag_base |>
     )
 
 # merge data ----
-## note: GDR, Zanzibar, S. Yemen, & S. Vietnam are in imp_base but not sp_lag_base (no extant polygons), meaning these countries have missing values on all spatially-laged variables
+## note: dropping high miss states and/or ones with no extant polygons
 imp_1962_sp_l1 <- imp_base |> 
   left_join(sp_lag_base) |> 
   filter(
     cow != "265",
+    cow != "347",
     cow != "511",
     cow != "680",
+    cow != "713",
     cow != "817"
     ) |> 
   relocate(region, .after = cow) |> 
@@ -58,11 +60,11 @@ imp_1962_sp_l1 <- imp_1962_sp_l1 |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = as.numeric(levels(year))[year]) |> 
-  mutate(year = as.factor(year))
+  mutate(year = droplevels(year))
 
 ## 1981 ----
 ## note: re-leveling cow codes to account for countries dropping out of the dataset
+## note: in this case, no countries drop out
 imp_1981_sp_l1 <- imp_1962_sp_l1 |> 
   mutate(
     year = as.numeric(levels(year))[year],
@@ -75,6 +77,7 @@ imp_1981_sp_l1 <- imp_1962_sp_l1 |>
     )
 
 ## 1990 ----
+## note: in this case, no countries drop out
 imp_1990_sp_l1 <- imp_1962_sp_l1 |> 
   mutate(
     year = as.numeric(levels(year))[year],

@@ -418,6 +418,22 @@ for(i in m){
   }
 }
 
+### check for zero variance ----
+zerovar_1962 <- caret::nearZeroVar(
+  start_1962[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1981 <- caret::nearZeroVar(
+  start_1981[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1990 <- caret::nearZeroVar(
+  start_1990[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
 ### combine ----
 no_interactions <- list(
   start_1962 = start_1962,
@@ -634,6 +650,22 @@ for(i in m){
     }
   }
 }
+
+### check for zero variance ----
+zerovar_1962 <- caret::nearZeroVar(
+  start_1962[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1981 <- caret::nearZeroVar(
+  start_1981[[1]][[1]]$data_model,
+  saveMetrics = T
+)
+
+zerovar_1990 <- caret::nearZeroVar(
+  start_1990[[1]][[1]]$data_model,
+  saveMetrics = T
+)
 
 ### combine ----
 has_interactions <- list(

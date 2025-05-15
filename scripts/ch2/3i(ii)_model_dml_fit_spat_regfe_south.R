@@ -38,20 +38,19 @@ for(stat in interact_stat){
           ml_l = lrn(
             "regr.cv_glmnet",
             s = "lambda.min",
-            parallel = TRUE
+            parallel = TRUE,
+            parallel_predict = TRUE
           ),
           ml_m = lrn(
             "regr.cv_glmnet",
             s = "lambda.min",
-            parallel = TRUE
+            parallel = TRUE,
+            parallel_predict = TRUE
           ),
           n_folds = 5,
           n_rep = 3
         )
-        fit <- spec$fit(
-          store_predictions = TRUE,
-          store_models = TRUE
-        )
+        fit <- spec$fit()
         imp_dml_fits_spat_regfe_south[[as.character(stat)]][[as.character(year)]][[as.character(name)]][[as.character(i)]] <- fit
       }
     }
