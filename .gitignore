@@ -36,6 +36,7 @@ data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_north.rda
 ### Spatial (no regional FE)
 
 ### Spatial (regional FE)
+data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_gen.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_south.rda
 data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_north.rda
 

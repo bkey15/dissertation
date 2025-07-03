@@ -115,3 +115,24 @@
 -Viewing lambda sequence tested and the minimum lambda selected for each learner requires models to be saved in fit step (within lrn() function). If saved (will yield very large files), access via: imp fit # --> models --> learner (ml_l or ml_m) --> treatment name --> repetition # --> fold # --> model --> $lambda (sequence) or $lambda.min (selected)
 -Note that the length of the lambda sequence is fairly large (~ 80; varies by fold).
 
+# 6/2/25 #
+-For Ch. 3, IST dataset "sender" codes (see IGO COW codes & IST codebook):
+  -1240 == Commonwealth Secretariat
+  -1520 == Economic Community of West African States
+  -1653 == European Economic Community (EU predecessor)
+  -1830 == European Union
+  -3450 == League of Arab States
+  -3760 == Organization for African Unity (AU predecessor) or African Union
+  -3900 == Organization of American States
+  -4120 == East African Community
+  -4250 == Southern African Development Community
+  -4375 == Union of South American Nations
+  -4400 == United Nations
+
+# 6/26/25 #
+-Downloaded and viewed the Global Sanctions Data Base (GDSB) mentioned in Peez, which contains a good deal more observations wherein non-Western countries (e.g., Russia, China, etc.) are senders. Isn't appreciately different from IST otherwise; and in any case, non-Western senders are less relevant, because their motivations for sanctioning are seldom (if at all) to improve HR/democracy respect.
+-Probably better to keep with IST to ensure comparability with Peez, too.
+
+# 7/1/25 #
+-GDSB has better pre-1990 coverage, but information on sanction measures is sparser. Still sticking with IST for now, although a robustness check could use GDSB.
+-For political proximity variable: use `ideal_point_all`, not `us_agree` (see codebook).
