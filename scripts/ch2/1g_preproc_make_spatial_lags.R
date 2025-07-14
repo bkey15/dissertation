@@ -189,7 +189,7 @@ var_names <- imp_base_spt |>
   names()
 var_names <- var_names[!var_names == "geometry"]
 
-### get data ----
+## get data ----
 for(imp in m){
   for(i in years){
     yr_i <- imp_base_spt |> 

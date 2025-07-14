@@ -227,8 +227,3 @@ ist_panel |>
   save(
     file = here("data/ch3/preprocessed/ist_panel.rda")
     )
-
-test <- ist_dyads |> 
-  mutate(n_measures = str_count(measures, ",") + 1) |> 
-  relocate(n_measures, .after = measures) |> 
-  arrange(n_measures)

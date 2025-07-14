@@ -136,3 +136,19 @@
 # 7/1/25 #
 -GDSB has better pre-1990 coverage, but information on sanction measures is sparser. Still sticking with IST for now, although a robustness check could use GDSB.
 -For political proximity variable: use `ideal_point_all`, not `us_agree` (see codebook).
+
+# 7/3/25 #
+-As to the neopatrimonialism index (`v2x_neopat`): this will suffice in representing clientelism & regime corruption, since the latter two contribute to the former.
+
+# 7/7/25 #
+-In lieu of UCDP/PRIO's armed conflict dataset (from which Peez's "intrastate conflict" variable comes), I'm opting for their "one-sided violence" dataset. This seems a better measure of a potential "trigger" for economic sanctions than increases in the number of intrastate conflicts (e.g., Russia's war crimes in Ukraine, Syrian war crimes throughout the civil war, etc.).
+
+# 7/8/25 #
+-V-Dem variables v2x_suffr & v2x_elecoff are not dummies. No need to convert them into factors.
+-I'm going to impute missing values in "political proximity" (many of which result from a lack of UN membership), because it's a proxy for alignment with the U.S./the West in general--not just in the UN.
+
+# 7/10/25 #
+-No EU "BITs" actually exist, so we'll count EU "TIPs" (Treaties w/ Investment Provisions) instead.
+
+# 7/11/25 #
+-Unlike Peez (and Soest & Wahmann), I'm lagging the trigger events (in addition to all the independent variables), because the imposition of democratic sanctions are never an outcome in my analysis. (Hence, both trigger events and imposition of sanctions will precede the outcome, HR Scores, at t-1.)
