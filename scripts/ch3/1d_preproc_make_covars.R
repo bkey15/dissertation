@@ -422,6 +422,14 @@ ems_final <- ems_final |>
       )
     )
 
+## cow
+## note: dropping countries w/ only 1 observation (zero variance b/c drops out of dataset in 1991)
+ems_final <- ems_final |> 
+  filter(
+    cow != 265,
+    cow != 680
+    )
+
 # save ----
 ems_final |> 
   save(file = here("data/ch3/preprocessed/ems_final.rda"))
