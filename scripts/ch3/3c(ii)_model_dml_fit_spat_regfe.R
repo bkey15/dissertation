@@ -21,34 +21,38 @@ registerDoMC(cores = n)
 # fit models ----
 imp_dml_fits_spat_regfe <- list()
 start_yrs <- names(imp_dml_dats_spat_regfe)
-treat_names <- names(imp_dml_dats_spat_regfe[[1]])
-m <- 1:length(imp_dml_dats_spat_regfe[[1]][[1]])
+lag_names <- names(imp_dml_dats_spat_regfe[[1]])
+treat_names <- names(imp_dml_dats_spat_regfe[[1]][[1]])
+m <- 1:length(imp_dml_dats_spat_regfe[[1]][[1]][[1]])
 
 for(year in start_yrs){
   list_1 <- imp_dml_dats_spat_regfe[[year]]
-  for(name in treat_names){
-    list_2 <- list_1[[name]]
-    for(i in m){
-      set.seed(15275)
-      spec <- DoubleMLPLR$new(
-        data = list_2[[i]],
-        ml_l = lrn(
-          "regr.cv_glmnet",
-          s = "lambda.min",
-          parallel = TRUE,
-          parallel_predict = TRUE
-        ),
-        ml_m = lrn(
-          "regr.cv_glmnet",
-          s = "lambda.min",
-          parallel = TRUE,
-          parallel_predict = TRUE
-        ),
-        n_folds = 5,
-        n_rep = 3
-      )
-      fit <- spec$fit()
-      imp_dml_fits_spat_regfe[[as.character(year)]][[as.character(name)]][[as.character(i)]] <- fit
+  for(lag in lag_names){
+    list_2 <- list_1[[lag]]
+    for(treat in treat_names){
+      list_3 <- list_2[[treat]]
+      for(i in m){
+        set.seed(15275)
+        spec <- DoubleMLPLR$new(
+          data = list_3[[i]],
+          ml_l = lrn(
+            "regr.cv_glmnet",
+            s = "lambda.min",
+            parallel = TRUE,
+            parallel_predict = TRUE
+            ),
+          ml_m = lrn(
+            "regr.cv_glmnet",
+            s = "lambda.min",
+            parallel = TRUE,
+            parallel_predict = TRUE
+            ),
+          n_folds = 5,
+          n_rep = 3
+          )
+        fit <- spec$fit()
+        imp_dml_fits_spat_regfe[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+      }
     }
   }
 }

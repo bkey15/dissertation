@@ -28,7 +28,7 @@ m <- 1:length(imp_dml_dats_2fe[[1]][[1]][[1]])
 for(year in start_yrs){
   list_1 <- imp_dml_dats_2fe[[year]]
   for(lag in lag_names){
-    list2 <- list1[[lag]]
+    list_2 <- list_1[[lag]]
     for(treat in treat_names){
       list_3 <- list_2[[treat]]
       for(i in m){
