@@ -46,6 +46,8 @@ data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_gen.rda
 data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_south.rda
 data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_north.rda
 
+data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe.rda
+
 ## Other
 data/ch4/mdb_speeches.feather
 data/ch4/every_single_word/every_single_word.RData
