@@ -21,6 +21,7 @@ imp_base <- imp_base |>
 # make lags ----
 ## L1 (t-1) ----
 ## note: re-leveling "year" to remove "2018" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), but am including the code for other lags for possible future use.
 
 l1 <- imp_base |> 
   mutate(
@@ -31,7 +32,10 @@ l1 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L2 (t-2) ----
@@ -44,7 +48,10 @@ l2 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L3 (t-3) ----
@@ -57,7 +64,10 @@ l3 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L4 (t-4) ----
@@ -70,7 +80,10 @@ l4 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L5 (t-5) ----
@@ -83,7 +96,10 @@ l5 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L6 (t-6) ----
@@ -96,7 +112,10 @@ l6 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L7 (t-7) ----
@@ -109,7 +128,10 @@ l7 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 ## L8 (t-8) ----
@@ -122,7 +144,10 @@ l8 <- imp_base |>
     ) |> 
   ungroup() |> 
   filter(!is.na(year)) |> 
-  mutate(year = droplevels(year)) |> 
+  mutate(
+    year = droplevels(year),
+    cow = droplevels(cow)
+    ) |> 
   as.mids()
 
 # combine ----

@@ -23,6 +23,8 @@ data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_north.rda
 
+data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe.rda
+
 ## Fits
 ### 2FE
 data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_gen.rda
