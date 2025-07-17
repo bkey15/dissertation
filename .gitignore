@@ -9,6 +9,8 @@ data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
 data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_north.rda
 
+data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe.rda
+
 ### Spatial (no regional FE)
 data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_gen.rda
 data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_south.rda
