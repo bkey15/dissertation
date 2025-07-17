@@ -10,13 +10,30 @@ library(mice)
 load(here("data/ch3/results/imputations/imp_base.rda"))
 
 # prep base data ----
+## note: creating interaction vars
 imp_base <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   relocate(.imp, .id) |> 
-  group_by(cow, .imp)
+  group_by(cow, .imp) |> 
+  mutate(
+    any_inforce = as.numeric(levels(any_inforce))[any_inforce],
+    across(
+      c(n_ems, any_inforce),
+      ~ .x * v2x_polyarchy,
+      .names = "v2x_polyarchy_x_{.col}"
+      ),
+    any_inforce = factor(
+      any_inforce,
+      levels = c("0", "1")
+      )
+    ) |> 
+  relocate(
+    contains("_x_"),
+    .after = any_inforce
+    )
 
 # make lags ----
 ## L1 (t-1) ----
