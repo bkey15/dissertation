@@ -12,7 +12,7 @@ library(data.table)
 # load data ----
 load(here("data/ch3/results/imputations/imp_1990_sp_t_lags.rda"))
 
-# get imputed datasets ----
+# get imputed data ----
 m <- 1:imp_1990_sp_t_lags[[1]]$m
 lag_names <- names(imp_1990_sp_t_lags)
 imp_1990_dfs <- list()
@@ -37,8 +37,10 @@ for(lag in lag_names){
 }
 
 # initialize data backend ----
-## get initial specs ----
-## important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the lassos.
+## no interactions ----
+### 1990 ----
+#### get initial specs ----
+#### important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the lassos.
 covar_names_1990 <- list()
 
 for(lag in lag_names){
@@ -49,8 +51,10 @@ for(lag in lag_names){
     as_tibble() |> 
     select(
       -1,
-      -c(n_ems, hr_score),
-      -starts_with("any_inforce")
+      -hr_score,
+      -contains(
+        c("n_ems", "any_inforce")
+        )
       )|> 
     names()
   
@@ -61,7 +65,7 @@ treat_names <- c("n_ems", "any_inforce1")
 
 start_1990 <- list()
 
-## finalize ----
+#### finalize ----
 for(lag in lag_names){
   lag_df <- imp_1990_dfs[[lag]]
   covar_names <- covar_names_1990[[lag]]
@@ -89,9 +93,54 @@ zerovar_1990 <- caret::nearZeroVar(
   saveMetrics = T
   )
 
-# combine ----
-imp_dml_dats_spat_regfe <- list(
+### combine ----
+no_interactions <- list(
   start_1990 = start_1990
+  )
+
+## has interactions ----
+### 1990 ----
+#### get initial specs ----
+interact_names <- imp_1990_dfs[[1]][[1]] |> 
+  select(contains("_x_")) |> 
+  names()
+
+start_1990 <- list()
+
+#### finalize ----
+for(lag in lag_names){
+  lag_df <- imp_1990_dfs[[lag]]
+  covar_names <- covar_names_1990[[lag]]
+  for(i in m){
+    df <- lag_df[[i]]
+    df <- model.matrix(
+      ~ . - 1,
+      data = df
+      ) |> 
+      as.data.table()
+    for(j in seq_along(treat_names)){
+      k <- treat_names[[j]]
+      l <- interact_names[[j]]
+      
+      start_1990[[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |> 
+        double_ml_data_from_data_frame(
+          x_cols = covar_names,
+          d_cols = c(k, l),
+          y_col = "hr_score"
+          )
+    }
+  }
+}
+
+### combine ----
+has_interactions <- list(
+  start_1990 = start_1990
+  )
+
+# all combine ----
+imp_dml_dats_spat_regfe <- list(
+  no_interactions = no_interactions,
+  has_interactions = has_interactions
   )
 
 # save initialized data ----

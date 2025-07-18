@@ -11,35 +11,39 @@ load(here("data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe.rda"))
 
 # pool results ----
 imp_dml_pool_2fe <- list()
-start_yrs <- names(imp_dml_fits_2fe)
-lag_names <- names(imp_dml_fits_2fe[[1]])
-treat_names <- names(imp_dml_fits_2fe[[1]][[1]])
-m <- 1:length(imp_dml_fits_2fe[[1]][[1]][[1]])
+interact_stat <- names(imp_dml_fits_2fe)
 
-for(year in start_yrs){
-  list_1 <- imp_dml_fits_2fe[[year]]
-  for(lag in lag_names){
-    list_2 <- list_1[[lag]]
-    for(treat in treat_names){
-      list_3 <- list_2[[treat]]
-      prepool_tbl <- tibble()
-      for(i in m){
-        res <- list_3[[i]]$summary() |> 
-          as.data.frame() |> 
-          rownames_to_column() |> 
-          clean_names() |> 
-          rename(
-            term = rowname,
-            std.error = std_error
-            ) |> 
-          select(term, estimate, std.error)
-        prepool_tbl <- prepool_tbl |> 
-          rbind(res)
+for(stat in interact_stat){
+  list_1 <- imp_dml_fits_2fe[[stat]]
+  start_yrs <- names(list_1)
+  for(year in start_yrs){
+    list_2 <- list_1[[year]]
+    lag_names <- names(list_2)
+    for(lag in lag_names){
+      list_3 <- list_2[[lag]]
+      treat_names <- names(list_3)
+      for(treat in treat_names){
+        list_4 <- list_3[[treat]]
+        m <- 1:length(list_4)
+        prepool_tbl <- tibble()
+        for(i in m){
+          res <- list_4[[i]]$summary() |> 
+            as.data.frame() |> 
+            rownames_to_column() |> 
+            clean_names() |> 
+            rename(
+              term = rowname,
+              std.error = std_error
+              ) |> 
+            select(term, estimate, std.error)
+          prepool_tbl <- prepool_tbl |> 
+            rbind(res)
+          }
+        
+        pool_res <- prepool_tbl |> 
+          pool.table()
+        imp_dml_pool_2fe[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]] <- pool_res
       }
-      
-      pool_res <- prepool_tbl |> 
-        pool.table()
-      imp_dml_pool_2fe[[as.character(year)]][[as.character(lag)]][[as.character(treat)]] <- pool_res
     }
   }
 }

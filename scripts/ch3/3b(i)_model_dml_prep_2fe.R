@@ -126,7 +126,7 @@ for(lag in lag_names){
           x_cols = covar_names,
           d_cols = c(k, l),
           y_col = "hr_score"
-        )
+          )
     }
   }
 }

@@ -20,38 +20,42 @@ registerDoMC(cores = n)
 
 # fit models ----
 imp_dml_fits_spat_regfe <- list()
-start_yrs <- names(imp_dml_dats_spat_regfe)
-lag_names <- names(imp_dml_dats_spat_regfe[[1]])
-treat_names <- names(imp_dml_dats_spat_regfe[[1]][[1]])
-m <- 1:length(imp_dml_dats_spat_regfe[[1]][[1]][[1]])
+interact_stat <- names(imp_dml_dats_spat_regfe)
 
-for(year in start_yrs){
-  list_1 <- imp_dml_dats_spat_regfe[[year]]
-  for(lag in lag_names){
-    list_2 <- list_1[[lag]]
-    for(treat in treat_names){
-      list_3 <- list_2[[treat]]
-      for(i in m){
-        set.seed(15275)
-        spec <- DoubleMLPLR$new(
-          data = list_3[[i]],
-          ml_l = lrn(
-            "regr.cv_glmnet",
-            s = "lambda.min",
-            parallel = TRUE,
-            parallel_predict = TRUE
+for(stat in interact_stat){
+  list_1 <- imp_dml_dats_spat_regfe[[stat]]
+  start_yrs <- names(list_1)
+  for(year in start_yrs){
+    list_2 <- list_1[[year]]
+    lag_names <- names(list_2)
+    for(lag in lag_names){
+      list_3 <- list_2[[lag]]
+      treat_names <- names(list_3)
+      for(treat in treat_names){
+        list_4 <- list_3[[treat]]
+        m <- 1:length(list_4)
+        for(i in m){
+          set.seed(15275)
+          spec <- DoubleMLPLR$new(
+            data = list_4[[i]],
+            ml_l = lrn(
+              "regr.cv_glmnet",
+              s = "lambda.min",
+              parallel = TRUE,
+              parallel_predict = TRUE
             ),
-          ml_m = lrn(
-            "regr.cv_glmnet",
-            s = "lambda.min",
-            parallel = TRUE,
-            parallel_predict = TRUE
+            ml_m = lrn(
+              "regr.cv_glmnet",
+              s = "lambda.min",
+              parallel = TRUE,
+              parallel_predict = TRUE
             ),
-          n_folds = 5,
-          n_rep = 3
+            n_folds = 5,
+            n_rep = 3
           )
-        fit <- spec$fit()
-        imp_dml_fits_spat_regfe[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+          fit <- spec$fit()
+          imp_dml_fits_spat_regfe[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+        }
       }
     }
   }
