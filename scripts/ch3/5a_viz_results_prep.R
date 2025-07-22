@@ -26,7 +26,12 @@ for(stat in interact_stat){
       for(treat in treat_names){
           res <- list_3[[treat]] |> 
             janitor::clean_names() |> 
-            select(term, estimate, p_value) |> 
+            select(
+              term,
+              estimate,
+              p_value,
+              starts_with("conf")
+              ) |> 
             mutate(
               id = treat,
               n_lag = as.numeric(
@@ -83,7 +88,12 @@ for(stat in interact_stat){
       for(treat in treat_names){
         res <- list_3[[treat]] |> 
           janitor::clean_names() |> 
-          select(term, estimate, p_value) |> 
+          select(
+            term,
+            estimate,
+            p_value,
+            starts_with("conf")
+            ) |> 
           mutate(
             id = treat,
             n_lag = as.numeric(
@@ -123,7 +133,7 @@ for(stat in interact_stat){
 
 # save ----
 imp_dml_pool_2fe_viz_dfs |> 
-  save(file = here("data/ch3/visualizations/imp_dml_pool_2fe_viz_dfs.rda"))
+  save(file = here("data/ch3/viz_prep/imp_dml_pool_2fe_viz_dfs.rda"))
 imp_dml_pool_spat_regfe_viz_dfs |> 
-  save(file = here("data/ch3/visualizations/imp_dml_pool_spat_regfe_viz_dfs.rda"))
+  save(file = here("data/ch3/viz_prep/imp_dml_pool_spat_regfe_viz_dfs.rda"))
 
