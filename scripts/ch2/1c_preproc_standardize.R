@@ -140,7 +140,7 @@ bits_standard <- bits_gen |>
   left_join(bits_ns) |> 
   left_join(bits_nn)
 
-# note: first nn BIT doesn't appear until 1950, so 
+# note: first nn BIT doesn't appear until 1950, so...
 
 # save ----
 bits_standard |> 
