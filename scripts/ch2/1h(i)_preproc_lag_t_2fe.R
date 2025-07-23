@@ -131,7 +131,7 @@ for(i in seq_along(1:8)){
   imp_1981_t_lags[[as.character(paste0("l", i))]] <- lag_dat
 }
 
-# imp_1990 ----
+# imp 1990 ----
 imp_base_1990 <- imp_base_1962 |> 
   mutate(
     year = as.numeric(levels(year))[year],
@@ -166,8 +166,7 @@ for(i in seq_along(1:8)){
 }
 
 # save ----
-## L1 ----
-### no imp ----
+## no imp ----
 bits_1962_l1 |> 
   save(file = here("data/ch2/preprocessed/bits_1962_l1.rda"))
 bits_1981_l1 |> 
@@ -175,7 +174,7 @@ bits_1981_l1 |>
 bits_1990_l1 |> 
   save(file = here("data/ch2/preprocessed/bits_1990_l1.rda"))
 
-### imp ----
+## imp ----
 imp_1962_t_lags |> 
   save(file = here("data/ch2/results/imputations/imp_1962_t_lags.rda"))
 imp_1981_t_lags |> 

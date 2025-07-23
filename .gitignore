@@ -1,4 +1,7 @@
 # Big files
+## Imputed data
+data/ch2/results/imputations/imp_1962_sp_t_lags.rda
+
 ## Initialized data
 ### 2FE
 data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
