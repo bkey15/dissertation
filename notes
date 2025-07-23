@@ -152,3 +152,7 @@
 
 # 7/11/25 #
 -Unlike Peez (and Soest & Wahmann), I'm lagging the trigger events (in addition to all the independent variables), because the imposition of democratic sanctions are never an outcome in my analysis. (Hence, both trigger events and imposition of sanctions will precede the outcome, HR Scores, at t-1.)
+
+# 7/22/25 #
+-Running Ch. 2 models with lags L1-L8 (as in Ch. 3). Removed 1962 start year & population-based treatments to speed runtimes. First model (imp_dml_fits_2fe_gen) took 2 hrs 53 min.
+

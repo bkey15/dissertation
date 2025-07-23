@@ -8,9 +8,9 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch2/results/imputations/imp_1962_l1.rda"))
-load(here("data/ch2/results/imputations/imp_1981_l1.rda"))
-load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
+load(here("data/ch2/results/imputations/imp_1962_t_lags.rda"))
+load(here("data/ch2/results/imputations/imp_1981_t_lags.rda"))
+load(here("data/ch2/results/imputations/imp_1990_t_lags.rda"))
 
 # get imputed datasets ----
 ## 1962 ----
@@ -18,28 +18,33 @@ load(here("data/ch2/results/imputations/imp_1990_l1.rda"))
 ## IMPORTANT: drop out unused cow levels. Unwanted columns will appear after initializing model.matrix otherwise.
 ### also important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
 
+m <- 1:imp_1962_t_lags[[1]]$m
+lag_names <- names(imp_1962_t_lags)
 imp_1962_dfs <- list()
-m <- 1:imp_1962_l1$m
 
-for(i in m){
-  imp_df <- imp_1962_l1 |> 
-    mice::complete(
-      action = "long",
-      include = TRUE
-      ) |> 
-    filter(
-      glb_s == 0,
-      .imp == i
-      ) |> 
-    select(
-      -contains("ss_"),
-      -glb_s,
-      -last_col(),
-      -last_col(offset = 1)
-      ) |> 
-    mutate(cow = droplevels(cow))
-  
-  imp_1962_dfs[[as.character(i)]] <- imp_df
+for(lag in lag_names){
+  imp_dat <- imp_1962_t_lags[[lag]]
+  for(i in m){
+    imp_df <- imp_dat |> 
+      mice::complete(
+        action = "long",
+        include = TRUE
+        ) |> 
+      filter(
+        glb_s == 0,
+        .imp == i
+        ) |> 
+      select(
+        -contains("ss_"),
+        -glb_s,
+        -any_inforce,
+        -last_col(),
+        -last_col(offset = 1)
+        ) |> 
+      mutate(cow = droplevels(cow))
+    
+    imp_1962_dfs[[as.character(lag)]][[as.character(i)]] <- imp_df
+  }
 }
 
 ## 1981 ----
