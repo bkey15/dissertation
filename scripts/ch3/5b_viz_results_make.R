@@ -54,7 +54,7 @@ for(stat in interact_stat){
               y = TeX("$\\Delta$ in HR Scores"),
               title = "Effect Estimates",
               subtitle = "Treatment: Econ. Sanctions (#)",
-              caption = "Note: bounds = CI (95%)"
+              caption = "Note: bars = CI (95%)"
               )
           
           imp_dml_pool_2fe_plots[[as.character(stat)]][[as.character(year)]][[as.character(treat)]] <- plot
@@ -66,7 +66,7 @@ for(stat in interact_stat){
               y = TeX("$\\Delta$ in HR Scores"),
               title = "Effect Estimates",
               subtitle = "Treatment: Econ. Sanction (Y/N)",
-              caption = "Note: bounds = CI (95%)"
+              caption = "Note: bars = CI (95%)"
               )
           
           imp_dml_pool_2fe_plots[[as.character(stat)]][[as.character(year)]][[as.character(treat)]] <- plot
@@ -105,7 +105,7 @@ for(stat in interact_stat){
             y = TeX("$\\Delta$ in HR Scores"),
             title = "Effect Estimates",
             subtitle = "Treatment + Interaction Term",
-            caption = "Note: bounds = CI (95%)"
+            caption = "Note: bars = CI (95%)"
             ) +
           theme_solarized() +
           theme(
@@ -192,7 +192,7 @@ for(stat in interact_stat){
               y = TeX("$\\Delta$ in HR Scores"),
               title = "Effect Estimates",
               subtitle = "Treatment: Econ. Sanctions (#)",
-              caption = "Note: bounds = CI (95%)"
+              caption = "Note: bars = CI (95%)"
               )
           
           imp_dml_pool_spat_regfe_plots[[as.character(stat)]][[as.character(year)]][[as.character(treat)]] <- plot
@@ -204,7 +204,7 @@ for(stat in interact_stat){
               y = TeX("$\\Delta$ in HR Scores"),
               title = "Effect Estimates",
               subtitle = "Treatment: Econ. Sanction (Y/N)",
-              caption = "Note: bounds = CI (95%)"
+              caption = "Note: bars = CI (95%)"
               )
           
           imp_dml_pool_spat_regfe_plots[[as.character(stat)]][[as.character(year)]][[as.character(treat)]] <- plot
@@ -243,7 +243,7 @@ for(stat in interact_stat){
             y = TeX("$\\Delta$ in HR Scores"),
             title = "Effect Estimates",
             subtitle = "Treatment + Interaction Term",
-            caption = "Note: bounds = CI (95%)"
+            caption = "Note: bars = CI (95%)"
             ) +
           theme_solarized() +
           theme(

@@ -133,6 +133,28 @@ treat_names_ns <- imp_1962_dfs[[1]][[1]] |>
     ) |> 
   names()
 
+## interact names ----
+interact_names_gen <- imp_1962_dfs[[1]][[1]] |> 
+  select(
+    starts_with("e_polity2_x") & !contains(c("_ss_", "_ns_")),
+    -ends_with("_pop")
+    ) |> 
+  names()
+
+interact_names_ss <- imp_1962_dfs[[1]][[1]] |> 
+  select(
+    starts_with("e_polity2_x_ss"),
+    -ends_with("_pop")
+    ) |> 
+  names()
+
+interact_names_ns <- imp_1962_dfs[[1]][[1]] |> 
+  select(
+    starts_with("e_polity2_x_ns"),
+    -ends_with("_pop")
+    ) |> 
+  names()
+
 ## covar names ----
 ## important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lasso
 ### 1962 ----
@@ -213,28 +235,6 @@ covar_names_all <- list(
   start_1981 = covar_names_1981,
   start_1990 = covar_names_1990
   )
-
-## interact names ----
-interact_names_gen <- imp_1962_dfs[[1]][[1]] |> 
-  select(
-    starts_with("e_polity2_x") & !contains(c("_ss_", "_ns_")),
-    -ends_with("_pop")
-    ) |> 
-  names()
-
-interact_names_ss <- imp_1962_dfs[[1]][[1]] |> 
-  select(
-    starts_with("e_polity2_x_ss"),
-    -ends_with("_pop")
-    ) |> 
-  names()
-
-interact_names_ns <- imp_1962_dfs[[1]][[1]] |> 
-  select(
-    starts_with("e_polity2_x_ns"),
-    -ends_with("_pop")
-    ) |> 
-  names()
 
 # initialize data backend ----
 ## no interactions ----

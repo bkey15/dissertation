@@ -13,6 +13,7 @@ library(data.table)
 load(here("data/ch3/results/imputations/imp_1990_sp_t_lags.rda"))
 
 # get imputed data ----
+## 1990 ----
 m <- 1:imp_1990_sp_t_lags[[1]]$m
 lag_names <- names(imp_1990_sp_t_lags)
 imp_1990_dfs <- list()
@@ -36,11 +37,25 @@ for(lag in lag_names){
   }
 }
 
-# initialize data backend ----
-## no interactions ----
+## combine ----
+## note: code below is drawn from earlier chapters; can be used in the event other start-dates are utilized
+imp_dfs_all <- list(
+  start_1990 = imp_1990_dfs
+  )
+
+# get main specs ----
+## treat names ----
+treat_names <- c("n_ems", "any_inforce1")
+
+## interact names ----
+interact_names <- imp_1990_dfs[[1]][[1]] |> 
+  select(contains("_x_")) |> 
+  names()
+
+## covar names ----
+## important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the lassos.
+## important: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
 ### 1990 ----
-#### get initial specs ----
-#### important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the lassos.
 covar_names_1990 <- list()
 
 for(lag in lag_names){
@@ -51,9 +66,12 @@ for(lag in lag_names){
     as_tibble() |> 
     select(
       -1,
-      -hr_score,
       -contains(
-        c("n_ems", "any_inforce")
+        c(
+          "n_ems",
+          "any_inforce",
+          "hr_score"
+          )
         )
       )|> 
     names()
@@ -61,80 +79,82 @@ for(lag in lag_names){
   covar_names_1990[[as.character(lag)]] <- covar_names
 }
 
-treat_names <- c("n_ems", "any_inforce1")
+### combine ----
+covar_names_all <- list(
+  start_1990 = covar_names_1990
+  )
 
-start_1990 <- list()
+# initialize data backend ----
+## no interactions ----
+### get initial specs ----
+no_interactions <- list()
+start_yrs <- imp_dfs_all |> 
+  names()
 
-#### finalize ----
-for(lag in lag_names){
-  lag_df <- imp_1990_dfs[[lag]]
-  covar_names <- covar_names_1990[[lag]]
-  for(i in m){
-    df <- lag_df[[i]]
-    df <- model.matrix(
-      ~ . - 1,
-      data = df
+### finalize ----
+for(year in start_yrs){
+  year_dfs <- imp_dfs_all[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
       ) |> 
-      as.data.table()
-    for(treat in treat_names){
-      start_1990[[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |> 
-        double_ml_data_from_data_frame(
-          x_cols = covar_names,
-          d_cols = treat,
-          y_col = "hr_score"
+        as.data.table()
+      for(treat in treat_names){
+        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = treat,
+            y_col = "hr_score"
           )
+      }
     }
   }
 }
 
-### check for zero variance
+### check for zero variance ----
 zerovar_1990 <- caret::nearZeroVar(
-  start_1990[[8]][[1]][[1]]$data_model,
+  no_interactions[[1]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
-### combine ----
-no_interactions <- list(
-  start_1990 = start_1990
-  )
-
 ## has interactions ----
-### 1990 ----
-#### get initial specs ----
-interact_names <- imp_1990_dfs[[1]][[1]] |> 
-  select(contains("_x_")) |> 
-  names()
+### get initial specs ----
+has_interactions <- list()
 
-start_1990 <- list()
-
-#### finalize ----
-for(lag in lag_names){
-  lag_df <- imp_1990_dfs[[lag]]
-  covar_names <- covar_names_1990[[lag]]
-  for(i in m){
-    df <- lag_df[[i]]
-    df <- model.matrix(
-      ~ . - 1,
-      data = df
-      ) |> 
-      as.data.table()
-    for(j in seq_along(treat_names)){
-      k <- treat_names[[j]]
-      l <- interact_names[[j]]
-      
-      start_1990[[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |> 
-        double_ml_data_from_data_frame(
-          x_cols = covar_names,
-          d_cols = c(k, l),
-          y_col = "hr_score"
-          )
+### finalize ----
+for(year in start_yrs){
+  year_dfs <- imp_dfs_all[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
+        ) |> 
+        as.data.table()
+      for(j in seq_along(treat_names)){
+        k <- treat_names[[j]]
+        l <- interact_names[[j]]
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = c(k, l),
+            y_col = "hr_score"
+            )
+      }
     }
   }
 }
 
-### combine ----
-has_interactions <- list(
-  start_1990 = start_1990
+### check for zero variance ----
+zerovar_1990 <- caret::nearZeroVar(
+  no_interactions[[1]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
   )
 
 # all combine ----

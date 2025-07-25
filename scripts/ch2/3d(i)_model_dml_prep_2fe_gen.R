@@ -105,6 +105,14 @@ treat_names <- imp_1962_dfs[[1]][[1]] |>
     ) |> 
   names()
 
+## interact names ----
+interact_names <- imp_1962_dfs[[1]][[1]] |> 
+  select(
+    starts_with("e_polity2_x"),
+    -ends_with("_pop")
+    ) |> 
+  names()
+
 ## covar names ----
 ## important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lasso
 ### 1962 ----
@@ -186,14 +194,6 @@ covar_names_all <- list(
   start_1990 = covar_names_1990
   )
 
-## interact names ----
-interact_names <- imp_1962_dfs[[1]][[1]] |> 
-  select(
-    starts_with("e_polity2_x"),
-    -ends_with("_pop")
-    ) |> 
-  names()
-
 # initialize data backend ----
 ## no interactions ----
 ### get initial specs ----
@@ -232,7 +232,7 @@ zerovar_1981 <- caret::nearZeroVar(
   )
 
 zerovar_1990 <- caret::nearZeroVar(
-  no_interactions[[1]][[1]][[1]][[1]]$data_model,
+  no_interactions[[2]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
@@ -252,9 +252,9 @@ for(year in start_yrs){
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(j in seq_along(treat_names_gen)){
-        k <- treat_names_gen[[j]]
-        l <- interact_names_gen[[j]]
+      for(j in seq_along(treat_names)){
+        k <- treat_names[[j]]
+        l <- interact_names[[j]]
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
             x_cols = covar_names,
@@ -267,18 +267,13 @@ for(year in start_yrs){
 }
 
 ### check for zero variance ----
-zerovar_1962 <- caret::nearZeroVar(
-  start_1962[[1]][[1]][[1]]$data_model,
-  saveMetrics = T
-  )
-
 zerovar_1981 <- caret::nearZeroVar(
   has_interactions[[1]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
 zerovar_1990 <- caret::nearZeroVar(
-  has_interactions[[1]][[1]][[1]][[1]]$data_model,
+  has_interactions[[2]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
