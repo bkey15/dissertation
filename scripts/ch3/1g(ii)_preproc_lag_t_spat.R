@@ -49,6 +49,7 @@ imp_base_1990 <- imp_base_1990 |>
     )
 
 # make lags ----
+## 1990 ----
 ## note: re-leveling "year" to remove "2018" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), and doesn't matter as much for spatial models (using regional fixed effects). Still including the code for possible future use.
 ## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).

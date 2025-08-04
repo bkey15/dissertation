@@ -120,11 +120,6 @@ imp_base <- bits_mice |>
   )
 
 ### save ----
-bits_1962 |> 
-  save(
-    file = here("data/ch2/preprocessed/bits_1962.rda")
-    )
-
 imp_base |> 
   save(
     file = here("data/ch2/results/imputations/imp_base.rda")

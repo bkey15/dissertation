@@ -42,41 +42,13 @@ imp_base_1962 <- imp_base_1962 |>
     .before = v2x_polyarchy
     )
 
-# 1962 ----
-## L1 (t-1) ----
-bits_1962_l1 <- bits_1962 |> 
-  select(-1) |> 
-  group_by(cow) |> 
-  mutate(
-    across(
-      contains("n_bits") | contains("partner_"),
-      ~ .x * e_polity2,
-      .names = "e_polity2_x_{.col}"
-      ),
-    across(
-      !hr_score,
-      ~ lag(.x)
-      )
-    ) |> 
-  ungroup() |> 
-  filter(!is.na(year))
-
-# 1981 ----
-## L1 (t-1) ----
-bits_1981_l1 <- bits_1962_l1  |> 
-  filter(year > 1980)
-
-# 1990 ----
-## L1 (t-1) ----
-bits_1990_l1 <- bits_1962_l1  |> 
-  filter(year > 1989)
-
-# imp 1962 ----
-## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+# make lags ----
+## 1962 ----
+## note: re-leveling "year" in imp_1962 chunk to remove "2019", "2018, etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging.
 imp_1962_t_lags <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1962 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -96,8 +68,7 @@ for(i in seq_along(1:8)){
   imp_1962_t_lags[[as.character(paste0("l", i))]] <- lag_dat
 }
 
-# imp 1981 ----
-## note: re-leveling cow codes to account for countries dropping out of the dataset
+## 1981 ----
 imp_base_1981 <- imp_base_1962 |> 
   mutate(
     year = as.numeric(levels(year))[year],
@@ -111,7 +82,7 @@ imp_base_1981 <- imp_base_1962 |>
 
 imp_1981_t_lags <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1981 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -131,7 +102,7 @@ for(i in seq_along(1:8)){
   imp_1981_t_lags[[as.character(paste0("l", i))]] <- lag_dat
 }
 
-# imp 1990 ----
+## 1990 ----
 imp_base_1990 <- imp_base_1962 |> 
   mutate(
     year = as.numeric(levels(year))[year],
@@ -145,7 +116,7 @@ imp_base_1990 <- imp_base_1962 |>
 
 imp_1990_t_lags <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -166,15 +137,6 @@ for(i in seq_along(1:8)){
 }
 
 # save ----
-## no imp ----
-bits_1962_l1 |> 
-  save(file = here("data/ch2/preprocessed/bits_1962_l1.rda"))
-bits_1981_l1 |> 
-  save(file = here("data/ch2/preprocessed/bits_1981_l1.rda"))
-bits_1990_l1 |> 
-  save(file = here("data/ch2/preprocessed/bits_1990_l1.rda"))
-
-## imp ----
 imp_1962_t_lags |> 
   save(file = here("data/ch2/results/imputations/imp_1962_t_lags.rda"))
 imp_1981_t_lags |> 

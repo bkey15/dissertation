@@ -11,8 +11,10 @@ library(mice)
 load(here("data/ch1/results/imputations/imp_base.rda"))
 load(here("data/ch1/results/imputations/sp_lag_base.rda"))
 
-# complete/prep base data ----
-imp_base <- imp_base |> 
+# prep base data ----
+## merge & drop select states ----
+## note: dropping high miss states and/or ones with no extant polygons
+imp_base_1968 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -26,9 +28,7 @@ sp_lag_base <- sp_lag_base |>
     year = as.factor(year)
     )
 
-# merge data ----
-## note: dropping high miss states and/or ones with no extant polygons
-imp_1968_sp_l1 <- imp_base |> 
+imp_base_1968 <- imp_base_1968 |> 
   left_join(sp_lag_base) |> 
   filter(
     cow != "265",
@@ -40,25 +40,50 @@ imp_1968_sp_l1 <- imp_base |>
   relocate(region, .after = cow) |> 
   mutate(cow = droplevels(cow))
 
-# L1 (t-1) ----
-## 1968 ----
-## note: re-leveling "year" in imp_1968 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
-imp_1968_sp_l1 <- imp_1968_sp_l1 |> 
-  group_by(cow, .imp) |> 
+## make interaction vars ----
+imp_base_1968 <- imp_base_1968 |> 
   mutate(
     across(
-      !c(.id, hr_score),
-      ~ lag(.x)
+      ends_with("_mean"),
+      ~ .x * v2x_polyarchy,
+      .names = "v2x_polyarchy_x_{.col}"
       )
     ) |> 
-  ungroup() |> 
-  filter(!is.na(year)) |> 
-  mutate(year = droplevels(year))
+  relocate(
+    contains("_x_"),
+    .before = v2x_polyarchy
+    )
+
+# make lags ----
+## 1968 ----
+## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## note: re-leveling cow codes to account for countries potentially dropping out of the dataset
+## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
+imp_1968_sp_t_lags <- list()
+
+for(i in seq(1:8)){
+  lag_dat <- imp_base_1968 |> 
+    group_by(cow, .imp) |> 
+    mutate(
+      across(
+        !c(.id, hr_score),
+        ~ lag(.x, n = i)
+        )
+      ) |> 
+    ungroup() |> 
+    filter(!is.na(year)) |> 
+    mutate(
+      year = droplevels(year),
+      cow = droplevels(cow),
+      region = droplevels(region)
+      ) |> 
+    as.mids()
+  
+  imp_1968_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+}
 
 ## 1977 ----
-## note: re-leveling cow codes to account for countries dropping out of the dataset
-## note: in this instance, no countries drop out
-imp_1977_sp_l1 <- imp_1968_sp_l1 |> 
+imp_base_1977 <- imp_base_1968 |> 
   mutate(
     year = as.numeric(levels(year))[year],
     cow = as.numeric(levels(cow))[cow]
@@ -69,17 +94,68 @@ imp_1977_sp_l1 <- imp_1968_sp_l1 |>
     cow = as.factor(cow)
     )
 
-## as.mids() ----
-imp_1968_sp_l1 <- imp_1968_sp_l1 |> 
-  as.mids()
+imp_1977_sp_t_lags <- list()
 
-imp_1977_sp_l1 <- imp_1977_sp_l1 |> 
-  as.mids()
+for(i in seq(1:8)){
+  lag_dat <- imp_base_1977 |> 
+    group_by(cow, .imp) |> 
+    mutate(
+      across(
+        !c(.id, hr_score),
+        ~ lag(.x, n = i)
+        )
+      ) |> 
+    ungroup() |> 
+    filter(!is.na(year)) |> 
+    mutate(
+      year = droplevels(year),
+      cow = droplevels(cow),
+      region = droplevels(region)
+      ) |> 
+    as.mids()
+  
+  imp_1977_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+}
+
+## 1990 ----
+imp_base_1990 <- imp_base_1968 |> 
+  mutate(
+    year = as.numeric(levels(year))[year],
+    cow = as.numeric(levels(cow))[cow]
+    ) |> 
+  filter(year > 1989) |> 
+  mutate(
+    year = as.factor(year),
+    cow = as.factor(cow)
+    )
+
+imp_1990_sp_t_lags <- list()
+
+for(i in seq(1:8)){
+  lag_dat <- imp_base_1990 |> 
+    group_by(cow, .imp) |> 
+    mutate(
+      across(
+        !c(.id, hr_score),
+        ~ lag(.x, n = i)
+        )
+      ) |> 
+    ungroup() |> 
+    filter(!is.na(year)) |> 
+    mutate(
+      year = droplevels(year),
+      cow = droplevels(cow),
+      region = droplevels(region)
+      ) |> 
+    as.mids()
+  
+  imp_1990_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+}
 
 # save ----
-## L1 ----
-### imp ----
-imp_1968_sp_l1 |> 
-  save(file = here("data/ch1/results/imputations/imp_1968_sp_l1.rda"))
-imp_1977_sp_l1 |> 
-  save(file = here("data/ch1/results/imputations/imp_1977_sp_l1.rda"))
+imp_1968_sp_t_lags |> 
+  save(file = here("data/ch1/results/imputations/imp_1968_sp_t_lags.rda"))
+imp_1977_sp_t_lags |> 
+  save(file = here("data/ch1/results/imputations/imp_1977_sp_t_lags.rda"))
+imp_1990_sp_t_lags |> 
+  save(file = here("data/ch1/results/imputations/imp_1990_sp_t_lags.rda"))

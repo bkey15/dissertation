@@ -1,5 +1,8 @@
 # Big files
 ## Imputed data
+data/ch1/results/imputations/imp_1968_sp_t_lags.rda
+data/ch1/results/imputations/imp_1977_sp_t_lags.rda
+
 data/ch2/results/imputations/imp_1962_sp_t_lags.rda
 
 ## Initialized data

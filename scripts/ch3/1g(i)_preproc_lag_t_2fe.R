@@ -10,14 +10,13 @@ library(mice)
 load(here("data/ch3/results/imputations/imp_base.rda"))
 
 # prep base data ----
-## note: creating interaction vars
+## make interaction vars ----
 imp_base_1990 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   relocate(.imp, .id) |> 
-  group_by(cow, .imp) |> 
   mutate(
     any_inforce = as.numeric(levels(any_inforce))[any_inforce],
     across(
@@ -36,11 +35,12 @@ imp_base_1990 <- imp_base |>
     )
 
 # make lags ----
-## note: re-leveling "year" to remove "2018" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## 1990 ----
+## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), but am including the code for other lags for possible future use.
 imp_1990_t_lags <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
     group_by(cow, .imp) |> 
     mutate(

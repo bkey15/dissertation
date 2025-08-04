@@ -64,7 +64,7 @@ imp_vals <- ptas_1968 |>
 ### check success
 for(var in imp_vals){
   is.logical(var) |> print()
-}
+  }
 
 # specify predictor cols ----
 ## get dimension names
@@ -110,8 +110,8 @@ ptas_mice <- ptas_1968 |>
     across(
       c(cow, year, inforce, glb_s),
       ~ as_factor(.x)
+      )
     )
-  )
 
 ## complete ----
 ## note: setting n.core == m (5), since imputed datasets are completed by core 
@@ -122,14 +122,9 @@ imp_base <- ptas_mice |>
     method = "rf",
     where = imp_vals,
     predictorMatrix = pred_mat
-  )
-
-### save ----
-ptas_1968 |> 
-  save(
-    file = here("data/ch1/preprocessed/ptas_1968.rda")
     )
 
+### save ----
 imp_base |> 
   save(
     file = here("data/ch1/results/imputations/imp_base.rda")

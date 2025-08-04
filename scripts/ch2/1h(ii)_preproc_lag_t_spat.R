@@ -56,8 +56,8 @@ imp_base_1962 <- imp_base_1962 |>
     )
 
 # make lags ----
-## imp 1962 ----
-## note: re-leveling "year" in imp_1962 chunk to remove "2019" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+## 1962 ----
+## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging.
 ## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
 
@@ -85,7 +85,7 @@ for(i in seq_along(1:8)){
 }
 
 
-## imp 1981 ----
+## 1981 ----
 ## note: re-leveling cow codes to account for countries dropping out of the dataset
 ## note: in this case, no countries drop out
 imp_base_1981 <- imp_base_1962 |> 
@@ -123,7 +123,7 @@ for(i in seq_along(1:8)){
   imp_1981_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
 }
 
-## imp 1990 ----
+## 1990 ----
 ## note: in this case, no countries drop out
 imp_base_1990 <- imp_base_1962 |> 
   mutate(
