@@ -1,4 +1,6 @@
-# Prep lasso models by tuning for lambda across all imputed datasets.
+# Prep lasso models across all imputed datasets.
+# IMPORTANT: we're not using the spatially-lagged versions of the treatments as covariates (for now) because this introduces the same endogeneity problems from which SAR suffers, specifically when the treatment(s) is/are regressed on the covariates (d ~ X).
+# IMPORTANT: difference here is we're including a region fixed effect (following Wimpy, Whitten, Williams)
 
 # load packages ----
 library(tidyverse)
@@ -8,18 +10,17 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1968_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1977_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1968_sp_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1977_sp_l1.rda"))
 
 # get imputed datasets ----
 ## 1968 ----
-## important: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
-## important: drop out unused cow levels. Unwanted columns will appear after initializing model.matrix otherwise.
+## important: drop out unused region levels. Unwanted columns will appear after initializing model.matrix otherwise.
 imp_1968_dfs <- list()
-m <- 1:imp_1968_l1$m
+m <- 1:imp_1968_sp_l1$m
 
 for(i in m){
-  imp_df <- imp_1968_l1 |> 
+  imp_df <- imp_1968_sp_l1 |> 
     mice::complete(
       action = "long",
       include = TRUE
@@ -31,11 +32,13 @@ for(i in m){
     select(
       -starts_with("ss_"),
       -glb_s,
-      -inforce,
       -last_col(),
-      -last_col(offset = 1)
+      -last_col(offset = 1),
+      -cow,
+      -inforce,
+      -n_ptas
     ) |> 
-    mutate(cow = droplevels(cow))
+    mutate(region = droplevels(region))
   
   imp_1968_dfs[[as.character(i)]] <- imp_df
 }
@@ -44,7 +47,7 @@ for(i in m){
 imp_1977_dfs <- list()
 
 for(i in m){
-  imp_df <- imp_1977_l1 |> 
+  imp_df <- imp_1977_sp_l1 |> 
     mice::complete(
       action = "long",
       include = TRUE
@@ -56,11 +59,13 @@ for(i in m){
     select(
       -starts_with("ss_"),
       -glb_s,
-      -inforce,
       -last_col(),
-      -last_col(offset = 1)
+      -last_col(offset = 1),
+      -cow,
+      -inforce,
+      -n_ptas
     ) |> 
-    mutate(cow = droplevels(cow))
+    mutate(region = droplevels(region))
   
   imp_1977_dfs[[as.character(i)]] <- imp_df
 }
@@ -68,6 +73,8 @@ for(i in m){
 # initialize data backend ----
 ## 1968 ----
 ### get initial specs ----
+start_1968 <- list()
+
 covar_names_1968 <- model.matrix(
   ~ . - 1,
   data = imp_1968_dfs[[1]]
@@ -75,19 +82,25 @@ covar_names_1968 <- model.matrix(
   as_tibble() |> 
   select(
     -1,
-    -hr_score,
-    -ends_with("_mean")
+    -starts_with(
+      c(
+        "hr_score",
+        "cpr_",
+        "esr_",
+        "lech_",
+        "ns_",
+        "nn_"
+      )
+    )
   ) |> 
   names()
-
-start_1968 <- list()
 
 ### general ----
 #### lechner ----
 treat_names_lech <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("lech_hr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
@@ -111,14 +124,14 @@ for(i in m){
 treat_names_cpr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("cpr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
 treat_names_esr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("esr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
@@ -144,14 +157,14 @@ for(i in m){
 treat_names_nn_lech <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("nn_lech"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
 treat_names_ns_lech <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("ns_lech"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
@@ -176,14 +189,14 @@ for(i in m){
 treat_names_nn_cpr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("nn_cpr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
 treat_names_ns_cpr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("ns_cpr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
@@ -208,14 +221,14 @@ for(i in m){
 treat_names_nn_esr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("nn_esr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
 treat_names_ns_esr <- imp_1968_dfs[[1]] |> 
   select(
     starts_with("ns_esr"),
-    -ends_with("pop_mean")
+    -ends_with(c("pop_mean", "sp_lag"))
   ) |> 
   names()
 
@@ -258,6 +271,8 @@ for(i in m){
 
 ## 1977 ----
 ### get initial specs ----
+start_1977 <- list()
+
 covar_names_1977 <- model.matrix(
   ~ . - 1,
   data = imp_1977_dfs[[1]]
@@ -265,12 +280,18 @@ covar_names_1977 <- model.matrix(
   as_tibble() |> 
   select(
     -1,
-    -hr_score,
-    -ends_with("_mean")
+    -starts_with(
+      c(
+        "hr_score",
+        "cpr_",
+        "esr_",
+        "lech_",
+        "ns_",
+        "nn_"
+      )
+    )
   ) |> 
   names()
-
-start_1977 <- list()
 
 ### general ----
 #### lechner ----
@@ -395,7 +416,7 @@ zerovar_1977 <- caret::nearZeroVar(
 )
 
 # combine ----
-imp_dml_dats_2fe_north <- list(
+imp_dml_dats_spat_regfe_north <- list(
   start_1968 = start_1968,
   start_1977 = start_1977
 )

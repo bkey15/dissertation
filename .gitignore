@@ -5,62 +5,28 @@ data/ch1/results/imputations/imp_1977_sp_t_lags.rda
 
 data/ch2/results/imputations/imp_1962_sp_t_lags.rda
 
-## Initialized data
-### 2FE
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_north.rda
-
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_gen.rda
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_south.rda
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe_north.rda
-
-data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe.rda
-
-### Spatial (no regional FE)
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_gen.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_south.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_north.rda
-
-### Spatial (regional FE)
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
-data/ch1/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_north.rda
-
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_gen.rda
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_south.rda
-data/ch2/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe_north.rda
-
-data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe.rda
-
 ## Fits
 ### 2FE
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_gen.rda
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_south.rda
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_north.rda
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda
 
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_gen.rda
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_south.rda
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe_north.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda
 
-data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_2fe.rda
+data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe.rda
 
-### Spatial (no regional FE)
+### Spatial (w/ regional FE)
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-### Spatial (regional FE)
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_gen.rda
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_south.rda
-data/ch1/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_north.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_gen.rda
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_south.rda
-data/ch2/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe_north.rda
-
-data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe.rda
-
-## Other
-data/ch4/mdb_speeches.feather
-data/ch4/every_single_word/every_single_word.RData
+data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe.rda
 
 # History files
 .Rhistory

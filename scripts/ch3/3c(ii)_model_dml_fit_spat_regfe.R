@@ -8,8 +8,8 @@ library(mlr3learners)
 library(parallel)
 library(doMC)
 
-# load data ----
-load(here("data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_spat_regfe.rda"))
+# run prep script ----
+source(here("scripts/ch3/3b(ii)_model_dml_prep_spat_regfe.R"))
 
 # set cores ----
 ## check
@@ -63,4 +63,4 @@ for(stat in interact_stat){
 
 # save fits ----
 imp_dml_fits_spat_regfe |> 
-  save(file = here("data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe.rda"))
+  save(file = here("data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe.rda"))

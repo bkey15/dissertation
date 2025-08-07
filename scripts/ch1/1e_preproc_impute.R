@@ -23,7 +23,13 @@ ptas_1968 <- ptas_final |>
 ptas_1968 <- ptas_1968 |> 
   mutate(
     across(
-      c(7:18, starts_with("ns_"), n_ptas),
+      c(
+        starts_with("cpr_"),
+        starts_with("esr_"),
+        starts_with("lech_"),
+        starts_with("ns_"),
+        n_ptas
+        ),
       ~ if_else(
         is.na(.x), 0, .x
         )

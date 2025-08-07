@@ -7,14 +7,14 @@ library(janitor)
 library(knitr)
 
 # load data ----
-load(here("data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda"))
+load(here("data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda"))
 
 # pool results ----
-imp_dml_pool_2fe_north <- list()
-interact_stat <- names(imp_dml_fits_2fe_north)
+imp_dml_pool_spat_regfe_north <- list()
+interact_stat <- names(imp_dml_fits_spat_regfe_north)
 
 for(stat in interact_stat){
-  list_1 <- imp_dml_fits_2fe_north[[stat]]
+  list_1 <- imp_dml_fits_spat_regfe_north[[stat]]
   start_yrs <- names(list_1)
   for(year in start_yrs){
     list_2 <- list_1[[year]]
@@ -34,7 +34,7 @@ for(stat in interact_stat){
             rename(
               term = rowname,
               std.error = std_error
-              ) |> 
+            ) |> 
             select(term, estimate, std.error)
           prepool_tbl <- prepool_tbl |> 
             rbind(res)
@@ -42,12 +42,12 @@ for(stat in interact_stat){
         
         pool_res <- prepool_tbl |> 
           pool.table()
-        imp_dml_pool_2fe_north[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]] <- pool_res
+        imp_dml_pool_spat_regfe_north[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]] <- pool_res
       }
     }
   }
 }
 
 # save ----
-imp_dml_pool_2fe_north |> 
-  save(file = here("data/ch2/results/fits/dml_lasso/pool/imp_dml_pool_2fe_north.rda"))
+imp_dml_pool_spat_regfe_north |> 
+  save(file = here("data/ch2/results/fits/dml_lasso/pool/imp_dml_pool_spat_regfe_north.rda"))

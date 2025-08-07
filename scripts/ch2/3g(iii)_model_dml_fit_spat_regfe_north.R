@@ -9,7 +9,7 @@ library(parallel)
 library(doMC)
 
 # run prep script ----
-source(here("scripts/ch3/3b(i)_model_dml_prep_2fe.R"))
+source(here("scripts/ch2/3e(iii)_model_dml_prep_spat_regfe_north.R"))
 
 # set cores ----
 ## check
@@ -19,11 +19,11 @@ n <- detectCores() - 1
 registerDoMC(cores = n)
 
 # fit models ----
-imp_dml_fits_2fe <- list()
-interact_stat <- names(imp_dml_dats_2fe)
+imp_dml_fits_spat_regfe_north <- list()
+interact_stat <- names(imp_dml_dats_spat_regfe_north)
 
 for(stat in interact_stat){
-  list_1 <- imp_dml_dats_2fe[[stat]]
+  list_1 <- imp_dml_dats_spat_regfe_north[[stat]]
   start_yrs <- names(list_1)
   for(year in start_yrs){
     list_2 <- list_1[[year]]
@@ -41,20 +41,18 @@ for(stat in interact_stat){
             ml_l = lrn(
               "regr.cv_glmnet",
               s = "lambda.min",
-              parallel = TRUE,
-              parallel_predict = TRUE
+              parallel = TRUE
               ),
             ml_m = lrn(
               "regr.cv_glmnet",
               s = "lambda.min",
-              parallel = TRUE,
-              parallel_predict = TRUE
+              parallel = TRUE
               ),
             n_folds = 5,
             n_rep = 3
             )
           fit <- spec$fit()
-          imp_dml_fits_2fe[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+          imp_dml_fits_spat_regfe_north[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
         }
       }
     }
@@ -62,5 +60,5 @@ for(stat in interact_stat){
 }
 
 # save fits ----
-imp_dml_fits_2fe |> 
-  save(file = here("data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe.rda"))
+imp_dml_fits_spat_regfe_north |> 
+  save(file = here("data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda"))

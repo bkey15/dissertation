@@ -159,7 +159,3 @@ imp_dml_dats_2fe <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
-
-# save initialized data ----
-imp_dml_dats_2fe |> 
-  save(file = here("data/ch3/results/fits/dml_lasso/dml_initial/imp_dml_dats_2fe.rda"))

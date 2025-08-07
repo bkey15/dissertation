@@ -101,7 +101,7 @@
 -glmnet::cv.glmnet() (called for in DoubleMLPLR$new(ml_* = lrn())) chooses its own lambda sequences and picks the lambda with the smallest cross-validation error (s = "lambda.min"). Sequence (lambda) & smallest lambda (lambda.min) for each regression (outcome as final outcome or treatment, respectively), and from each repetition-fold, can be found in the "models" tab of the fit object.
 
 # 5/9/25 #
--For Ch. 2, truest Bodea-Ye replications (scripts 3(a)) yield same results as their paper (negative & significant coefficient on n_ptas, positive and significant coefficient on e_polity2*n_ptas).
+-For Ch. 2, truest Bodea-Ye replications (scripts 3(a)) yield same results as their paper (negative & significant coefficient on n_bits, positive and significant coefficient on e_polity2*n_bits).
 -Results begin to vary once imputations are used.
 -"Logged event" after as.mids() in north/south models is glb_s (is constant after filtering to glb_s == 1 or glb_s == 0). Not an issue, because the variable isn't included in the model.
 

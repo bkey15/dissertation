@@ -6,25 +6,29 @@ library(here)
 library(mice)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1968_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1977_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1968_t_lags.rda"))
+load(here("data/ch1/results/imputations/imp_1977_t_lags.rda"))
+
+## L1 ----
+hb_rep_1968_l1 <- imp_1968_t_lags[["l1"]]
+hb_rep_1977_l1 <- imp_1977_t_lags[["l1"]]
 
 ## get treat names
-treat_names <- imp_1968_l1 |> 
+treat_names <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   select(
     contains("mean"),
-    -contains("pop"),
+    -contains(c("pop", "_x_")),
     -starts_with(
       c("ss_", "ns_", "nn_")
       )
     ) |> 
   names()
 
-treat_names_cpr <- imp_1968_l1 |> 
+treat_names_cpr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -35,7 +39,7 @@ treat_names_cpr <- imp_1968_l1 |>
     ) |> 
   names()
 
-treat_names_esr <- imp_1968_l1 |> 
+treat_names_esr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -57,7 +61,7 @@ for(name in treat_names){
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + cow + year"
   )
   
-  fit <- with(imp_1968_l1, lm(as.formula(formula)))
+  fit <- with(hb_rep_1968_l1, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -78,7 +82,7 @@ for(i in seq_along(treat_names_cpr)){
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + cow + year"
   )
   
-  fit <- with(imp_1968_l1, lm(as.formula(formula)))
+  fit <- with(hb_rep_1968_l1, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -97,7 +101,7 @@ for(name in treat_names){
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + cow + year"
   )
   
-  fit <- with(imp_1977_l1, lm(as.formula(formula)))
+  fit <- with(hb_rep_1977_l1, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)
@@ -118,7 +122,7 @@ for(i in seq_along(treat_names_cpr)){
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + cow + year"
   )
   
-  fit <- with(imp_1977_l1, lm(as.formula(formula)))
+  fit <- with(hb_rep_1977_l1, lm(as.formula(formula)))
   
   pool <- pool(fit)
   sum <- summary(pool)

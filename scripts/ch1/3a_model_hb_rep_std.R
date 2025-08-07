@@ -7,29 +7,43 @@ library(here)
 library(broom)
 
 # load data ----
+load(here("data/ch1/results/imputations/imp_1968_t_lags.rda"))
+load(here("data/ch1/results/imputations/imp_1977_t_lags.rda"))
+
 ## L1 ----
-load(here("data/ch1/preprocessed/ptas_1968_l1.rda"))
-load(here("data/ch1/preprocessed/ptas_1977_l1.rda"))
+hb_rep_1968_l1 <- imp_1968_t_lags[["l1"]] |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  filter(.imp == 0)
+
+hb_rep_1977_l1 <- imp_1977_t_lags[["l1"]] |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  filter(.imp == 0)
 
 ## get treat names
-treat_names <- ptas_1968_l1 |> 
+treat_names <- hb_rep_1968_l1 |> 
   select(
     contains("mean"),
-    -contains("pop"),
+    -contains(c("pop", "_x_")),
     -starts_with(
       c("ss_", "ns_", "nn_")
       )
     ) |> 
   names()
 
-treat_names_cpr <- ptas_1968_l1 |> 
+treat_names_cpr <- hb_rep_1968_l1 |> 
   select(
     starts_with("cpr_"),
     -contains("pop")
     ) |> 
   names()
 
-treat_names_esr <- ptas_1968_l1 |> 
+treat_names_esr <- hb_rep_1968_l1 |> 
   select(
     starts_with("esr_"),
     -contains("pop")
@@ -45,9 +59,9 @@ for(name in treat_names){
     "hr_score ~ ",
     name,
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + factor(cow) + factor(year)"
-  )
+    )
   
-  sum <- with(ptas_1968_l1, lm(as.formula(formula))) |> 
+  sum <- with(hb_rep_1968_l1, lm(as.formula(formula))) |> 
     summary() |> 
     tidy()
   
@@ -65,9 +79,9 @@ for(i in seq_along(treat_names_cpr)){
     " + ",
     k,
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + factor(cow) + factor(year)"
-  )
+    )
   
-  sum <- with(ptas_1968_l1, lm(as.formula(formula))) |> 
+  sum <- with(hb_rep_1968_l1, lm(as.formula(formula))) |> 
     summary() |> 
     tidy()
   
@@ -85,9 +99,9 @@ for(name in treat_names){
     "hr_score ~ ",
     name,
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + factor(cow) + factor(year)"
-  )
+    )
   
-  sum <- with(ptas_1977_l1, lm(as.formula(formula))) |> 
+  sum <- with(hb_rep_1977_l1, lm(as.formula(formula))) |> 
     summary() |> 
     tidy()
   
@@ -107,7 +121,7 @@ for(i in seq_along(treat_names_cpr)){
     " + e_polity2 + p_durable + wdi_popden + wdi_trade + inv + gdppc_log10 + hras + factor(cow) + factor(year)"
   )
   
-  sum <- with(ptas_1977_l1, lm(as.formula(formula))) |> 
+  sum <- with(hb_rep_1977_l1, lm(as.formula(formula))) |> 
     summary() |> 
     tidy()
   

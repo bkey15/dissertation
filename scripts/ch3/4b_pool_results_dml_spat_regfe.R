@@ -7,7 +7,7 @@ library(janitor)
 library(knitr)
 
 # load data ----
-load(here("data/ch3/results/fits/dml_lasso/dml_final/imp_dml_fits_spat_regfe.rda"))
+load(here("data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe.rda"))
 
 # pool results ----
 imp_dml_pool_spat_regfe <- list()
@@ -50,4 +50,4 @@ for(stat in interact_stat){
 
 # save ----
 imp_dml_pool_spat_regfe |> 
-  save(file = here("data/ch3/results/fits/dml_lasso/dml_final/imp_dml_pool_spat_regfe.rda"))
+  save(file = here("data/ch3/results/fits/dml_lasso/pool/imp_dml_pool_spat_regfe.rda"))

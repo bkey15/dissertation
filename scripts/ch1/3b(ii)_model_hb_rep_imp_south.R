@@ -6,12 +6,16 @@ library(here)
 library(mice)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1968_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1977_l1.rda"))
+load(here("data/ch1/results/imputations/imp_1968_t_lags.rda"))
+load(here("data/ch1/results/imputations/imp_1977_t_lags.rda"))
+
+## L1 ----
+hb_rep_1968_l1 <- imp_1968_t_lags[["l1"]]
+hb_rep_1977_l1 <- imp_1977_t_lags[["l1"]]
 
 # filter to south ----
 ## note: logged event that as.mids() yields is glb_s (no variation; all == 1)
-imp_1968_l1_south <- imp_1968_l1 |> 
+imp_1968_l1_south <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -19,24 +23,24 @@ imp_1968_l1_south <- imp_1968_l1 |>
   filter(glb_s == 1) |> 
   as.mids()
 
-imp_1977_l1_south <- imp_1977_l1 |> 
+imp_1977_l1_south <- hb_rep_1977_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
-  ) |> 
+    ) |> 
   filter(glb_s == 1) |> 
   as.mids()
 
 ## get treat names
 ### general
-treat_names_gen <- imp_1968_l1 |> 
+treat_names_gen <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   select(
     contains("mean"),
-    -contains("pop"),
+    -contains(c("pop", "_x_")),
     -starts_with(
       c("ss_", "ns_", "nn_")
       )
@@ -45,7 +49,7 @@ treat_names_gen <- imp_1968_l1 |>
 
 ### partner type (ss & ns)
 #### ss
-treat_names_ss <- imp_1968_l1 |> 
+treat_names_ss <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -56,30 +60,30 @@ treat_names_ss <- imp_1968_l1 |>
     ) |> 
   names()
 
-treat_names_ss_cpr <- imp_1968_l1 |> 
+treat_names_ss_cpr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
-  ) |> 
+    ) |> 
   select(
     starts_with("ss_cpr"),
     -contains("pop")
-  ) |> 
+    ) |> 
   names()
 
-treat_names_ss_esr <- imp_1968_l1 |> 
+treat_names_ss_esr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
-  ) |> 
+    ) |> 
   select(
     starts_with("ss_esr"),
     -contains("pop")
-  ) |> 
+    ) |> 
   names()
 
 #### ns
-treat_names_ns <- imp_1968_l1 |> 
+treat_names_ns <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -90,7 +94,7 @@ treat_names_ns <- imp_1968_l1 |>
     ) |> 
   names()
 
-treat_names_ns_cpr <- imp_1968_l1 |> 
+treat_names_ns_cpr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
@@ -101,7 +105,7 @@ treat_names_ns_cpr <- imp_1968_l1 |>
     ) |> 
   names()
 
-treat_names_ns_esr <- imp_1968_l1 |> 
+treat_names_ns_esr <- hb_rep_1968_l1 |> 
   mice::complete(
     action = "long",
     include = TRUE
