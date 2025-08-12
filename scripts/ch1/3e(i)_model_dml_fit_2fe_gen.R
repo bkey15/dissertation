@@ -34,27 +34,29 @@ for(stat in interact_stat){
       for(treat in treat_names){
         list_4 <- list_3[[treat]]
         m <- 1:length(list_4)
-        for(i in m){
-          set.seed(15275)
-          spec <- DoubleMLPLR$new(
-            data = list_4[[i]],
-            ml_l = lrn(
-              "regr.cv_glmnet",
-              s = "lambda.min",
-              parallel = TRUE,
-              parallel_predict = TRUE
-              ),
-            ml_m = lrn(
-              "regr.cv_glmnet",
-              s = "lambda.min",
-              parallel = TRUE,
-              parallel_predict = TRUE
-              ),
-            n_folds = 5,
-            n_rep = 3
-            )
-          fit <- spec$fit()
-          imp_dml_fits_2fe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+        if(str_detect(treat, "lech")){
+          for(i in m){
+            set.seed(15275)
+            spec <- DoubleMLPLR$new(
+              data = list_4[[i]],
+              ml_l = lrn(
+                "regr.cv_glmnet",
+                s = "lambda.min",
+                parallel = TRUE,
+                parallel_predict = TRUE
+                ),
+              ml_m = lrn(
+                "regr.cv_glmnet",
+                s = "lambda.min",
+                parallel = TRUE,
+                parallel_predict = TRUE
+                ),
+              n_folds = 5,
+              n_rep = 3
+              )
+            fit <- spec$fit()
+            imp_dml_fits_2fe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+          }
         }
       }
     }

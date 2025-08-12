@@ -10,206 +10,256 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1968_sp_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1977_sp_l1.rda"))
+load(here("data/ch1/results/imputations/imp_sp_t_lags.rda"))
+
+# truncate data ----
+## IMPORTANT: leaving out start_1968 date for now (reduces computation time & helps computer memory)
+imp_sp_t_lags <- imp_sp_t_lags[-1]
 
 # get imputed datasets ----
-## 1968 ----
-imp_1968_dfs <- list()
-m <- 1:imp_1968_sp_l1$m
+m <- 1:imp_sp_t_lags[[1]][[1]]$m
+start_yrs <- names(imp_sp_t_lags)
+imp_sp_t_dfs <- list()
 
-for(i in m){
-  imp_df <- imp_1968_sp_l1 |> 
-    mice::complete(
-      action = "long",
-      include = TRUE
-      ) |> 
-    filter(.imp == i) |> 
-    select(
-      -starts_with(c("ss_", "ns_", "nn_")),
-      -glb_s,
-      -last_col(),
-      -last_col(offset = 1),
-      -cow,
-      -inforce,
-      -n_ptas
-    )
+for(year in start_yrs){
+  lags <- imp_sp_t_lags[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    imp_dat <- lags[[lag]]
+    for(i in m){
+      imp_df <- imp_dat |> 
+        mice::complete(
+          action = "long",
+          include = TRUE
+          ) |> 
+        filter(.imp == i) |> 
+        select(
+          -contains(c("ss_", "ns_", "nn_")),
+          -glb_s,
+          -inforce,
+          -n_ptas,
+          -cow,
+          -last_col(),
+          -last_col(offset = 1)
+          )
   
-  imp_1968_dfs[[as.character(i)]] <- imp_df
+      imp_sp_t_dfs[[as.character(year)]][[as.character(lag)]][[as.character(i)]] <- imp_df
+    }
+  }
 }
 
-## 1977 ----
-imp_1977_dfs <- list()
-
-for(i in m){
-  imp_df <- imp_1977_sp_l1 |> 
-    mice::complete(
-      action = "long",
-      include = TRUE
+# get main specs ----
+## treat names ----
+treat_names_lech <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("lech_hr"),
+    -contains(c("pop", "sp_lag"))
     ) |> 
-    filter(.imp == i) |> 
-    select(
-      -starts_with(c("ss_", "ns_", "nn_")),
-      -glb_s,
-      -last_col(),
-      -last_col(offset = 1),
-      -cow,
-      -inforce,
-      -n_ptas
-    )
-  
-  imp_1977_dfs[[as.character(i)]] <- imp_df
+  names()
+
+treat_names_cpr <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("cpr_"),
+    -contains(c("pop", "sp_lag"))
+    ) |> 
+  names()
+
+treat_names_esr <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("esr_"),
+    -contains(c("pop", "sp_lag"))
+    ) |> 
+  names()
+
+## interact names ----
+interact_names_lech <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("v2x_polyarchy_x_lech"),
+    -contains(c("pop", "sp_lag"))
+    ) |> 
+  names()
+
+interact_names_cpr <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("v2x_polyarchy_x_cpr"),
+    -contains(c("pop", "sp_lag"))
+    ) |> 
+  names()
+
+interact_names_esr <- imp_sp_t_dfs[[1]][[1]][[1]] |> 
+  select(
+    starts_with("v2x_polyarchy_x_esr"),
+    -contains(c("pop", "sp_lag"))
+    ) |> 
+  names()
+
+## covar names ----
+### important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the lasso
+covar_names_all <- list()
+
+for(year in start_yrs){
+  lags <- imp_sp_t_dfs[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    covar_names <- model.matrix(
+      ~ . - 1,
+      data = imp_sp_t_dfs[[year]][[lag]][[1]]
+      ) |> 
+      as_tibble() |> 
+      select(
+        -1,
+        -contains(c("hr_score", "mean"))
+        ) |> 
+      names()
+    
+    covar_names_all[[as.character(year)]][[as.character(lag)]] <- covar_names
+  }
 }
 
 # initialize data backend ----
-## 1968 ----
+## no interactions ----
 ### get initial specs ----
-covar_names_1968 <- model.matrix(
-  ~ . - 1,
-  data = imp_1968_dfs[[1]]
-  ) |> 
-  as_tibble() |> 
-  select(
-    -1,
-    -starts_with(
-      c(
-        "hr_score",
-        "cpr_",
-        "esr_",
-        "lech_"
-        )
-      )
-    ) |> 
-  names()
+no_interactions <- list()
 
-treat_names_lech <- imp_1968_dfs[[1]] |> 
-  select(
-    starts_with("lech_hr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-    ) |> 
-  names()
-
-treat_names_cpr <- imp_1968_dfs[[1]] |> 
-  select(
-    starts_with("cpr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-    ) |> 
-  names()
-
-treat_names_esr <- imp_1968_dfs[[1]] |> 
-  select(
-    starts_with("esr"),
-    -ends_with(c("pop_mean", "sp_lag"))
-    ) |> 
-  names()
-
-start_1968 <- list()
-
-### lechner ----
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1,
-    data = imp_1968_dfs[[i]]
-  ) |> 
-    as.data.table()
-  for(name in treat_names_lech){
-    start_1968[[as.character(name)]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names_1968,
-        d_cols = name,
-        y_col = "hr_score"
-      )
+### finalize ----
+#### lechner ----
+for(year in start_yrs){
+  year_dfs <- imp_sp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
+        ) |> 
+        as.data.table()
+      for(treat in treat_names_lech){
+        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = treat,
+            y_col = "hr_score"
+            )
+      }
+    }
   }
 }
 
-### cpr & esr ----
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1, data = imp_1968_dfs[[i]]
-    ) |> 
-    as.data.table()
-  for(j in seq_along(treat_names_cpr)){
-    k <- treat_names_cpr[[j]]
-    l <- treat_names_esr[[j]]
-    start_1968[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names_1968,
-        d_cols = c(k, l),
-        y_col = "hr_score"
-      )
+#### cpr & esr ----
+for(year in start_yrs){
+  year_dfs <- imp_sp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
+        ) |> 
+        as.data.table()
+      for(j in seq_along(treat_names_cpr)){
+        k <- treat_names_cpr[[j]]
+        l <- treat_names_esr[[j]]
+        
+        no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |> 
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = c(k, l),
+            y_col = "hr_score"
+            )
+      }
+    }
   }
 }
 
-## 1977 ----
-### get initial specs ----
-covar_names_1977 <- model.matrix(
-  ~ . - 1,
-  data = imp_1977_dfs[[1]]
-  ) |> 
-  as_tibble() |> 
-  select(
-    -1,
-    -starts_with(
-      c(
-        "hr_score",
-        "cpr_",
-        "esr_",
-        "lech_"
-      )
-    )
-  ) |> 
-  names()
-
-start_1977 <- list()
-
-### lechner ----
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1,
-    data = imp_1977_dfs[[i]]
-  ) |> 
-    as.data.table()
-  for(name in treat_names_lech){
-    start_1977[[as.character(name)]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names_1977,
-        d_cols = name,
-        y_col = "hr_score"
-      )
-  }
-}
-
-### cpr & esr ----
-for(i in m){
-  df <- model.matrix(
-    ~ . - 1, data = imp_1977_dfs[[i]]
-  ) |> 
-    as.data.table()
-  for(j in seq_along(treat_names_cpr)){
-    k <- treat_names_cpr[[j]]
-    l <- treat_names_esr[[j]]
-    start_1977[[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
-      double_ml_data_from_data_frame(
-        x_cols = covar_names_1977,
-        d_cols = c(k, l),
-        y_col = "hr_score"
-      )
-  }
-}
-
-# check for zero variance ----
-zerovar_1968 <- caret::nearZeroVar(
-  start_1968[[1]][[1]]$data_model,
-  saveMetrics = T
-)
-
+### check for zero variance ----
 zerovar_1977 <- caret::nearZeroVar(
-  start_1977[[1]][[1]]$data_model,
+  no_interactions[[1]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
-)
-
-# combine ----
-imp_dml_dats_spat_regfe_gen <- list(
-  start_1968 = start_1968,
-  start_1977 = start_1977
   )
+
+zerovar_1990 <- caret::nearZeroVar(
+  no_interactions[[2]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+## has interactions ----
+### get initial specs ----
+has_interactions <- list()
+
+### finalize ----
+#### lechner ----
+for(year in start_yrs){
+  year_dfs <- imp_sp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
+        ) |> 
+        as.data.table()
+      for(j in seq_along(treat_names_lech)){
+        k <- treat_names_lech[[j]]
+        l <- interact_names_lech[[j]]
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = c(k, l),
+            y_col = "hr_score"
+            )
+      }
+    }
+  }
+}
+
+#### cpr & esr ----
+for(year in start_yrs){
+  year_dfs <- imp_sp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_all[[year]][[lag]]
+    for(i in m){
+      df <- model.matrix(
+        ~ . - 1,
+        data = lag_df[[i]]
+        ) |> 
+        as.data.table()
+      for(j in seq_along(treat_names_cpr)){
+        k <- treat_names_cpr[[j]]
+        l <- treat_names_esr[[j]]
+        n <- interact_names_cpr[[j]]
+        o <- interact_names_esr[[j]]
+        
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = c(k, l, n, o),
+            y_col = "hr_score"
+            )
+      }
+    }
+  }
+}
+
+### check for zero variance ----
+zerovar_1977 <- caret::nearZeroVar(
+  has_interactions[[1]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+zerovar_1990 <- caret::nearZeroVar(
+  has_interactions[[1]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+# all combine ----
+imp_dml_dats_spat_regfe_gen <- list(
+  no_interactions = no_interactions,
+  has_interactions = has_interactions
+  )
+
+# clear glb env ----
+rm(list = setdiff(ls(), "imp_dml_dats_spat_regfe_gen"))

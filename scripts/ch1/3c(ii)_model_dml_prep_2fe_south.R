@@ -8,125 +8,68 @@ library(DoubleML)
 library(data.table)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_1968_t_lags.rda"))
-load(here("data/ch1/results/imputations/imp_1977_t_lags.rda"))
-load(here("data/ch1/results/imputations/imp_1990_t_lags.rda"))
+load(here("data/ch1/results/imputations/imp_t_lags.rda"))
+
+# truncate data ----
+## IMPORTANT: leaving out start_1968 date for now (reduces computation time & helps computer memory)
+imp_t_lags <- imp_t_lags[-1]
 
 # get imputed datasets ----
-## 1968 ----
 ## IMPORTANT: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
 ## IMPORTANT: drop out unused cow levels. Unwanted columns will appear after initializing model.matrix otherwise.
 
-m <- 1:imp_1968_t_lags[[1]]$m
-lag_names <- names(imp_1968_t_lags)
-imp_1968_dfs <- list()
+m <- 1:imp_t_lags[[1]][[1]]$m
+start_yrs <- names(imp_t_lags)
+imp_t_dfs <- list()
 
-for(lag in lag_names){
-  imp_dat <- imp_1968_t_lags[[lag]]
-  for(i in m){
-    imp_df <- imp_dat |> 
-      mice::complete(
-        action = "long",
-        include = TRUE
-        ) |> 
-      filter(
-        glb_s == 1,
-        .imp == i
-        ) |> 
-      select(
-        -contains("nn_"),
-        -glb_s,
-        -inforce,
-        -last_col(),
-        -last_col(offset = 1)
-        ) |> 
-      mutate(cow = droplevels(cow))
-    
-    imp_1968_dfs[[as.character(lag)]][[as.character(i)]] <- imp_df
+for(year in start_yrs){
+  lags <- imp_t_lags[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    imp_dat <- lags[[lag]]
+    for(i in m){
+      imp_df <- imp_dat |> 
+        mice::complete(
+          action = "long",
+          include = TRUE
+          ) |> 
+        filter(
+          glb_s == 1,
+          .imp == i
+          ) |> 
+        select(
+          -contains("nn_"),
+          -glb_s,
+          -inforce,
+          -n_ptas,
+          -last_col(),
+          -last_col(offset = 1)
+          ) |> 
+        mutate(cow = droplevels(cow))
+      
+      imp_t_dfs[[as.character(year)]][[as.character(lag)]][[as.character(i)]] <- imp_df
+    }
   }
 }
-
-## 1977 ----
-imp_1977_dfs <- list()
-
-for(lag in lag_names){
-  imp_dat <- imp_1977_t_lags[[lag]]
-  for(i in m){
-    imp_df <- imp_dat |> 
-      mice::complete(
-        action = "long",
-        include = TRUE
-        ) |> 
-      filter(
-        glb_s == 1,
-        .imp == i
-        ) |> 
-      select(
-        -contains("nn_"),
-        -glb_s,
-        -inforce,
-        -last_col(),
-        -last_col(offset = 1)
-        ) |> 
-      mutate(cow = droplevels(cow))
-    
-    imp_1977_dfs[[as.character(lag)]][[as.character(i)]] <- imp_df
-  }
-}
-
-## 1990 ----
-imp_1990_dfs <- list()
-
-for(lag in lag_names){
-  imp_dat <- imp_1990_t_lags[[lag]]
-  for(i in m){
-    imp_df <- imp_dat |> 
-      mice::complete(
-        action = "long",
-        include = TRUE
-        ) |> 
-      filter(
-        glb_s == 1,
-        .imp == i
-        ) |> 
-      select(
-        -contains("nn_"),
-        -glb_s,
-        -inforce,
-        -last_col(),
-        -last_col(offset = 1)
-        ) |> 
-      mutate(cow = droplevels(cow))
-    
-    imp_1990_dfs[[as.character(lag)]][[as.character(i)]] <- imp_df
-  }
-}
-
-## combine ----
-### IMPORTANT: leaving out start_1968 date for now (reduce computation time)
-imp_dfs_all <- list(
-  start_1977 = imp_1977_dfs,
-  start_1990 = imp_1990_dfs
-  )
 
 # get main specs ----
 ## treat names ----
 ### gen ----
-treat_names_lech <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("lech_hr"),
     -contains("pop")
     ) |> 
   names()
 
-treat_names_cpr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("cpr_"),
     -contains("pop")
     ) |> 
   names()
 
-treat_names_esr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("esr_"),
     -contains("pop")
@@ -134,42 +77,42 @@ treat_names_esr <- imp_1968_dfs[[1]][[1]] |>
   names()
 
 ### partner-type (ss & ns) ----
-treat_names_ss_lech <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ss_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ss_lech"),
     -ends_with("pop_mean")
     ) |> 
   names()
 
-treat_names_ns_lech <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ns_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ns_lech"),
     -ends_with("pop_mean")
     ) |> 
   names()
 
-treat_names_ss_cpr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ss_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ss_cpr"),
     -ends_with("pop_mean")
     ) |> 
   names()
 
-treat_names_ns_cpr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ns_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ns_cpr"),
     -ends_with("pop_mean")
     ) |> 
   names()
 
-treat_names_ss_esr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ss_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ss_esr"),
     -ends_with("pop_mean")
     ) |> 
   names()
 
-treat_names_ns_esr <- imp_1968_dfs[[1]][[1]] |> 
+treat_names_ns_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("ns_esr"),
     -ends_with("pop_mean")
@@ -178,21 +121,21 @@ treat_names_ns_esr <- imp_1968_dfs[[1]][[1]] |>
 
 ## interact names ----
 ### gen ----
-interact_names_lech <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_lech"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_cpr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_cpr"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_esr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_esr"),
     -contains("pop")
@@ -200,42 +143,42 @@ interact_names_esr <- imp_1968_dfs[[1]][[1]] |>
   names()
 
 ### partner-type (ss & ns) ----
-interact_names_ss_lech <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ss_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ss_lech"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_ns_lech <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ns_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ns_lech"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_ss_cpr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ss_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ss_cpr"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_ns_cpr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ns_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ns_cpr"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_ss_esr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ss_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ss_esr"),
     -contains("pop")
     ) |> 
   names()
 
-interact_names_ns_esr <- imp_1968_dfs[[1]][[1]] |> 
+interact_names_ns_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
   select(
     starts_with("v2x_polyarchy_x_ns_esr"),
     -contains("pop")
@@ -243,93 +186,39 @@ interact_names_ns_esr <- imp_1968_dfs[[1]][[1]] |>
   names()
 
 ## covar names ----
-## important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
-### 1968 ----
-covar_names_1968 <- list()
+### important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
+covar_names_all <- list()
 
-for(lag in lag_names){
-  covar_names <- model.matrix(
-    ~ . - 1,
-    data = imp_1968_dfs[[lag]][[1]]
-    ) |> 
-    as_tibble() |> 
-    select(
-      -c(
-        1,
-        hr_score,
-        n_ptas,
-        ends_with("_mean")
-        )
+for(year in start_yrs){
+  lags <- imp_t_dfs[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    covar_names <- model.matrix(
+      ~ . - 1,
+      data = imp_t_dfs[[year]][[lag]][[1]]
       ) |> 
-    names()
+      as_tibble() |> 
+      select(
+        -1,
+        -contains(c("hr_score", "mean"))
+        ) |> 
+      names()
   
-  covar_names_1968[[as.character(lag)]] <- covar_names
+    covar_names_all[[as.character(year)]][[as.character(lag)]] <- covar_names
+  }
 }
-
-### 1977 ----
-covar_names_1977 <- list()
-
-for(lag in lag_names){
-  covar_names <- model.matrix(
-    ~ . - 1,
-    data = imp_1977_dfs[[lag]][[1]]
-    ) |> 
-    as_tibble() |> 
-    select(
-      -c(
-        1,
-        hr_score,
-        n_ptas,
-        ends_with("_mean")
-        )
-      ) |> 
-    names()
-  
-  covar_names_1977[[as.character(lag)]] <- covar_names
-}
-
-### 1990 ----
-covar_names_1990 <- list()
-
-for(lag in lag_names){
-  covar_names <- model.matrix(
-    ~ . - 1,
-    data = imp_1990_dfs[[lag]][[1]]
-    ) |> 
-    as_tibble() |> 
-    select(
-      -c(
-        1,
-        hr_score,
-        n_ptas,
-        ends_with("_mean")
-        )
-      ) |> 
-    names()
-  
-  covar_names_1990[[as.character(lag)]] <- covar_names
-}
-
-### combine ----
-### IMPORTANT: leaving out start_1962 date for now (reduce computation time)
-covar_names_all <- list(
-  start_1977 = covar_names_1977,
-  start_1990 = covar_names_1990
-  )
 
 # initialize data backend ----
 ## no interactions ----
 ### get initial specs ----
 no_interactions <- list()
-start_yrs <- imp_dfs_all |> 
-  names()
 
 ### finalize ----
 #### gen ----
 #### i.e., no consideration for ns, ss bits
 ##### lechner ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -353,7 +242,7 @@ for(year in start_yrs){
 
 ##### cpr & esr ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -381,7 +270,7 @@ for(year in start_yrs){
 #### partner-type (ss & ns) ----
 ##### lechner ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -407,7 +296,7 @@ for(year in start_yrs){
 
 ##### cpr & esr ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -452,7 +341,7 @@ has_interactions <- list()
 #### gen ----
 ##### lechner ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -478,7 +367,7 @@ for(year in start_yrs){
 
 ##### cpr & esr ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -508,7 +397,7 @@ for(year in start_yrs){
 #### partner-type (ss & ns) ----
 ##### lechner ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -537,7 +426,7 @@ for(year in start_yrs){
 
 ##### cpr & esr ----
 for(year in start_yrs){
-  year_dfs <- imp_dfs_all[[year]]
+  year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_all[[year]][[lag]]
@@ -584,3 +473,6 @@ imp_dml_dats_2fe_south <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
+
+# clear glb env ----
+rm(list = setdiff(ls(), "imp_dml_dats_2fe_south"))

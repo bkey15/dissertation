@@ -282,3 +282,6 @@ imp_dml_dats_2fe_gen <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
+
+# clear glb env ----
+rm(list = setdiff(ls(), "imp_dml_dats_2fe_gen"))

@@ -474,3 +474,6 @@ imp_dml_dats_spat_regfe_south <- list(
   no_interactions = no_interactions,
   has_interactions = has_interactions
   )
+
+# clear glb env ----
+rm(list = setdiff(ls(), "imp_dml_dats_spat_regfe_south"))

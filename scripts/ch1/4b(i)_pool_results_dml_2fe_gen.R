@@ -7,70 +7,47 @@ library(janitor)
 library(knitr)
 
 # load data ----
-load(here("data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_fits_2fe.rda"))
-load(here("data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_fits_2fe.rda"))
+load(here("data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda"))
 
 # pool results ----
-## imp_2 ----
-imp_2_dml_fits_pool_2fe <- list()
-treat_names <- imp_2_dml_fits_2fe |> 
-  names()
-m <- 1:5
+imp_dml_pool_2fe_gen <- list()
+interact_stat <- names(imp_dml_fits_2fe_gen)
 
-for(name in treat_names){
-  list <- imp_2_dml_fits_2fe[[name]]
-  prepool_tbl <- tibble()
-  
-  for(i in m){
-    res <- list[[i]]$summary() |> 
-      as.data.frame() |> 
-      rownames_to_column() |> 
-      clean_names() |> 
-      rename(
-        term = rowname,
-        std.error = std_error
-      ) |> 
-      select(term, estimate, std.error)
-    prepool_tbl <- prepool_tbl |> 
-      rbind(res)
+for(stat in interact_stat){
+  list_1 <- imp_dml_fits_2fe_gen[[stat]]
+  start_yrs <- names(list_1)
+  for(year in start_yrs){
+    list_2 <- list_1[[year]]
+    lag_names <- names(list_2)
+    for(lag in lag_names){
+      list_3 <- list_2[[lag]]
+      treat_names <- names(list_3)
+      for(treat in treat_names){
+        list_4 <- list_3[[treat]]
+        m <- 1:length(list_4)
+        prepool_tbl <- tibble()
+        for(i in m){
+          res <- list_4[[i]]$summary() |> 
+            as.data.frame() |> 
+            rownames_to_column() |> 
+            clean_names() |> 
+            rename(
+              term = rowname,
+              std.error = std_error
+              ) |> 
+            select(term, estimate, std.error)
+          prepool_tbl <- prepool_tbl |> 
+            rbind(res)
+          }
+        
+        pool_res <- prepool_tbl |> 
+          pool.table()
+        imp_dml_pool_2fe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]] <- pool_res
+      }
+    }
   }
-  
-  pool_res <- prepool_tbl |> 
-    pool.table()
-  imp_2_dml_fits_pool_2fe[[as.character(name)]] <- pool_res
-}
-
-## imp_3 ----
-imp_3_dml_fits_pool_2fe <- list()
-treat_names <- imp_3_dml_fits_2fe |> 
-  names()
-m <- 1:5
-
-for(name in treat_names){
-  list <- imp_3_dml_fits_2fe[[name]]
-  prepool_tbl <- tibble()
-  
-  for(i in m){
-    res <- list[[i]]$summary() |> 
-      as.data.frame() |> 
-      rownames_to_column() |> 
-      clean_names() |> 
-      rename(
-        term = rowname,
-        std.error = std_error
-      ) |> 
-      select(term, estimate, std.error)
-    prepool_tbl <- prepool_tbl |> 
-      rbind(res)
-  }
-  
-  pool_res <- prepool_tbl |> 
-    pool.table()
-  imp_3_dml_fits_pool_2fe[[as.character(name)]] <- pool_res
 }
 
 # save ----
-imp_2_dml_fits_pool_2fe |> 
-  save(file = here("data/ch1/results/fits/dml_lasso/dml_final/imp_2_dml_fits_pool_2fe.rda"))
-imp_3_dml_fits_pool_2fe |> 
-  save(file = here("data/ch1/results/fits/dml_lasso/dml_final/imp_3_dml_fits_pool_2fe.rda"))
+imp_dml_pool_2fe_gen |> 
+  save(file = here("data/ch1/results/fits/dml_lasso/pool/imp_dml_pool_2fe_gen.rda"))

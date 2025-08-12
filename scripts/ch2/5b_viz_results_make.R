@@ -307,7 +307,6 @@ for(mod in mod_type){
 }
 
 # reorganize plots ----
-## 2fe ----
 imp_dml_pool_2fe_plots <- list()
 imp_dml_pool_spat_regfe_plots <- list()
 plot_type <- c(names(gen_plots), names(ns_plots))
@@ -343,6 +342,6 @@ for(type in plot_type){
 
 # save ----
 imp_dml_pool_2fe_plots |> 
-  save(file = here("visualizations/ch3/imp_dml_pool_2fe_plots.rda"))
+  save(file = here("visualizations/ch2/imp_dml_pool_2fe_plots.rda"))
 imp_dml_pool_spat_regfe_plots |> 
-  save(file = here("visualizations/ch3/imp_dml_pool_spat_regfe_plots.rda"))
+  save(file = here("visualizations/ch2/imp_dml_pool_spat_regfe_plots.rda"))

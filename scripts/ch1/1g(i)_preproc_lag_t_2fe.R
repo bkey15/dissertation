@@ -44,7 +44,7 @@ imp_base_1968 <- imp_base_1968 |>
 ## 1968 ----
 ## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: re-leveling cow codes to account for countries potentially dropping out of the dataset
-imp_1968_t_lags <- list()
+start_1968 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1968 |> 
@@ -63,7 +63,7 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1968_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1968[[as.character(paste0("l", i))]] <- lag_dat
 }
 
 ## 1977 ----
@@ -78,7 +78,7 @@ imp_base_1977 <- imp_base_1968 |>
     cow = as.factor(cow)
     )
 
-imp_1977_t_lags <- list()
+start_1977 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1977 |> 
@@ -97,7 +97,7 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1977_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1977[[as.character(paste0("l", i))]] <- lag_dat
 }
 
 ## 1990 ----
@@ -112,7 +112,7 @@ imp_base_1990 <- imp_base_1968 |>
     cow = as.factor(cow)
     )
 
-imp_1990_t_lags <- list()
+start_1990 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
@@ -131,13 +131,16 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1990_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1990[[as.character(paste0("l", i))]] <- lag_dat
 }
 
+# combine ----
+imp_t_lags <- list(
+  start_1968 = start_1968,
+  start_1977 = start_1977,
+  start_1990 = start_1990
+  )
+
 # save ----
-imp_1968_t_lags |> 
-  save(file = here("data/ch1/results/imputations/imp_1968_t_lags.rda"))
-imp_1977_t_lags |> 
-  save(file = here("data/ch1/results/imputations/imp_1977_t_lags.rda"))
-imp_1990_t_lags |> 
-  save(file = here("data/ch1/results/imputations/imp_1990_t_lags.rda"))
+imp_t_lags |> 
+  save(file = here("data/ch1/results/imputations/imp_t_lags.rda"))
