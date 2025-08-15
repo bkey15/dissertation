@@ -6,9 +6,51 @@ library(naniar)
 # load data ----
 load(here("data/ch1/preprocessed/ptas_panel.rda"))
 load(here("data/ch1/preprocessed/ptas_final.rda"))
-load(here("data/ch1/preprocessed/ptas_1968_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1968_l1.rda"))
-load(here("data/ch1/results/imputations/imp_1977_l1.rda"))
+
+lechner <- read_delim(file = "data/ch1/raw/lechner_data/nti_201711.txt")
+indices <- read_delim(file = "data/ch1/raw/desta/desta_indices_version_02_02.txt")
+
+# merge data ----
+indices <- indices |> 
+  filter(str_detect(number, "a", negate = TRUE))
+
+desta_dat <- lechner |> 
+  left_join(indices, by = join_by(number == base_treaty))
+
+desta_dat <- desta_dat |> 
+  mutate(lech_hr_mean = (cpr_all_lta + esr_all_lta)/2)
+
+# check correlations ----
+summary(lm(lech_hr_mean ~ depth_index, data = desta_dat))
+cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$depth_index)
+
+summary(lm(lech_hr_mean ~ depth_rasch, data = desta_dat))
+cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$depth_rasch)
+
+summary(lm(lech_hr_mean ~ flexrigid, data = desta_dat))
+cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$flexrigid)
+
+summary(lm(lech_hr_mean ~ flexescape, data = desta_dat))
+cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$flexescape)
+
+## viz corrs ----
+desta_dat |> 
+  ggplot(
+    aes(
+      x = depth_index,
+      y = lech_hr_mean
+      )
+    ) +
+  geom_point()
+
+desta_dat |> 
+  ggplot(
+    aes(
+      x = depth_rasch,
+      y = lech_hr_mean
+      )
+    ) +
+  geom_point()
 
 # quick mean checks ----
 ## south-south ----

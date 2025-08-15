@@ -6,21 +6,20 @@ library(ggthemes)
 library(latex2exp)
 
 # load data ----
-load(here("data/ch2/viz_prep/imp_dml_pool_2fe_viz_dfs.rda"))
-load(here("data/ch2/viz_prep/imp_dml_pool_spat_regfe_viz_dfs.rda"))
+load(here("data/ch2/viz_prep/imp_dml_pool_viz_dfs.rda"))
 
 # reorganize data ----
 ## note: doing this to simplify for-loops
 gen_dfs <- list(
-  "2fe" = imp_dml_pool_2fe_viz_dfs[["general"]],
-  spat_regfe = imp_dml_pool_spat_regfe_viz_dfs[["general"]]
+  "2fe" = imp_dml_pool_viz_dfs[["2fe"]][["general"]],
+  spat_regfe = imp_dml_pool_viz_dfs[["spat_regfe"]][["general"]]
   )
 
 ns_dfs <- list(
-  "2fe_south" = imp_dml_pool_2fe_viz_dfs[["south"]],
-  "2fe_north" = imp_dml_pool_2fe_viz_dfs[["north"]],
-  spat_regfe_south = imp_dml_pool_spat_regfe_viz_dfs[["south"]],
-  spat_regfe_north = imp_dml_pool_spat_regfe_viz_dfs[["north"]]
+  "2fe_south" = imp_dml_pool_viz_dfs[["2fe"]][["south"]],
+  "2fe_north" = imp_dml_pool_viz_dfs[["2fe"]][["north"]],
+  spat_regfe_south = imp_dml_pool_viz_dfs[["spat_regfe"]][["south"]],
+  spat_regfe_north = imp_dml_pool_viz_dfs[["spat_regfe"]][["north"]]
   )
 
 # get new labels ----
@@ -307,8 +306,7 @@ for(mod in mod_type){
 }
 
 # reorganize plots ----
-imp_dml_pool_2fe_plots <- list()
-imp_dml_pool_spat_regfe_plots <- list()
+imp_dml_pool_plots <- list()
 plot_type <- c(names(gen_plots), names(ns_plots))
 
 for(type in plot_type){
@@ -316,32 +314,30 @@ for(type in plot_type){
     list_1 <- gen_plots[[type]]
     list_2 <- ns_plots[[type]]
     if(type == "2fe"){
-      imp_dml_pool_2fe_plots[["general"]] <- list_1
-      }
+      imp_dml_pool_plots[["2fe"]][["general"]] <- list_1
+    }
     else if(str_detect(type, "south")){
-      imp_dml_pool_2fe_plots[["south"]] <- list_2
-      }
+      imp_dml_pool_plots[["2fe"]][["south"]] <- list_2
+    }
     else{
-      imp_dml_pool_2fe_plots[["north"]] <- list_2
+      imp_dml_pool_plots[["2fe"]][["north"]] <- list_2
     }
   }
   else{
     list_1 <- gen_plots[[type]]
     list_2 <- ns_plots[[type]]
     if(type == "spat_regfe"){
-      imp_dml_pool_spat_regfe_plots[["general"]] <- list_1
-      }
+      imp_dml_pool_plots[["spat_regfe"]][["general"]] <- list_1
+    }
     else if(str_detect(type, "south")){
-      imp_dml_pool_spat_regfe_plots[["south"]] <- list_2
-      }
+      imp_dml_pool_plots[["spat_regfe"]][["south"]] <- list_2
+    }
     else{
-      imp_dml_pool_spat_regfe_plots[["north"]] <- list_2
+      imp_dml_pool_plots[["spat_regfe"]][["north"]] <- list_2
     }
   }
 }
 
 # save ----
-imp_dml_pool_2fe_plots |> 
-  save(file = here("visualizations/ch2/imp_dml_pool_2fe_plots.rda"))
-imp_dml_pool_spat_regfe_plots |> 
-  save(file = here("visualizations/ch2/imp_dml_pool_spat_regfe_plots.rda"))
+imp_dml_pool_plots |> 
+  save(file = here("visualizations/ch2/imp_dml_pool_plots.rda"))

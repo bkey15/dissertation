@@ -39,7 +39,7 @@ ptas_final <- ptas_final |>
   select(-gdp_raw, -bop_raw)
 
 # drop gdp_mean, gdppc_mean, and pop_mean ----
-## note: doing this for now so they don't end up in imputations/lasso
+## note: doing this for now so they don't end up in imputations/lasso; aim is to use log10 versions instead
 ptas_final <- ptas_final |> 
   select(-gdp_mean, -gdppc_mean, -pop_mean)
 

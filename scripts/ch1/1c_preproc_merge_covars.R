@@ -180,13 +180,16 @@ merge_base <- merge_base |>
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
-  relocate(47:96, .after = hr_score)
+  relocate(
+    47:102,
+    .after = hr_score
+    )
 
-# fix inforce ----
+# fix any_inforce ----
 merge_base <- merge_base |> 
   mutate(
-    inforce = if_else(
-      is.na(inforce), 0, inforce
+    any_inforce = if_else(
+      is.na(any_inforce), 0, any_inforce
       )
     )
 

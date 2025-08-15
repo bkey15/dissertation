@@ -55,10 +55,10 @@ imp_vals <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(1:53, glb_s, hras), ~ FALSE
+      c(1:59, glb_s, hras), ~ FALSE
       ),
     across(
-      !c(1:53, glb_s, hras),
+      !c(1:59, glb_s, hras),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -79,12 +79,13 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 90,
-  ncol = 90,
+  nrow = 96,
+  ncol = 96,
   dimnames = dim_names
   )
 
 ## convert to tibble, specify predictor cols, convert back to matrix
+### note: removing pop_mean vars as predictors b/c I'm presently not using them as treatments. Allowing gen & ns lech vars as predictors b/c rf not significantly affected by multicollinearity.
 pred_mat <- pred_mat |> 
   as_tibble() |> 
   mutate(
@@ -96,7 +97,7 @@ pred_mat <- pred_mat |>
       c(
         starts_with("ss_"),
         starts_with("nn_"),
-        contains("lech_hr"),
+        ends_with("pop_mean"),
         bop_pct_gdp,
         wdi_trade,
         inv
@@ -114,7 +115,7 @@ ptas_mice <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(cow, year, inforce, glb_s),
+      c(cow, year, any_inforce, glb_s),
       ~ as_factor(.x)
       )
     )

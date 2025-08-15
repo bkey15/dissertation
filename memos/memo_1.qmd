@@ -1,0 +1,80 @@
+---
+title: "Dissertation Memo"
+subtitle: |
+  | Preliminary Findings
+author: "Brian Key"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    theme:
+      dark: darkly
+
+number-sections: true
+
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+
+```{r, echo = FALSE}
+#| label: load-pkgs
+#| code-fold: false
+
+library(tidyverse)
+library(DT)
+library(here)
+```
+
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+
+[Dissertation Github Repo](https://github.com/bkey15/dissertation)
+
+:::
+## Introduction
+
+### Purpose
+
+Since defending my prospectus, I've developed, deployed, and refined a raft of models that carry out my express research agenda. The object of this memo is to describe these models and both illustrate and comment on my main preliminary findings.
+
+### Research Questions
+
+Before proceeding, it may be useful to recall the contents of my research agenda. To this end, below are concise formulations of the questions animating each chapter (in order):
+
+1. Do human rights conditions in preferential trade agreements (PTAs), particularly when codified as more legalized (i.e., "harder"), improve human rights respect among signatories?
+2. Do bilateral investment treaties (BITs) improve human rights respect among signatories?
+3. Do economic sanctions sent by Western states improve human rights respect among non-Western targets?
+
+### Key Findings
+
+As we shall see in the remainder of the memo, my models as presently construed suggest the following general answers to my research questions: 
+
+1. "Harder" human rights conditions in PTAs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
+2. Likewise, BITs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
+3. Conversely, economic sanctions against non-Western states are associated with worsened human rights respect in less-democratic targets but an improvement of such respect in more-democratic ones.
+
+### Overview of Memo
+
+The remainder of my memo is organized as follows:
+
+1.  An overview of HR scores and V-Dem, including an EDA of the former (@sec-gen-app).
+2.  A description of initial data preprocessing.
+3.  A summary of the recipes used.
+4.  The results of the baseline fits.
+5.  The results of the tuned fits.
+6.  The final fit's predictions and an analysis thereof.
+7.  A discussion of time-series predictions and how they compare to those of the final fit.
+8.  Appendices.
+
+## The General Approach {#sec-gen-app}
+
+### HR Scores
+

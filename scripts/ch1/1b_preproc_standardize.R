@@ -307,6 +307,7 @@ ptas_panel <- ptas_panel |>
 
 ## standardize
 ### general ----
+### note: when computing any_inforce, know there are no obs. where is.na(cpr_mean) & !is.na(esr_mean) (or vice versa)
 ptas_gen <- ptas_panel |> 
   summarize(
     cpr_mean = mean(cpr_all_lta, na.rm = TRUE),
@@ -327,12 +328,12 @@ ptas_gen <- ptas_panel |>
         is.nan(.x), NA, .x
         )
       ),
-    inforce = if_else(
-      is.na(cpr_mean) | is.na(esr_mean), 0, 1
+    any_inforce = if_else(
+      is.na(cpr_mean) & is.na(esr_mean), 0, 1
       )
     ) |> 
   arrange(cow, year) |> 
-  relocate(inforce, n_ptas, .after = year)
+  relocate(any_inforce, n_ptas, .after = year)
 
 ptas_gen <- ptas_gen |> 
   mutate(
@@ -354,21 +355,22 @@ ptas_ss <- ptas_panel |>
     ss_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     ss_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     ss_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    ss_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
-  ) |> 
+    ) |> 
   mutate(
     across(
       !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
+        )
+      ),
+    ss_any_inforce = if_else(
+      is.na(ss_cpr_mean) & is.na(ss_esr_mean), 0, 1
       )
-    ),
-    inforce = if_else(
-      is.na(ss_cpr_mean) | is.na(ss_esr_mean), 0, 1
-    )
-  ) |> 
+    ) |> 
   arrange(cow, year) |> 
-  relocate(inforce, .after = year)
+  relocate(ss_any_inforce, .after = year)
 
 ptas_ss <- ptas_ss |> 
   mutate(
@@ -376,7 +378,7 @@ ptas_ss <- ptas_ss |>
     ss_lech_hr_gdp_mean = (ss_cpr_gdp_mean + ss_esr_gdp_mean)/2,
     ss_lech_hr_gdppc_mean = (ss_cpr_gdppc_mean + ss_esr_gdppc_mean)/2,
     ss_lech_hr_pop_mean = (ss_cpr_pop_mean + ss_esr_pop_mean)/2
-  )
+    )
 
 ### north-south ----
 ptas_ns <- ptas_panel |> 
@@ -390,21 +392,22 @@ ptas_ns <- ptas_panel |>
     ns_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     ns_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     ns_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    ns_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
-  ) |> 
+    ) |> 
   mutate(
     across(
       !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
+        )
+      ),
+    ns_any_inforce = if_else(
+      is.na(ns_cpr_mean) & is.na(ns_esr_mean), 0, 1
       )
-    ),
-    inforce = if_else(
-      is.na(ns_cpr_mean) | is.na(ns_esr_mean), 0, 1
-    )
-  ) |> 
+    ) |> 
   arrange(cow, year) |> 
-  relocate(inforce, .after = year)
+  relocate(ns_any_inforce, .after = year)
 
 ptas_ns <- ptas_ns |> 
   mutate(
@@ -412,7 +415,7 @@ ptas_ns <- ptas_ns |>
     ns_lech_hr_gdp_mean = (ns_cpr_gdp_mean + ns_esr_gdp_mean)/2,
     ns_lech_hr_gdppc_mean = (ns_cpr_gdppc_mean + ns_esr_gdppc_mean)/2,
     ns_lech_hr_pop_mean = (ns_cpr_pop_mean + ns_esr_pop_mean)/2
-  )
+    )
 
 ### north-north ----
 ptas_nn <- ptas_panel |> 
@@ -426,21 +429,22 @@ ptas_nn <- ptas_panel |>
     nn_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     nn_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     nn_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    nn_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
-  ) |> 
+    ) |> 
   mutate(
     across(
       !c(cow, year),
       ~ if_else(
         is.nan(.x), NA, .x
+        )
+      ),
+    nn_any_inforce = if_else(
+      is.na(nn_cpr_mean) & is.na(nn_esr_mean), 0, 1
       )
-    ),
-    inforce = if_else(
-      is.na(nn_cpr_mean) | is.na(nn_esr_mean), 0, 1
-    )
-  ) |> 
+    ) |> 
   arrange(cow, year) |> 
-  relocate(inforce, .after = year)
+  relocate(nn_any_inforce, .after = year)
 
 ptas_nn <- ptas_nn |> 
   mutate(
@@ -448,7 +452,7 @@ ptas_nn <- ptas_nn |>
     nn_lech_hr_gdp_mean = (nn_cpr_gdp_mean + nn_esr_gdp_mean)/2,
     nn_lech_hr_gdppc_mean = (nn_cpr_gdppc_mean + nn_esr_gdppc_mean)/2,
     nn_lech_hr_pop_mean = (nn_cpr_pop_mean + nn_esr_pop_mean)/2
-  )
+    )
 
 ### merge ----
 ptas_standard <- ptas_gen |> 
