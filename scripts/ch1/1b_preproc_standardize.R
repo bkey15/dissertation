@@ -281,14 +281,25 @@ ptas_panel <- ptas_panel |>
     cpr_pop = cpr_all_lta*pop_log10,
     esr_gdp = esr_all_lta*gdp_log10,
     esr_gdppc = esr_all_lta*gdppc_log10,
-    esr_pop = esr_all_lta*pop_log10
+    esr_pop = esr_all_lta*pop_log10,
+    depth_gdp = depth_rasch*gdp_log10,
+    depth_gdppc = depth_rasch*gdppc_log10,
+    depth_pop = depth_rasch*pop_log10,
+    enforce_gdp = enforce01*gdp_log10,
+    enforce_gdppc = enforce01*gdppc_log10,
+    enforce_pop = enforce01*pop_log10
     )
 
-## keep 0 vals where pta is in force; otherwise force to NA (the latter shouldn't be used in computing the legalization means)
+## keep 0 vals where pta is in force; otherwise force to NA (the latter shouldn't be used in computing the legalization & depth/enforceability means)
 ptas_panel <- ptas_panel |> 
   mutate(
     across(
-      c(11:13, 21:26),
+      c(
+        starts_with("cpr"),
+        starts_with("esr"),
+        starts_with("depth"),
+        starts_with("enforce")
+        ),
       ~ case_when(
         .x == 0 & inforce == 1 ~ 0,
         .x == 0 & inforce == 0 ~ NA,
@@ -318,6 +329,14 @@ ptas_gen <- ptas_panel |>
     esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    depth_mean = mean(depth_rasch, na.rm = TRUE),
+    depth_gdp_mean = mean(depth_gdp, na.rm = TRUE),
+    depth_gdppc_mean = mean(depth_gdppc, na.rm = TRUE),
+    depth_pop_mean = mean(depth_pop, na.rm = TRUE),
+    enforce_mean = mean(enforce01, na.rm = TRUE),
+    enforce_gdp_mean = mean(enforce_gdp, na.rm = TRUE),
+    enforce_gdppc_mean = mean(enforce_gdppc, na.rm = TRUE),
+    enforce_pop_mean = mean(enforce_pop, na.rm = TRUE),
     n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
@@ -355,6 +374,14 @@ ptas_ss <- ptas_panel |>
     ss_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     ss_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     ss_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    ss_depth_mean = mean(depth_rasch, na.rm = TRUE),
+    ss_depth_gdp_mean = mean(depth_gdp, na.rm = TRUE),
+    ss_depth_gdppc_mean = mean(depth_gdppc, na.rm = TRUE),
+    ss_depth_pop_mean = mean(depth_pop, na.rm = TRUE),
+    ss_enforce_mean = mean(enforce01, na.rm = TRUE),
+    ss_enforce_gdp_mean = mean(enforce_gdp, na.rm = TRUE),
+    ss_enforce_gdppc_mean = mean(enforce_gdppc, na.rm = TRUE),
+    ss_enforce_pop_mean = mean(enforce_pop, na.rm = TRUE),
     ss_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
@@ -370,7 +397,7 @@ ptas_ss <- ptas_panel |>
       )
     ) |> 
   arrange(cow, year) |> 
-  relocate(ss_any_inforce, .after = year)
+  relocate(ss_any_inforce, ss_n_ptas, .after = year)
 
 ptas_ss <- ptas_ss |> 
   mutate(
@@ -392,6 +419,14 @@ ptas_ns <- ptas_panel |>
     ns_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     ns_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     ns_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    ns_depth_mean = mean(depth_rasch, na.rm = TRUE),
+    ns_depth_gdp_mean = mean(depth_gdp, na.rm = TRUE),
+    ns_depth_gdppc_mean = mean(depth_gdppc, na.rm = TRUE),
+    ns_depth_pop_mean = mean(depth_pop, na.rm = TRUE),
+    ns_enforce_mean = mean(enforce01, na.rm = TRUE),
+    ns_enforce_gdp_mean = mean(enforce_gdp, na.rm = TRUE),
+    ns_enforce_gdppc_mean = mean(enforce_gdppc, na.rm = TRUE),
+    ns_enforce_pop_mean = mean(enforce_pop, na.rm = TRUE),
     ns_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
@@ -407,7 +442,7 @@ ptas_ns <- ptas_panel |>
       )
     ) |> 
   arrange(cow, year) |> 
-  relocate(ns_any_inforce, .after = year)
+  relocate(ns_any_inforce, ns_n_ptas, .after = year)
 
 ptas_ns <- ptas_ns |> 
   mutate(
@@ -429,6 +464,14 @@ ptas_nn <- ptas_panel |>
     nn_esr_gdp_mean = mean(esr_gdp, na.rm = TRUE),
     nn_esr_gdppc_mean = mean(esr_gdppc, na.rm = TRUE),
     nn_esr_pop_mean = mean(esr_pop, na.rm = TRUE),
+    nn_depth_mean = mean(depth_rasch, na.rm = TRUE),
+    nn_depth_gdp_mean = mean(depth_gdp, na.rm = TRUE),
+    nn_depth_gdppc_mean = mean(depth_gdppc, na.rm = TRUE),
+    nn_depth_pop_mean = mean(depth_pop, na.rm = TRUE),
+    nn_enforce_mean = mean(enforce01, na.rm = TRUE),
+    nn_enforce_gdp_mean = mean(enforce_gdp, na.rm = TRUE),
+    nn_enforce_gdppc_mean = mean(enforce_gdppc, na.rm = TRUE),
+    nn_enforce_pop_mean = mean(enforce_pop, na.rm = TRUE),
     nn_n_ptas = n_distinct(base_treaty_inforce, na.rm = TRUE),
     .by = c(cow, year)
     ) |> 
@@ -444,7 +487,7 @@ ptas_nn <- ptas_panel |>
       )
     ) |> 
   arrange(cow, year) |> 
-  relocate(nn_any_inforce, .after = year)
+  relocate(nn_any_inforce, nn_n_ptas, .after = year)
 
 ptas_nn <- ptas_nn |> 
   mutate(

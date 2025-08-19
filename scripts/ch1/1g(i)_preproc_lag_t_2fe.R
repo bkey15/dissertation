@@ -30,15 +30,34 @@ imp_base_1968 <- imp_base |>
 imp_base_1968 <- imp_base_1968 |> 
   mutate(
     across(
-      ends_with("_mean"),
+      ends_with("any_inforce"),
+      ~ as.numeric(levels(.x))[.x]
+      ),
+    across(
+      ends_with(
+        c(
+          "n_ptas",
+          "any_inforce",
+          "_mean"
+          )
+        ),
       ~ .x * v2x_polyarchy,
       .names = "v2x_polyarchy_x_{.col}"
+      ),
+    across(
+      c(
+        any_inforce,
+        ss_any_inforce,
+        ns_any_inforce,
+        nn_any_inforce
+        ),
+      ~ as.factor(.x)
       )
     ) |> 
   relocate(
     contains("_x_"),
     .before = v2x_polyarchy
-  )
+    )
 
 # make lags ----
 ## 1968 ----

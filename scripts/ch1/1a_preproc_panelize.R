@@ -12,6 +12,11 @@ desta_dyads <- read_xlsx(
   sheet = 2
   )
 
+desta_indices <- read_delim(
+  file = "data/ch1/raw/desta/desta_indices_version_02_02.txt"
+  ) |> 
+  arrange(base_treaty, year)
+
 ## lechner ----
 lechner <- read_delim(
   file = "data/ch1/raw/lechner_data/nti_201711.txt"
@@ -47,11 +52,27 @@ bop <- read_csv("data/common/raw/imf/imf_bop_small.csv")
 
 # panelize ptas data ----
 ## merge ptas datasets ----
+### desta_indices & lechner
+ptas <- desta_indices |> 
+  filter(!duplicated(base_treaty)) |> 
+  select(
+    base_treaty,
+    depth_rasch,
+    enforce01) |> 
+  right_join(
+    lechner,
+    by = c("base_treaty" = "number")
+    ) |> 
+  relocate(
+    c(depth_rasch, enforce01),
+    .after = ep_all_sum
+    )
+
 ### desta_dyads & lechner
 ptas <- desta_dyads |> 
   inner_join(
-    lechner,
-    by = c("base_treaty" = "number")
+    ptas,
+    by = "base_treaty"
     ) |> 
   select(
     !ends_with(".y")
@@ -240,6 +261,61 @@ ptas_long <- ptas |>
     exitforceyear
     )
 
+### fix depth & inforce vars (i.e., include score updates when "consolidated")
+dups_1 <- desta_indices |> 
+  filter(duplicated(base_treaty)) |> 
+  filter(!duplicated(base_treaty)) |> 
+  select(
+    base_treaty,
+    year,
+    depth_rasch,
+    enforce01
+    ) |> 
+  rename(
+    year_d1 = year,
+    depth_rasch_d1 = depth_rasch,
+    enforce01_d1 = enforce01
+    )
+
+dups_2 <- desta_indices |> 
+  filter(duplicated(base_treaty)) |> 
+  filter(duplicated(base_treaty)) |> 
+  select(
+    base_treaty,
+    year,
+    depth_rasch,
+    enforce01
+    ) |> 
+  rename(
+    year_d2 = year,
+    depth_rasch_d2 = depth_rasch,
+    enforce01_d2 = enforce01
+    )
+
+ptas_long <- ptas_long |> 
+  left_join(dups_1) |> 
+  left_join(dups_2) |> 
+  mutate(
+    depth_rasch = case_when(
+      year >= year_d1 ~ depth_rasch_d1,
+      year >= year_d2 ~ depth_rasch_d2,
+      .default = depth_rasch
+      ),
+    enforce01 = case_when(
+      year >= year_d1 ~ enforce01_d1,
+      year >= year_d2 ~ enforce01_d2,
+      .default = enforce01
+      )
+    ) |> 
+  select(
+    -c(
+      ends_with("d1"),
+      ends_with("d2")
+      )
+    )
+
+#### note: at this point, only missing val.s for depth & enforce should result from missingness in original desta_indices dataset
+
 ### create indicator for whether pta is "in force" for the year at issue; standardize Lechner vars by this indicator, such that scores > 0 only appear during in-force years
 ptas_long <- ptas_long |> 
   mutate(
@@ -249,7 +325,7 @@ ptas_long <- ptas_long |>
       year >= entryforceyear & year < exitforceyear ~ 1,
       year >= exitforceyear ~ 0
       ),
-    across(18:23, ~ .x*inforce)
+    across(18:25, ~ .x*inforce)
     )
 
 ### create country-code var for each partner
@@ -316,7 +392,17 @@ ptas_panel <- ptas_panel |>
 
 ### select only essential vars
 ptas_panel <- ptas_panel |> 
-  select(1:5, 8, 17:19, 23)
+  select(
+    country,
+    iso,
+    contains("partner"),
+    year,
+    base_treaty,
+    ends_with("all_lta"),
+    depth_rasch,
+    enforce01,
+    inforce
+    )
 
 ### convert ISO codes to COW codes
 ptas_panel <- ptas_panel |> 

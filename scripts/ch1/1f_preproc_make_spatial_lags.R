@@ -21,7 +21,11 @@ imp_base <- imp_base |>
   filter(.imp != 0) |> 
   mutate(
     cow = as.numeric(levels(cow))[cow],
-    year = as.numeric(levels(year))[year]
+    year = as.numeric(levels(year))[year],
+    across(
+      contains("any_inforce"),
+      ~ as.numeric(levels(.x))[.x]
+      )
     ) |> 
   relocate(.imp, .id)
 
@@ -110,7 +114,7 @@ for(i in years){
   dist_mat <- st_distance(yr_i, yr_i) |> 
     as_tibble()
   dist_mats[[as.character(i)]] <- dist_mat
-  }
+}
 
 ## get neighbors ----
 ## note: neighbor index == position in dist_mat (so US is 1, as first in cow list, by which I arranged imp_..._spt)
@@ -143,8 +147,8 @@ for(i in years){
       pull(index)
       
     nb_lists[[i]][[str_remove(name, "V")]] <- neighbors
-    }
   }
+}
 
 ## impose index == 0 for states w/o neighbors ----
 ## Note: step needed to execute nb2listw()
@@ -159,10 +163,9 @@ for(i in years) {
       } 
     else{
       nb_lists[[i]][[j]] <- nb_lists[[i]][[j]]
-      }
     }
   }
-
+}
 
 ## get weights ----
 years <- nb_lists |> 
@@ -174,7 +177,6 @@ for(i in years){
     nb2listw(zero.policy = TRUE)
   }
 
-
 # make spatial lags ----
 ## get specs ----
 sp_lag_base <- list()
@@ -183,7 +185,7 @@ years <- nb_lists |>
   names()
 var_names <- imp_base_spt |> 
   select(
-    -c(.imp, .id, cow, region_wb, year, inforce, glb_s)
+    -c(.imp, .id, cow, region_wb, year, glb_s)
     ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]

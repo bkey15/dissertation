@@ -10,6 +10,8 @@ data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
 data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
 data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda
 
+data/ch1/results/fits/dml_lasso/full_dat/rc_imp_dml_fits_2fe_gen.rda
+
 data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
 data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
 data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda

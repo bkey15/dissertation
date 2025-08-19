@@ -181,7 +181,7 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
   relocate(
-    47:102,
+    47:134,
     .after = hr_score
     )
 
