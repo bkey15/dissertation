@@ -51,7 +51,7 @@ rm(imp_dml_dats_2fe_south)
 imp_dml_fits_2fe_south <- list()
 
 for(stat in interact_stat){
-  list_1 <- imp_dml_dats_2fe_south[[stat]]
+  list_1 <- dats_final[[stat]]
   start_yrs <- names(list_1)
   for(year in start_yrs){
     list_2 <- list_1[[year]]

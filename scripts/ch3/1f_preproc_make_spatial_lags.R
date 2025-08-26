@@ -167,7 +167,7 @@ years <- nb_lists |>
   names()
 var_names <- imp_base_spt |> 
   select(
-    -c(.imp, .id, cow, region_wb, year, n_ems, any_inforce)
+    -c(.imp, .id, cow, region_wb, year, glb_s, n_ems, any_inforce)
   ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]

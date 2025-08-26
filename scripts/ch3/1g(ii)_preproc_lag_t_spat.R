@@ -13,25 +13,29 @@ load(here("data/ch3/results/imputations/sp_lag_base.rda"))
 
 # prep base data ----
 ## note: creating interaction vars
-imp_base_1990 <- imp_base |> 
+### note: also filtering out glb_s == 0 cases (these were aids in computing spatial lags but are no longer necessary)
+imp_base <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   relocate(.imp, .id)
 
-sp_lag_base_1990 <- sp_lag_base |> 
+sp_lag_base <- sp_lag_base |> 
   mutate(
     cow = as.factor(cow),
     region = as.factor(region),
     year = as.factor(year)
     )
 
-imp_base_1990 <- imp_base_1990 |> 
-  left_join(sp_lag_base_1990) |> 
+imp_base_1990 <- imp_base |> 
+  left_join(sp_lag_base) |> 
   relocate(region, .after = cow) |> 
   group_by(cow, .imp) |> 
+  filter(glb_s == "1") |> 
   mutate(
+    cow = droplevels(cow),
+    region = droplevels(region),
     any_inforce = as.numeric(levels(any_inforce))[any_inforce],
     across(
       c(n_ems, any_inforce),
@@ -46,15 +50,15 @@ imp_base_1990 <- imp_base_1990 |>
   relocate(
     contains("_x_"),
     .after = any_inforce
-    )
+    ) |> 
+  select(-glb_s)
 
 # make lags ----
 ## 1990 ----
 ## note: re-leveling "year" to remove "2018" as a level, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), and doesn't matter as much for spatial models (using regional fixed effects). Still including the code for possible future use.
 ## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
-
-imp_1990_sp_t_lags <- list()
+start_1990 <- list()
 
 for(i in seq_along(1:8)){
   lag_dat <- imp_base_1990 |> 
@@ -73,9 +77,14 @@ for(i in seq_along(1:8)){
       ) |> 
     as.mids()
   
-  imp_1990_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1990[[as.character(paste0("l", i))]] <- lag_dat
 }
 
+# combine ----
+imp_sp_t_lags <- list(
+  start_1990 = start_1990
+  )
+
 # save ----
-imp_1990_sp_t_lags |> 
-  save(file = here("data/ch3/results/imputations/imp_1990_sp_t_lags.rda"))
+imp_sp_t_lags |> 
+  save(file = here("data/ch3/results/imputations/imp_sp_t_lags.rda"))

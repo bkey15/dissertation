@@ -13,7 +13,7 @@ load(here("data/ch2/results/imputations/sp_lag_base.rda"))
 
 # prep base data ----
 ## merge & drop select states ----
-## note: dropping high miss states and/or ones with no extant polygons
+### note: drop states w/ no extant polygons (265, 511, 680, 817); see make_spatial_lags script for more
 imp_base_1962 <- imp_base |> 
   mice::complete(
     action = "long",
@@ -32,10 +32,8 @@ imp_base_1962 <- imp_base_1962 |>
   left_join(sp_lag_base_1962) |> 
   filter(
     cow != "265",
-    cow != "347",
     cow != "511",
     cow != "680",
-    cow != "713",
     cow != "817"
     ) |> 
   relocate(region, .after = cow) |> 
@@ -60,10 +58,9 @@ imp_base_1962 <- imp_base_1962 |>
 ## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging.
 ## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
+start_1962 <- list()
 
-imp_1962_sp_t_lags <- list()
-
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1962 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -81,12 +78,11 @@ for(i in seq_along(1:8)){
       ) |> 
     as.mids()
   
-  imp_1962_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1962[[as.character(paste0("l", i))]] <- lag_dat
 }
 
-
 ## 1981 ----
-## note: re-leveling cow codes to account for countries dropping out of the dataset
+## note: re-leveling cow codes to account for countries possibly dropping out of the dataset
 ## note: in this case, no countries drop out
 imp_base_1981 <- imp_base_1962 |> 
   mutate(
@@ -100,9 +96,9 @@ imp_base_1981 <- imp_base_1962 |>
     region = droplevels(region)
     )
 
-imp_1981_sp_t_lags <- list()
+start_1981 <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1981 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -120,7 +116,7 @@ for(i in seq_along(1:8)){
       ) |> 
     as.mids()
   
-  imp_1981_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1981[[as.character(paste0("l", i))]] <- lag_dat
 }
 
 ## 1990 ----
@@ -137,9 +133,9 @@ imp_base_1990 <- imp_base_1962 |>
     region = droplevels(region)
     )
 
-imp_1990_sp_t_lags <- list()
+start_1990 <- list()
 
-for(i in seq_along(1:8)){
+for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
     group_by(cow, .imp) |> 
     mutate(
@@ -157,13 +153,16 @@ for(i in seq_along(1:8)){
       ) |> 
     as.mids()
   
-  imp_1990_sp_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1990[[as.character(paste0("l", i))]] <- lag_dat
 }
 
+# combine ----
+imp_sp_t_lags <- list(
+  start_1962 = start_1962,
+  start_1981 = start_1981,
+  start_1990 = start_1990
+  )
+
 # save ----
-imp_1962_sp_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1962_sp_t_lags.rda"))
-imp_1981_sp_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1981_sp_t_lags.rda"))
-imp_1990_sp_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1990_sp_t_lags.rda"))
+imp_sp_t_lags |> 
+  save(file = here("data/ch2/results/imputations/imp_sp_t_lags.rda"))

@@ -9,22 +9,16 @@ library(mice)
 # load data ----
 load(here("data/ch1/results/imputations/imp_base.rda"))
 
-# drop high miss states ----
-# note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). Dropping these cases are important in preventing zero-variance variables at the dml-prep step. See notes for more.
+# prep base data ----
+## complete ----
+### note: drop high miss. states only if miss. still exists. Dropping these cases are important in preventing zero-variance variables at the dml-prep step. See notes for more.
 
 imp_base_1968 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  relocate(.imp, .id) |> 
-  filter(
-    cow != "347",
-    cow != "680",
-    cow != "713",
-    cow != "817"
-    ) |> 
-  mutate(cow = droplevels(cow))
+  relocate(.imp, .id)
 
 ## make interaction vars ----
 imp_base_1968 <- imp_base_1968 |> 
@@ -53,6 +47,16 @@ imp_base_1968 <- imp_base_1968 |>
         ),
       ~ as.factor(.x)
       )
+    ) |> 
+  select(
+    -starts_with("v2x_polyarchy_x_depth"),
+    -starts_with("v2x_polyarchy_x_ns_depth"),
+    -starts_with("v2x_polyarchy_x_ss_depth"),
+    -starts_with("v2x_polyarchy_x_nn_depth"),
+    -starts_with("v2x_polyarchy_x_enforce"),
+    -starts_with("v2x_polyarchy_x_ns_enforce"),
+    -starts_with("v2x_polyarchy_x_ss_enforce"),
+    -starts_with("v2x_polyarchy_x_nn_enforce")
     ) |> 
   relocate(
     contains("_x_"),

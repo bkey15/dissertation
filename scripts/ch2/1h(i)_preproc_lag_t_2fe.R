@@ -7,26 +7,18 @@ library(here)
 library(mice)
 
 # load data ----
-load(here("data/ch2/preprocessed/bits_1962.rda"))
 load(here("data/ch2/results/imputations/imp_base.rda"))
 
 # prep base data ----
-## drop high miss states ----
-## note: these countries are Kosovo, Taiwan, S. Vietnam, S. Yemen. Their missing values can't be imputed b/c there's too much missingness across key variables, particularly ones from the UN/World Bank (hras, wdi_trade, etc., b/c these were generally partially recognized states w/o organizational membership). Dropping these cases are important in preventing zero-variance variables at the dml-prep step. See notes for more.
+## complete ----
+### note: drop high miss. states only if miss. still exists. Dropping these cases are important in preventing zero-variance variables at the dml-prep step. See notes for more.
 
 imp_base_1962 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  relocate(.imp, .id) |> 
-  filter(
-    cow != "347",
-    cow != "680",
-    cow != "713",
-    cow != "817"
-    ) |> 
-  mutate(cow = droplevels(cow))
+  relocate(.imp, .id)
 
 ## make interaction vars ----
 imp_base_1962 <- imp_base_1962 |> 
@@ -46,7 +38,7 @@ imp_base_1962 <- imp_base_1962 |>
 ## 1962 ----
 ## note: re-leveling "year" in imp_1962 chunk to remove "2019", "2018, etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
 ## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging.
-imp_1962_t_lags <- list()
+start_1962 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1962 |> 
@@ -65,7 +57,7 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1962_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1962[[as.character(paste0("l", i))]] <- lag_dat
 }
 
 ## 1981 ----
@@ -80,7 +72,7 @@ imp_base_1981 <- imp_base_1962 |>
     cow = as.factor(cow)
     )
 
-imp_1981_t_lags <- list()
+start_1981 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1981 |> 
@@ -99,7 +91,7 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1981_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1981[[as.character(paste0("l", i))]] <- lag_dat
 }
 
 ## 1990 ----
@@ -114,7 +106,7 @@ imp_base_1990 <- imp_base_1962 |>
     cow = as.factor(cow)
     )
 
-imp_1990_t_lags <- list()
+start_1990 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
@@ -133,13 +125,16 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1990_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1990[[as.character(paste0("l", i))]] <- lag_dat
 }
 
+# combine ----
+imp_t_lags <- list(
+  start_1962 = start_1962,
+  start_1981 = start_1981,
+  start_1990 = start_1990
+  )
+
 # save ----
-imp_1962_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1962_t_lags.rda"))
-imp_1981_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1981_t_lags.rda"))
-imp_1990_t_lags |> 
-  save(file = here("data/ch2/results/imputations/imp_1990_t_lags.rda"))
+imp_t_lags |> 
+  save(file = here("data/ch2/results/imputations/imp_t_lags.rda"))

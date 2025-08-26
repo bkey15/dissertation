@@ -28,10 +28,40 @@ ems_final <- merge_base |>
   select(-c(v2elwestmon, v2elmonden, v2elmonref)) |> 
   relocate(cont_elect, .after = coup_success)
 
+## us_or_eu ----
+### note: indicator needed for computing pta_west & bit_tip_west
+### note: data from https://european-union.europa.eu/principles-countries-history/eu-countries_en
+us_or_eu_indic <- tibble(
+  cow = c(
+    2, 200, 205, 210, 211, 212, 220, 230, 235, 255, 290, 305, 310, 316, 317, 325, 338, 344, 349, 350, 352, 355, 360, 366, 367, 368, 375, 380, 390
+    ),
+  acc_year = c(
+    1958, 1973, 1973, 1958, 1958, 1958, 1958, 1986, 1986, 1958, 2004, 1995, 2004, 2004, 2004, 1958, 2004, 2013, 2004, 1981, 2004, 2007, 2007, 2004, 2004, 2004, 1995, 1995, 1973
+    )
+  )
+
+years_indic <- tibble(year = 1958:2018)
+us_or_eu_indic <- us_or_eu_indic |> 
+  cross_join(years_indic) |> 
+  mutate(
+    us_or_eu = if_else(
+      year >= acc_year, 1, 0
+      )
+    ) |> 
+  select(-acc_year)
+
+ems_final <- ems_final |> 
+  left_join(us_or_eu_indic) |> 
+  mutate(
+    us_or_eu = if_else(
+      is.na(us_or_eu), 0, us_or_eu
+      )
+    ) |> 
+  relocate(us_or_eu, .after = glb_s)
 
 ## pta_west ----
-### get cow codes & filter to US/EU ptas
-desta_dyads <- desta_dyads |> 
+### get cow codes & filter desta_dyads to only US/EU ptas
+dd_us_eu <- desta_dyads |> 
   mutate(
     cow1 = countrycode(
       sourcevar = iso1,
@@ -49,7 +79,7 @@ desta_dyads <- desta_dyads |>
     )
 
 ### fix cow codes
-desta_dyads <- desta_dyads |> 
+dd_us_eu <- dd_us_eu |> 
   mutate(
     cow1 = case_when(
       iso1 == 688 ~ 345,
@@ -65,23 +95,15 @@ desta_dyads <- desta_dyads |>
   select(-c(iso1, iso2)) |> 
   relocate(c(cow1, cow2), .after = country2)
 
-### filter to ptas only involving merge_base countries
-ch3_cows <- unique(merge_base$cow)
+### filter ptas_panel to base treaties only in dd_us_eu & countries only in ems_final (latter removes Carib. & Euro. microstates not in V-Dem); remove duplicates (e.g., where Mexico shares a single EC pta w/ France, Germany, etc.)
+#### note: some duplicates will remain, where treaty was signed prior to some EU countries acceding to union (hence why some country-years will have both inforce == 1 & inforce == 0 for same base_treaty--e.g., Mexico-330, where for some years the pta is inforce dyads w/ France, Germany, etc., but not Poland, Bulgaria, etc.). We'll fix this in the summarize() step, below (since duplicate 0 vals will effectively be excluded from sum()).
+base_trts_us_eu <- unique(dd_us_eu$base_treaty)
+ems_cow <- unique(ems_final$cow)
 
-desta_dyads <- desta_dyads |> 
-  filter(cow1 %in% ch3_cows | cow2 %in% ch3_cows)
-
-### filter ptas_panel to base treaties only in desta_dyads
-ch3_base_trts <- unique(desta_dyads$base_treaty)
-
-ptas_panel <- ptas_panel |> 
-  filter(base_treaty %in% ch3_base_trts)
-
-### filter cow to ch3_cows; remove (most) duplicates
-#### note: some duplicates will remain, where treaty was signed prior to some EU countries acceding to union (hence why some country-years will have both inforce == 0 & inforce == 1 for same base_treaty). We'll fix this in summarize() step.
-ptas_panel <- ptas_panel |> 
+pp_us_eu <- ptas_panel |> 
   filter(
-    cow %in% ch3_cows,
+    base_treaty %in% base_trts_us_eu,
+    cow %in% ems_cow,
     year > 1989 & year < 2019
     ) |> 
   select(cow, year, base_treaty, inforce) |> 
@@ -89,14 +111,14 @@ ptas_panel <- ptas_panel |>
   arrange(cow, year)
 
 ### count inforce ptas
-ptas_panel <- ptas_panel |> 
+pp_us_eu <- pp_us_eu |> 
   summarize(
     n_ptas_west = sum(inforce),
     .by = c(cow, year)
     )
 
 ### create pta_west indicator
-ptas_panel <- ptas_panel |> 
+pp_us_eu <- pp_us_eu |> 
   mutate(
     pta_west = if_else(
       n_ptas_west > 0, 1, 0
@@ -104,18 +126,20 @@ ptas_panel <- ptas_panel |>
     ) |> 
   select(-n_ptas_west)
 
-### merge & fix missingness
+### merge & fix missingness & redundancies (US or EU states, once acceded, shouldn't == 1)
 ems_final <- ems_final |> 
-  left_join(ptas_panel) |> 
+  left_join(pp_us_eu) |> 
   mutate(
-    pta_west = if_else(
-      is.na(pta_west), 0, pta_west
+    pta_west = case_when(
+      is.na(pta_west) ~ 0,
+      us_or_eu == 1 ~ 0,
+      .default = pta_west
       )
     )
 
 ## bit_tip_west ----
 ### filter to US/EU bits/tips (& inforce pre-2019)
-bits_raw <- bits_raw |> 
+bits_us_eu <- bits_raw |> 
   select(
     treaty_id,
     short_title,
@@ -138,7 +162,7 @@ bits_raw <- bits_raw |>
 
 ### separate "country" names
 #### separate
-bits_raw <- bits_raw |> 
+bits_us_eu <- bits_us_eu |> 
   separate_wider_delim(
     short_title,
     delim = " - ",
@@ -314,7 +338,7 @@ bits_raw <- bits_raw |>
     )
 
 ### lengthen, filter, get cow codes
-bits_raw <- bits_raw |> 
+bits_us_eu <- bits_us_eu |> 
   pivot_longer(
     cols = c(
       country1,
@@ -343,7 +367,7 @@ bits_raw <- bits_raw |>
 
 ### fix cow codes; filter out NAs
 #### note: fixing only where signatory is unrepresented through other international organization
-bits_raw <- bits_raw |> 
+bits_us_eu <- bits_us_eu |> 
   mutate(
     cow = case_when(
       signatory == "Serbia" ~ 345,
@@ -359,14 +383,14 @@ bits_raw <- bits_raw |>
 ### panelize
 years_ist <- tibble(year = 1990:2018)
 
-bits_panel <- bits_raw |> 
+bp_us_eu <- bits_us_eu |> 
   cross_join(years_ist) |> 
   relocate(cow, year) |> 
   arrange(cow, year)
 
 ### create inforce indicator
 #### note: in the ch. 2 code, BITs that have a "terminated" status but not an in-force date are assigned a value of 0 for all observations via case_when(.default = 0) (this applies to 40-some BITs in the full dataset). The code is included below for the sake of possible future reproducibility.
-bits_panel <- bits_panel |> 
+bp_us_eu <- bp_us_eu |> 
   mutate(
     inforce = case_when(
       status == "Signed (not in force)" ~ 0,
@@ -380,14 +404,14 @@ bits_panel <- bits_panel |>
   select(-status, -contains("date"))
 
 ### count inforce bits
-bits_panel <- bits_panel |> 
+bp_us_eu <- bp_us_eu |> 
   summarize(
     n_bits_tips_west = sum(inforce),
     .by = c(cow, year)
     )
 
 ### create bit_tip_west indicator
-bits_panel <- bits_panel |> 
+bp_us_eu <- bp_us_eu |> 
   mutate(
     bit_tip_west = if_else(
       n_bits_tips_west > 0, 1, 0
@@ -397,10 +421,12 @@ bits_panel <- bits_panel |>
 
 ### merge & fix missingness
 ems_final <- ems_final |> 
-  left_join(bits_panel) |> 
+  left_join(bp_us_eu) |> 
   mutate(
-    bit_tip_west = if_else(
-      is.na(bit_tip_west), 0, bit_tip_west
+    bit_tip_west = case_when(
+      is.na(bit_tip_west) ~ 0,
+      us_or_eu == 1 ~ 0,
+      .default = bit_tip_west
       )
     )
 
@@ -422,13 +448,17 @@ ems_final <- ems_final |>
       )
     )
 
-## cow
-## note: dropping countries w/ only 1 observation (zero variance b/c drops out of dataset in 1991)
+## cow ----
+### note: dropping countries w/ only 1 observation (zero variance b/c drops out of dataset in 1991)
 ems_final <- ems_final |> 
   filter(
     cow != 265,
     cow != 680
     )
+
+## drop us_or_eu ----
+ems_final <- ems_final |> 
+  select(-us_or_eu)
 
 # save ----
 ems_final |> 

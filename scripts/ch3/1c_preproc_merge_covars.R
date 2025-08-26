@@ -46,8 +46,9 @@ us_ally <- read_csv(
 ### controversial election indicators + neo-patrimonialism
 ## missing cases filtered out below are Zanzibar, Somaliland, Palestine/West Bank, etc.
 vdem <- vdem |> 
+  rename(cow = COWcode) |> 
   select(
-    COWcode,
+    cow,
     year,
     v2elwestmon,
     v2elmonden,
@@ -57,14 +58,31 @@ vdem <- vdem |>
   filter(
     year > 1989,
     year < 2019,
-    !is.na(COWcode)
+    !is.na(cow)
     ) |> 
-  rename(cow = COWcode) |> 
+  mutate(
+    cow = case_when(
+      cow == 260 ~ 255,
+      cow == 315 ~ 316,
+      cow == 678 ~ 679,
+      .default = cow
+      )
+    ) |> 
   arrange(cow, year)
 
 ## ch. 2 covars + hr_score ----
 bits_final <- bits_final |> 
-  select(cow, year, hr_score, 22:59) |> 
+  select(
+    cow,
+    year,
+    hr_score,
+    starts_with(c("v2", "wdi")),
+    ends_with("log10"),
+    e_polity2,
+    p_durable,
+    glb_s,
+    bop_pct_gdp
+    ) |> 
   filter(year > 1989 & year < 2019)
 
 ## wdi vars ----
@@ -107,51 +125,70 @@ unemp <- unemp |>
 
 ## political proximity ----
 us_ally <- us_ally |> 
-  mutate(year = session + 1945) |> 
-  filter(year > 1989 & year < 2019) |> 
-  select(ccode, year, ideal_point_all) |> 
   rename(
     cow = ccode,
     pol_prox = ideal_point_all
-    )
+    ) |> 
+  mutate(
+    year = session + 1945,
+    cow = case_when(
+      cow == 260 ~ 255,
+      cow == 315 ~ 316,
+      cow == 678 ~ 679,
+      .default = cow
+      )
+    ) |> 
+  filter(year > 1989 & year < 2019) |> 
+  select(cow, year, pol_prox) |> 
+  arrange(cow, year)
 
 ## colpus ----
 years_ist <- tibble(year = 1990:2018)
 
-colpus_base <- colpus |> 
+colpus <- colpus |> 
+  rename(
+    cow = ccode,
+    coup_success = success
+    ) |> 
+  mutate(
+    cow = case_when(
+      cow == 315 ~ 316,
+      cow == 678 ~ 679,
+      .default = cow
+      )
+    ) |> 
   filter(
-    success == 1,
+    coup_success == 1,
     year > 1989,
     year < 2019
     ) |> 
-  select(ccode) |> 
+  select(cow, year, coup_success)
+
+colpus_base <- colpus |> 
+  filter(
+    coup_success == 1,
+    year > 1989,
+    year < 2019
+    ) |> 
+  select(cow) |> 
   distinct() |> 
   cross_join(years_ist)
 
 colpus <- colpus |> 
-  filter(
-    success == 1,
-    year > 1989,
-    year < 2019
-    ) |> 
-  select(ccode, year, success) |> 
   right_join(colpus_base) |> 
   mutate(
-    success = if_else(
-      is.na(success), 0, success
+    coup_success = if_else(
+      is.na(coup_success), 0, coup_success
       )
-    ) |> 
-  rename(
-    coup_success = success,
-    cow = ccode
     ) |> 
   arrange(cow, year)
 
 ## one_sided_violence ----
 ## note: filter out missing cow row (Rwandi & Burundi, 1996, accounted for in a different row)
-one_sided_violence_base <- one_sided_violence |> 
+one_sided_violence <- one_sided_violence |> 
+  rename(gov_kill = is_government_actor) |> 
   filter(
-    is_government_actor == 1,
+    gov_kill == 1,
     year > 1989,
     year < 2019
     ) |> 
@@ -161,29 +198,18 @@ one_sided_violence_base <- one_sided_violence |>
       sourcevar = gwnoa,
       origin = "gwn",
       destination = "cown"
-      )
+      ),
+    cow = if_else(cow == 678, 679, cow)
     ) |> 
+  select(cow, year, gov_kill)
+
+one_sided_violence_base <- one_sided_violence |> 
   select(cow) |> 
   filter(!is.na(cow)) |> 
   distinct() |> 
   cross_join(years_ist)
 
 one_sided_violence <- one_sided_violence |> 
-  filter(
-    is_government_actor == 1,
-    year > 1989,
-    year < 2019
-    ) |> 
-  mutate(
-    gwnoa = as.numeric(gwnoa),
-    cow = countrycode(
-      sourcevar = gwnoa,
-      origin = "gwn",
-      destination = "cown"
-      )
-    ) |> 
-  mutate(gov_kill = 1) |> 
-  select(cow, year, gov_kill) |> 
   right_join(one_sided_violence_base) |> 
   mutate(
     gov_kill = if_else(

@@ -13,7 +13,7 @@ load(here("data/ch1/results/imputations/sp_lag_base.rda"))
 
 # prep base data ----
 ## merge & drop select states ----
-## note: dropping high miss states and/or ones with no extant polygons
+### note: drop states w/ no extant polygons (265, 680, 817); see make_spatial_lags script for more
 imp_base_1968 <- imp_base |> 
   mice::complete(
     action = "long",
@@ -29,14 +29,12 @@ sp_lag_base <- sp_lag_base |>
     )
 
 imp_base_1968 <- imp_base_1968 |> 
-  left_join(sp_lag_base) |> 
   filter(
     cow != "265",
-    cow != "347",
     cow != "680",
-    cow != "713",
     cow != "817"
     ) |> 
+  left_join(sp_lag_base) |> 
   relocate(region, .after = cow) |> 
   mutate(cow = droplevels(cow))
 
@@ -68,10 +66,20 @@ imp_base_1968 <- imp_base_1968 |>
       ~ as.factor(.x)
       )
     ) |> 
+  select(
+    -starts_with("v2x_polyarchy_x_depth"),
+    -starts_with("v2x_polyarchy_x_ns_depth"),
+    -starts_with("v2x_polyarchy_x_ss_depth"),
+    -starts_with("v2x_polyarchy_x_nn_depth"),
+    -starts_with("v2x_polyarchy_x_enforce"),
+    -starts_with("v2x_polyarchy_x_ns_enforce"),
+    -starts_with("v2x_polyarchy_x_ss_enforce"),
+    -starts_with("v2x_polyarchy_x_nn_enforce")
+    ) |> 
   relocate(
     contains("_x_"),
     .before = v2x_polyarchy
-  )
+    )
 
 # make lags ----
 ## 1968 ----

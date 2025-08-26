@@ -59,6 +59,7 @@ world <- world |>
     cow = case_when(
       iso_a3 == "SRB" ~ 345,
       subunit == "France" ~ 220,
+      subunit == "Kosovo" ~ 347,
       subunit == "Norway" ~ 385,
       .default = cow
       )
@@ -175,7 +176,7 @@ for(i in years){
   class(nb_lists[[i]]) <- "nb"
   nb_lists[[i]] <- nb_lists[[i]] |> 
     nb2listw(zero.policy = TRUE)
-  }
+}
 
 # make spatial lags ----
 ## get specs ----

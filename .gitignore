@@ -2,7 +2,7 @@
 ## Imputed data
 data/ch1/results/imputations/imp_sp_t_lags.rda
 
-data/ch2/results/imputations/imp_1962_sp_t_lags.rda
+data/ch2/results/imputations/imp_sp_t_lags.rda
 
 ## Fits
 ### 2FE

@@ -11,13 +11,16 @@ load(here("data/ch3/results/imputations/imp_base.rda"))
 
 # prep base data ----
 ## make interaction vars ----
+### note: also filtering out glb_s == 0 cases (these were aids in computing spatial lags but are no longer necessary)
 imp_base_1990 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
   relocate(.imp, .id) |> 
+  filter(glb_s == "1") |> 
   mutate(
+    cow = droplevels(cow),
     any_inforce = as.numeric(levels(any_inforce))[any_inforce],
     across(
       c(n_ems, any_inforce),
@@ -32,13 +35,14 @@ imp_base_1990 <- imp_base |>
   relocate(
     contains("_x_"),
     .after = any_inforce
-    )
+    ) |> 
+  select(-glb_s)
 
 # make lags ----
 ## 1990 ----
-## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
-## note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), but am including the code for other lags for possible future use.
-imp_1990_t_lags <- list()
+### note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
+### note: also re-leveling "cow" to remove any cow-levels dropping out of the dataset after lagging. This is only needed at L8 (S. Sudan), but am including the code for other lags for possible future use.
+start_1990 <- list()
 
 for(i in seq(1:8)){
   lag_dat <- imp_base_1990 |> 
@@ -57,9 +61,14 @@ for(i in seq(1:8)){
       ) |> 
     as.mids()
   
-  imp_1990_t_lags[[as.character(paste0("l", i))]] <- lag_dat
+  start_1990[[as.character(paste0("l", i))]] <- lag_dat
 }
 
+# combine ----
+imp_t_lags <- list(
+  start_1990 = start_1990
+  )
+
 # save ----
-imp_1990_t_lags |> 
-  save(file = here("data/ch3/results/imputations/imp_1990_t_lags.rda"))
+imp_t_lags |> 
+  save(file = here("data/ch3/results/imputations/imp_t_lags.rda"))

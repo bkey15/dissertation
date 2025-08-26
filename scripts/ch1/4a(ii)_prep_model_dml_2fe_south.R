@@ -38,10 +38,14 @@ for(year in start_yrs){
           .imp == i
           ) |> 
         select(
-          -contains("nn_"),
+          -contains(
+            c(
+              "nn_",
+              "cpr",
+              "esr"
+              )
+            ),
           -glb_s,
-          -any_inforce,
-          -n_ptas,
           -last_col(),
           -last_col(offset = 1)
           ) |> 
@@ -56,139 +60,91 @@ for(year in start_yrs){
 ## treat names ----
 ### gen ----
 treat_names_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("lech_hr"),
-    -contains("pop")
-    ) |> 
+  select(starts_with("lech_hr")) |> 
   names()
 
-treat_names_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("cpr_"),
-    -contains("pop")
-    ) |> 
-  names()
-
-treat_names_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("esr_"),
-    -contains("pop")
-    ) |> 
-  names()
+treat_names_rc <- c("n_ptas", "any_inforce1")
 
 ### partner-type (ss & ns) ----
 treat_names_ss_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ss_lech"),
-    -ends_with("pop_mean")
-    ) |> 
+  select(starts_with("ss_lech")) |> 
   names()
 
 treat_names_ns_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ns_lech"),
-    -ends_with("pop_mean")
-    ) |> 
+  select(starts_with("ns_lech")) |> 
   names()
 
-treat_names_ss_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ss_cpr"),
-    -ends_with("pop_mean")
-    ) |> 
-  names()
+treat_names_ss_rc <- c("ss_n_ptas", "ss_any_inforce1")
 
-treat_names_ns_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ns_cpr"),
-    -ends_with("pop_mean")
-    ) |> 
-  names()
-
-treat_names_ss_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ss_esr"),
-    -ends_with("pop_mean")
-    ) |> 
-  names()
-
-treat_names_ns_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("ns_esr"),
-    -ends_with("pop_mean")
-    ) |> 
-  names()
+treat_names_ns_rc <- c("ns_n_ptas", "ns_any_inforce1")
 
 ## interact names ----
 ### gen ----
 interact_names_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_lech"),
-    -contains("pop")
-    ) |> 
+  select(starts_with("v2x_polyarchy_x_lech")) |> 
   names()
 
-interact_names_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_cpr"),
-    -contains("pop")
-    ) |> 
-  names()
-
-interact_names_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_esr"),
-    -contains("pop")
-    ) |> 
-  names()
+interact_names_rc <- c(
+  "v2x_polyarchy_x_n_ptas",
+  "v2x_polyarchy_x_any_inforce"
+  )
 
 ### partner-type (ss & ns) ----
 interact_names_ss_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ss_lech"),
-    -contains("pop")
-    ) |> 
+  select(starts_with("v2x_polyarchy_x_ss_lech")) |> 
   names()
 
 interact_names_ns_lech <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ns_lech"),
-    -contains("pop")
-    ) |> 
+  select(starts_with("v2x_polyarchy_x_ns_lech")) |> 
   names()
 
-interact_names_ss_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ss_cpr"),
-    -contains("pop")
-    ) |> 
-  names()
+interact_names_ss_rc <- c(
+  "v2x_polyarchy_x_ss_n_ptas",
+  "v2x_polyarchy_x_ss_any_inforce"
+  )
 
-interact_names_ns_cpr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ns_cpr"),
-    -contains("pop")
-    ) |> 
-  names()
-
-interact_names_ss_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ss_esr"),
-    -contains("pop")
-    ) |> 
-  names()
-
-interact_names_ns_esr <- imp_t_dfs[[1]][[1]][[1]] |> 
-  select(
-    starts_with("v2x_polyarchy_x_ns_esr"),
-    -contains("pop")
-    ) |> 
-  names()
+interact_names_ns_rc <- c(
+  "v2x_polyarchy_x_ns_n_ptas",
+  "v2x_polyarchy_x_ns_any_inforce"
+  )
 
 ## covar names ----
-### important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
-covar_names_all <- list()
+### get initial specs ----
+dep_enf_ids <- c("mean", "gdp_mean", "gdppc_mean")
 
+#### gen ----
+depth_names_gen <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("depth")) |> 
+  names()
+
+enforce_names_gen <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("enforce")) |> 
+  names()
+
+covar_names_gen_sml <- list()
+covar_names_gen_all <- list()
+
+#### partner-type (ss & ns) ----
+depth_names_ss <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("ss_depth")) |> 
+  names()
+depth_names_ns <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("ns_depth")) |> 
+  names()
+
+enforce_names_ss <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("ss_enforce")) |> 
+  names()
+enforce_names_ns <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("ns_enforce")) |> 
+  names()
+
+covar_names_pt_sml <- list()
+covar_names_pt_all <- list()
+
+### finalize ----
+### important: dropping first column after creating matrix to ensure first level of factor (cow) isn't included in the lassos.
+#### gen ----
 for(year in start_yrs){
   lags <- imp_t_dfs[[year]]
   lag_names <- names(lags)
@@ -200,11 +156,63 @@ for(year in start_yrs){
       as_tibble() |> 
       select(
         -1,
-        -contains(c("hr_score", "mean"))
+        -contains(
+          c(
+            "hr_score",
+            "mean",
+            "n_ptas",
+            "any_inforce"
+            )
+          )
         ) |> 
       names()
-  
-    covar_names_all[[as.character(year)]][[as.character(lag)]] <- covar_names
+    for(j in seq_along(depth_names_gen)){
+      k <- depth_names_gen[[j]]
+      l <- enforce_names_gen[[j]]
+      n <- dep_enf_ids[[j]]
+      
+      covar_names_gen_sml[[as.character(n)]] <- covar_names |> 
+        append(c(k, l))
+      
+      covar_names_gen_all[[as.character(year)]][[as.character(lag)]] <- covar_names_gen_sml
+    }
+  }
+}
+
+#### partner-type (ss & ns) ----
+for(year in start_yrs){
+  lags <- imp_t_dfs[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    covar_names <- model.matrix(
+      ~ . - 1,
+      data = imp_t_dfs[[year]][[lag]][[1]]
+      ) |> 
+      as_tibble() |> 
+      select(
+        -1,
+        -contains(
+          c(
+            "hr_score",
+            "mean",
+            "n_ptas",
+            "any_inforce"
+            )
+          )
+        ) |> 
+      names()
+    for(j in seq_along(depth_names_ns)){
+      k <- depth_names_ns[[j]]
+      l <- enforce_names_ns[[j]]
+      n <- dep_enf_ids[[j]]
+      o <- depth_names_ss[[j]]
+      p <- enforce_names_ss[[j]]
+      
+      covar_names_pt_sml[[as.character(n)]] <- covar_names |> 
+        append(c(k, l, o, p))
+      
+      covar_names_pt_all[[as.character(year)]][[as.character(lag)]] <- covar_names_pt_sml
+    }
   }
 }
 
@@ -221,18 +229,21 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(treat in treat_names_lech){
-        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |>
+      for(j in seq_along(treat_names_lech)){
+        k <- treat_names_lech[[j]]
+        l <- covar_names[[j]]
+        
+        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
-            d_cols = treat,
+            x_cols = l,
+            d_cols = k,
             y_col = "hr_score"
             )
       }
@@ -240,26 +251,26 @@ for(year in start_yrs){
   }
 }
 
-##### cpr & esr ----
+##### rc treats ----
 for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(j in seq_along(treat_names_cpr)){
-        k <- treat_names_cpr[[j]]
-        l <- treat_names_esr[[j]]
+      for(j in seq_along(treat_names_rc)){
+        k <- treat_names_rc[[j]]
+        l <- covar_names[[1]]
         
-        no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |> 
+        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
-            d_cols = c(k, l),
+            x_cols = l,
+            d_cols = k,
             y_col = "hr_score"
             )
       }
@@ -273,7 +284,7 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_pt_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
@@ -283,9 +294,11 @@ for(year in start_yrs){
       for(j in seq_along(treat_names_ss_lech)){
         k <- treat_names_ss_lech[[j]]
         l <- treat_names_ns_lech[[j]]
+        n <- covar_names[[j]]
+        
         no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
+            x_cols = n,
             d_cols = c(k, l),
             y_col = "hr_score"
             )
@@ -294,27 +307,27 @@ for(year in start_yrs){
   }
 }
 
-##### cpr & esr ----
+##### rc treats ----
 for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_pt_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(j in seq_along(treat_names_ss_cpr)){
-        k <- treat_names_ss_cpr[[j]]
-        l <- treat_names_ns_cpr[[j]]
-        n <- treat_names_ss_esr[[j]]
-        o <- treat_names_ns_esr[[j]]
-        no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
+      for(j in seq_along(treat_names_ss_rc)){
+        k <- treat_names_ss_rc[[j]]
+        l <- treat_names_ns_rc[[j]]
+        n <- covar_names[[1]]
+        
+        no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
-            d_cols = c(k, l, n, o),
+            x_cols = n,
+            d_cols = c(k, l),
             y_col = "hr_score"
             )
       }
@@ -344,7 +357,7 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
@@ -354,9 +367,11 @@ for(year in start_yrs){
       for(j in seq_along(treat_names_lech)){
         k <- treat_names_lech[[j]]
         l <- interact_names_lech[[j]]
+        n <- covar_names[[j]]
+        
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
+            x_cols = n,
             d_cols = c(k, l),
             y_col = "hr_score"
             )
@@ -365,28 +380,27 @@ for(year in start_yrs){
   }
 }
 
-##### cpr & esr ----
+##### rc treats ----
 for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(j in seq_along(treat_names_cpr)){
-        k <- treat_names_cpr[[j]]
-        l <- treat_names_esr[[j]]
-        n <- interact_names_cpr[[j]]
-        o <- interact_names_esr[[j]]
+      for(j in seq_along(treat_names_rc)){
+        k <- treat_names_rc[[j]]
+        l <- interact_names_rc[[j]]
+        n <- covar_names[[1]]
         
-        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
-            d_cols = c(k, l, n, o),
+            x_cols = n,
+            d_cols = c(k, l),
             y_col = "hr_score"
             )
       }
@@ -400,7 +414,7 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_pt_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
@@ -412,10 +426,11 @@ for(year in start_yrs){
         l <- treat_names_ns_lech[[j]]
         n <- interact_names_ss_lech[[j]]
         o <- interact_names_ns_lech[[j]]
+        p <- covar_names[[j]]
         
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
+            x_cols = p,
             d_cols = c(k, l, n, o),
             y_col = "hr_score"
             )
@@ -424,32 +439,29 @@ for(year in start_yrs){
   }
 }
 
-##### cpr & esr ----
+##### rc treats ----
 for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names <- covar_names_pt_all[[year]][[lag]]
     for(i in m){
       df <- model.matrix(
         ~ . - 1,
         data = lag_df[[i]]
         ) |> 
         as.data.table()
-      for(j in seq_along(treat_names_ss_cpr)){
-        k <- treat_names_ss_cpr[[j]]
-        l <- treat_names_ns_cpr[[j]]
-        n <- treat_names_ss_esr[[j]]
-        o <- treat_names_ns_esr[[j]]
-        p <- interact_names_ss_cpr[[j]]
-        q <- interact_names_ns_cpr[[j]]
-        r <- interact_names_ss_esr[[j]]
-        s <- interact_names_ns_esr[[j]]
+      for(j in seq_along(treat_names_ss_rc)){
+        k <- treat_names_ss_rc[[j]]
+        l <- treat_names_ns_rc[[j]]
+        n <- interact_names_ss_rc[[j]]
+        o <- interact_names_ns_rc[[j]]
+        p <- covar_names[[1]]
         
-        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), as.character(p), as.character(q), as.character(r), as.character(s), sep = "_AND_")]][[as.character(i)]] <- df |> 
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), as.character(n), as.character(o), sep = "_AND_")]][[as.character(i)]] <- df |> 
           double_ml_data_from_data_frame(
-            x_cols = covar_names,
-            d_cols = c(k, l, n, o, p, q, r, s),
+            x_cols = p,
+            d_cols = c(k, l, n, o),
             y_col = "hr_score"
             )
       }

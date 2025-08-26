@@ -30,6 +30,14 @@ ptas_final <- ptas_final |>
     -c(cat_rat, iccpr_rat)
     )
 
+### code Taiwan, Kosovo, S. Yemen, & S. Vietnam as non-signatories. See notes.
+ptas_final <- ptas_final |> 
+  mutate(
+    hras = if_else(
+      year > 1967 & is.na(hras), 0, hras
+      )
+    )
+
 # make bop as % of GDP ----
 ptas_final <- ptas_final |> 
   mutate(

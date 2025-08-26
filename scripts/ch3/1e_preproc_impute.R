@@ -15,10 +15,28 @@ miss_vars <- miss_var_summary(ems_final)
 imp_vals <- ems_final |> 
   mutate(
     across(
-      c(1:5), ~ FALSE
+      c(
+        cow,
+        year,
+        hr_score,
+        n_ems,
+        any_inforce,
+        gov_kill,
+        coup_success,
+        cont_elect,
+        glb_s,
+        ends_with("_west")
+        ), ~ FALSE
       ),
     across(
-      !c(1:5),
+      c(
+        starts_with(c("v2", "wdi_")),
+        ends_with("_log10"),
+        e_polity2,
+        p_durable,
+        bop_pct_gdp,
+        pol_prox
+        ),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -40,8 +58,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 52,
-  ncol = 52,
+  nrow = 53,
+  ncol = 53,
   dimnames = dim_names
   )
 
@@ -78,6 +96,7 @@ ems_mice <- ems_final |>
         gov_kill,
         coup_success,
         cont_elect,
+        glb_s,
         pta_west,
         bit_tip_west
         ),

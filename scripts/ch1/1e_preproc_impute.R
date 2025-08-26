@@ -147,7 +147,7 @@ ptas_1968 <- ptas_1968 |>
     )
 
 # missingness check ----
-# IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. See specify prediction cols section, below
+# IMPORTANT: vars with more than 10% missingness in 1968 start-year will be excluded as predictors. hras will also be excluded because it is systematically missing for some countries (e.g., Kosovo & Taiwan), leading to failed imputations for such countries on other variables . This will be implemented specify prediction cols section, below.
 miss_vars_1968 <- miss_var_summary(ptas_1968)
 
 # specify imputation vals (T/F) ----
@@ -222,7 +222,7 @@ imp_vals <- ptas_1968 |>
 ### check success
 for(var in imp_vals){
   is.logical(var) |> print()
-  }
+}
 
 ### note: ultimately, there are only a few cases where depth/enforce vars need to be imputed (namely, the US pre-1985)
 
