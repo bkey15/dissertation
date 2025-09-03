@@ -4,7 +4,6 @@ library(here)
 library(DoubleML)
 library(mice)
 library(janitor)
-library(knitr)
 
 # load data ----
 load(here("data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda"))

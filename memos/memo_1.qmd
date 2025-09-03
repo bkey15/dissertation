@@ -1,7 +1,7 @@
 ---
 title: "Dissertation Memo"
 subtitle: |
-  | Preliminary Findings
+  | Discussion of Work
 author: "Brian Key"
 date: today
 
@@ -43,7 +43,7 @@ library(here)
 
 ### Purpose
 
-Since defending my prospectus, I've developed, deployed, and refined a raft of models that carry out my express research agenda. The object of this memo is to describe these models and both illustrate and comment on my main preliminary findings.
+Since defending my prospectus, I've developed, deployed, and refined a raft of models that carry out my express research agenda. The object of this memo is to describe these models and both illustrate and comment on my central findings.
 
 ### Research Questions
 
@@ -55,7 +55,7 @@ Before proceeding, it may be useful to recall the contents of my research agenda
 
 ### Key Findings
 
-As we shall see in the remainder of the memo, my models as presently construed suggest the following general answers to my research questions: 
+As we shall see in the remainder of the memo, my models (as presently construed) suggest the following general answers to my research questions: 
 
 1. "Harder" human rights conditions in PTAs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
 2. Likewise, BITs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
@@ -65,16 +65,75 @@ As we shall see in the remainder of the memo, my models as presently construed s
 
 The remainder of my memo is organized as follows:
 
-1.  An overview of HR scores and V-Dem, including an EDA of the former (@sec-gen-app).
-2.  A description of initial data preprocessing.
-3.  A summary of the recipes used.
-4.  The results of the baseline fits.
-5.  The results of the tuned fits.
-6.  The final fit's predictions and an analysis thereof.
-7.  A discussion of time-series predictions and how they compare to those of the final fit.
-8.  Appendices.
+1.  A description of my general methods for the dissertation writ large (@sec-gen-mtd).
+2.  Discussions and illustrations of my work and findings for each chapter (@sec-ch1, @sec-ch2, @sec-ch3).
+3.  A conclusion, wherein I contemplate remaining questions and future work (@sec-cncl).
+4.  Appendices (@sec-appx).
 
-## The General Approach {#sec-gen-app}
+## The General Methodology {#sec-gen-mtd}
 
-### HR Scores
+### Replication
 
+In each chapter, I first run models that approximately replicate those of the literature inspiring my work, the main points of departure (where appropriate) being (1.) the substitution of [HR Scores](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for the authors' outcomes and my selected treatments for theirs, and (2.) the use of both unimputed (in line with the authors' methodologies) and multiply-imputed data. I do so to test whether the introduction of new key variables and/or multiple imputation immediately yields divergent results. More on these replications can be found in @sec-ch1-rep, @sec-ch2-rep, and @sec-ch3-rep.
+
+### Preprocessing
+
+#### Data Wrangling
+
+Before running the replication and novel models, I assemble a dataset, $\textbf{X}$, through data wrangling. The first (and perhaps most involved) step in this process is the creation of the treatment variables, a task which generally demands significant transformations to the raw data to ultimately render them in panel (i.e., country-year) format. How these treatments are sourced and generated is discussed further in @sec-ch1-treats, @sec-ch2-treats, and @sec-ch3-treats.
+
+Secondly, I consolidate the outcome (HR Scores) and covariates, and I create additional covariates where necessary. Common to all three chapters are the following covariates:
+
+1.  All [V-Dem](https://www.v-dem.net/) high-level and mid-level indices.
+2.  [Polity Score](https://www.systemicpeace.org/polityproject.html).
+3.  World Development Indicators (World Bank) pertaining to:^[These variables are proximately sourced from the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset.]
+  i. Trade (sum of exports and imports of goods and services, % of GDP).
+  ii. Foreign direct investment (net inflows and outflows, % of GDP).
+  iii. Population density.
+4.  Regime durability.^[This variable is also sourced from the QoG dataset.]
+5.  Latent estimates of GDP, GDPpc, and population (logged).
+6.  Balance of payments (% of GDP).
+
+Decisions about outlier countries (which ones are included, which ones aren't, how some are coded).
+
+#### Multiple Imputation
+
+From here, remaining missingness in the covariates of $\textbf{X}$ are handled through multiple imputation.
+
+#### Spatial Lagging
+
+![Preprocessing Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/preproc_flow_viz.png){#fig-preproc-flow}
+
+#### Start-Year Specification
+
+#### Temporal Lagging
+
+### Double/Debiased Machine Learning (DML)
+
+![DML Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/dml_flow_viz.png){#fig-dml-flow}
+
+### Pooling
+
+![Pooling Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/pool_flow_viz.png){#fig-pool-flow}
+
+## Chapter 1: PTAs {#sec-ch1}
+
+### Treatments {#sec-ch1-treats}
+
+### Replication: Hafner-Burton (2005) {#sec-ch1-rep}
+
+## Chapter 2: BITs {#sec-ch2}
+
+### Treatments {#sec-ch2-treats}
+
+### Replication: Bodea & Ye (2020) {#sec-ch2-rep}
+
+## Chapter 3: Economic Sanctions {#sec-ch3}
+
+### Treatments {#sec-ch3-treats}
+
+### Replication: Peez (2025) {#sec-ch3-rep}
+
+## Conclusion {#sec-cncl}
+
+## Appendices {#sec-appx}
