@@ -7,6 +7,9 @@ library(igraph)
 library(ggraph)
 library(latex2exp)
 library(patchwork)
+library(gt)
+library(rnaturalearth)
+library(countrycode)
 
 # make flowcharts ----
 ## preproc 1 ----
@@ -199,6 +202,275 @@ pool_flow_viz <- graph_init_4 |>
 
 # note on subscripts: i = imputation id, j = start-year id, k = lag id
 
+# appendix a ----
+## cow dat ----
+keep_cows <- c(31, 54, 55, 56, 57, 58, 60, 80, 221, 223, 232, 265, 331, 680, 835, 946, 947, 955, 970, 983, 986, 987, 990)
+
+appx_a_dat <- states::cowstates |> 
+  rename(cow = cowcode) |> 
+  filter(cow %in% keep_cows) |> 
+  mutate(
+    country_name = case_when(
+      cow == 265 ~ "East Germany",
+      cow == 680 ~ "South Yemen",
+      .default = country_name
+      )
+    ) |> 
+  select(cow, country_name, microstate)
+
+## get world dat ----
+world <- ne_countries(
+  scale = "medium",
+  returnclass = "sf"
+  ) |> 
+  arrange(subunit) |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = iso_a3,
+      origin = "iso3c",
+      destination = "cown"
+      ),
+    cow = case_when(
+      iso_a3 == "SRB" ~ 345,
+      subunit == "France" ~ 220,
+      subunit == "Kosovo" ~ 347,
+      subunit == "Norway" ~ 385,
+      .default = cow
+      )
+    ) |> 
+  select(cow, region_wb) |> 
+  arrange(cow)
+
+## combine ----
+appx_a_dat <- appx_a_dat |> 
+  left_join(world) |> 
+  mutate(
+    region_wb = case_when(
+      cow == 265 ~ "Europe & Central Asia",
+      cow == 680 ~ "Middle East & North Africa",
+      .default = region_wb
+      )
+    ) |> 
+  select(-geometry)
+
+## add paliestine ----
+pal_dat <- tibble(
+  cow = rep(NA, 2),
+  country_name = c("Palestine/West Bank", "Palestine/Gaza"),
+  microstate = rep(NA, 2),
+  region_wb = rep("Middle East & North Africa", 2)
+  )
+
+appx_a_slice_1 <- appx_a_dat |> 
+  filter(cow < 680)
+appx_a_slice_2 <- appx_a_dat |> 
+  filter(cow > 679)
+
+appx_a_dat <- appx_a_slice_1 |> 
+  rbind(pal_dat, appx_a_slice_2)
+
+## create new ids ----
+appx_a_dat <- appx_a_dat |> 
+  mutate(
+    in_fariss = if_else(
+      is.na(cow), FALSE, TRUE
+      ),
+    in_vdem = if_else(
+      is.na(cow) | cow == 265 | cow == 680, TRUE, FALSE),
+    in_ne = case_when(
+      is.na(cow) ~ NA,
+      cow == 265 | cow == 680 ~ FALSE,
+      .default = TRUE
+      ),
+    in_2fe = if_else(in_ne != FALSE | is.na(in_ne), FALSE, TRUE),
+    in_spat = FALSE
+    )
+
+## make viz ----
+appx_a_viz <- appx_a_dat |> 
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region_wb"
+    ) |> 
+  cols_label(
+    cow = md("*COW Code*"),
+    microstate = md("*Microstate*"),
+    in_fariss = md("*In Fariss et al. (2022)*"),
+    in_vdem = md("*In V-Dem*"),
+    in_ne = md("*In Natural Earth*"),
+    in_2fe = md("*In 2FE Models*"),
+    in_spat = md("*In Spatial Models*")
+    ) |> 
+  tab_style(
+    style = list(
+      cell_fill(color = "gray35"),
+      cell_text(color = "white")
+      ),
+    locations = cells_row_groups()
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = c("left", "right"),
+        style = "solid",
+        color = "gray35"
+        )
+      ),
+    locations = cells_body()
+    ) |> 
+  opt_table_outline() |> 
+  fmt_tf(tf_style = "circles") |> 
+  sub_missing() |> 
+  tab_footnote(
+    footnote = "Status assigned in the COW State System Membership List (v2011).",
+    locations = cells_column_labels(columns = microstate)
+    ) |> 
+  tab_footnote(
+    footnote = "Palestine is uncovered in the COW project.",
+    locations = cells_body(
+      columns = c(cow, microstate),
+      rows = contains("Palestine")
+      )
+    ) |> 
+  tab_footnote(
+    footnote = "Natural Earth represents Palestine as a single polygon.",
+    locations = cells_body(
+      columns = in_ne,
+      rows = contains("Palestine")
+      )
+    ) |> 
+  tab_source_note(source_note = "Sources: COW (v2011), Fariss et al. (2022, v1), Natural Earth (v4.1.0), & V-Dem (v15).") |> 
+  tab_header(
+    title = md("**Countries Excluded from Models**"),
+    subtitle = "Cases lack coverage in at least one critical dataset"
+    )
+
+# appendix b ----
+## make dat ----
+appx_b_dat <- tibble(
+  name = c("Czechia", "Germany", "Serbia", "Yemen", "Czechoslovakia", "West Germany", "Yugoslavia", "North Yemen"),
+  stat = c("Successor", "Successor", "Successor", "Successor", "Predecessor", "Predecessor", "Predecessor", "Predecessor"),
+  cow_hr = c(316, 255, 345, 679, 316, 260, 345, 678),
+  cow_vdem = c(316, 255, 345, 679, 315, 260, 345, 678),
+  id_vdem = c(157, 77, 198, 14, 157, 77, 198, 14),
+  dec_cow = c(316, 255, 345, 679, 316, 255, 345, 679)
+  )
+
+## make viz ----
+### https://waldyrious.net/viridis-palette-generator/, categories = 10
+appx_b_viz <- appx_b_dat |> 
+  gt(
+    rowname_col = "name",
+    groupname_col = "stat"
+    ) |> 
+  tab_header(
+    title = md("**Manually-Coded Country IDs**"),
+    subtitle = "Resolves discrepancies between predecessor-successor continuities"
+    ) |> 
+  cols_label(
+    cow_hr = md("*COW (HRS)*"),
+    cow_vdem = md("*COW (V-Dem)*"),
+    id_vdem = md("*ID (V-Dem)*"),
+    dec_cow = md("*Decision (COW)*"),
+    ) |> 
+  tab_footnote(footnote = html("Shared COW (HR Scores) = <span style='display:inline-block;width:12px;height:12px;background-color:#6ece58;margin-left:4px;'></span>")) |> 
+  tab_footnote(footnote = html("Shared COW (V-Dem) = <span style='display:inline-block;width:12px;height:12px;background-color:#fde725;margin-left:4px;'></span>")) |> 
+  tab_footnote(footnote = html("Shared ID (V-Dem) = <span style='display:inline-block;width:12px;height:12px;background-color:#1f9e89;margin-left:4px;'></span>")) |> 
+  tab_source_note(source_note = "Sources: HR Scores (v4) & V-Dem (v15)") |> 
+  tab_style(
+    style = cell_fill(color = "#1f9e89"),
+    locations = cells_body(
+      columns = id_vdem
+      )
+    ) |> 
+  tab_style(
+    style = cell_fill(color = "#6ece58"),
+    locations = cells_body(
+      columns = cow_hr,
+      rows = name == "Czechia" | name == "Czechoslovakia" | name == "Serbia" | name == "Yugoslavia"
+      )
+    ) |> 
+  tab_style(
+    style = cell_fill(color = "#fde725"),
+    locations = cells_body(
+      columns = cow_vdem,
+      rows = name == "Serbia" | name == "Yugoslavia"
+      )
+    ) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = dec_cow)
+    ) |> 
+  tab_style(
+    style = list(
+      cell_fill(color = "gray35"),
+      cell_text(color = "white")
+      ),
+    locations = cells_row_groups()
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = c("left", "right"),
+        style = "solid",
+        color = "gray35"
+        )
+      ),
+    locations = cells_body()
+    ) |> 
+  opt_table_outline()
+
+# appendix c ----
+## make dat ----
+appx_c_dat <- tibble(
+  chp_mod = c(
+    rep("Chapter 1 (PTAs)", 2), rep("Chapter 2 (BITs)", 2), "Chapter 3 (Sanctions)"
+    ),
+  st_yr = c("Start 1977", "Start 1990", "Start 1981", "Start 1990", "Start 1990"),
+  n_cs_2fe = c(176, 174, 176, 174, 139),
+  n_cs_spat = c(174, 174, 174, 174, 139)
+  )
+
+## make viz ----
+appx_c_viz <- appx_c_dat |> 
+  gt(
+    rowname_col = "st_yr",
+    groupname_col = "chp_mod"
+    ) |> 
+  tab_header(
+    title = md("**Total Number of Countries Included per Model**"),
+    subtitle = "Varies by Type and Dataset Start Year"
+    ) |> 
+  cols_label(
+    n_cs_2fe = md("*2FE Models*"),
+    n_cs_spat = md("*Spatial Models*")
+    ) |> 
+  tab_style(
+    style = list(
+      cell_fill(color = "gray35"),
+      cell_text(color = "white")
+      ),
+    locations = cells_row_groups()
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = c("left", "right"),
+        style = "solid",
+        color = "gray35"
+        )
+      ),
+    locations = cells_body()
+    ) |> 
+  opt_table_outline() |> 
+  tab_footnote(
+    footnote = md("The universe of cases in Chapter 3 is limited to \"Global South\" countries."),
+    locations = cells_row_groups(
+      groups = contains("Sanctions")
+      )
+    ) |> 
+  tab_source_note(source_note = md("Note: values are taken from the most \"general\" models available (i.e., for chapters 1 and 2, those sans Global South/Global North conditionalities), and with temporal lag $t-1$."))
+
 # save ----
 ggsave(
   preproc_flow_viz,
@@ -220,4 +492,22 @@ ggsave(
   height = 1787,
   units = "px",
   file = here("visualizations/memos/pool_flow_viz.png")
+  )
+
+gtsave(
+  appx_a_viz,
+  zoom = 5,
+  filename = here("visualizations/memos/appx_a_viz.png")
+  )
+
+gtsave(
+  appx_b_viz,
+  zoom = 5,
+  filename = here("visualizations/memos/appx_b_viz.png")
+  )
+
+gtsave(
+  appx_c_viz,
+  zoom = 5,
+  filename = here("visualizations/memos/appx_c_viz.png")
   )

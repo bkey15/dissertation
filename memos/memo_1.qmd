@@ -32,13 +32,12 @@ library(DT)
 library(here)
 ```
 
-::: {.callout-tip icon=false}
-
+::: {.callout-tip icon="false"}
 ## Github Repo Link
 
 [Dissertation Github Repo](https://github.com/bkey15/dissertation)
-
 :::
+
 ## Introduction
 
 ### Purpose
@@ -49,17 +48,17 @@ Since defending my prospectus, I've developed, deployed, and refined a raft of m
 
 Before proceeding, it may be useful to recall the contents of my research agenda. To this end, below are concise formulations of the questions animating each chapter (in order):
 
-1. Do human rights conditions in preferential trade agreements (PTAs), particularly when codified as more legalized (i.e., "harder"), improve human rights respect among signatories?
-2. Do bilateral investment treaties (BITs) improve human rights respect among signatories?
-3. Do economic sanctions sent by Western states improve human rights respect among non-Western targets?
+1.  Do human rights conditions in preferential trade agreements (PTAs), particularly when codified as more legalized (i.e., "harder"), improve human rights respect among signatories?
+2.  Do bilateral investment treaties (BITs) improve human rights respect among signatories?
+3.  Do economic sanctions sent by Western states improve human rights respect among non-Western targets?
 
 ### Key Findings
 
-As we shall see in the remainder of the memo, my models (as presently construed) suggest the following general answers to my research questions: 
+As we shall see, my models (as presently construed) suggest the following general answers to my research questions:
 
-1. "Harder" human rights conditions in PTAs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
-2. Likewise, BITs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
-3. Conversely, economic sanctions against non-Western states are associated with worsened human rights respect in less-democratic targets but an improvement of such respect in more-democratic ones.
+1.  "Harder" human rights conditions in PTAs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
+2.  Likewise, BITs are associated with improved human rights respect in less-democratic states but a worsening of such respect in more-democratic ones.
+3.  Conversely, economic sanctions against non-Western states are associated with worsened human rights respect in less-democratic targets but an improvement of such respect in more-democratic ones.
 
 ### Overview of Memo
 
@@ -72,47 +71,83 @@ The remainder of my memo is organized as follows:
 
 ## The General Methodology {#sec-gen-mtd}
 
-### Replication
+### Summary {#sec-gen-sum}
+
+The following section delineates the overarching methodology common to my work in all three chapters:
+
+1.  Replication (@sec-gen-rep)
+2.  Preprocessing (@sec-gen-prep)
+    i.  Data wrangling (@sec-gen-prep-dw)
+    ii. Multiple imputation (@sec-gen-prep-mi)
+    iii. Spatial lagging (@sec-gen-prep-sptl)
+    iv. Start-Year Specification (@sec-gen-prep-sy)
+    v.  Temporal lagging (@sec-gen-prep-tl)
+3.  Double/debiased machine learning (@sec-gen-dml)
+4.  Pooling (@sec-gen-dml)
+
+### Replication {#sec-gen-rep}
 
 In each chapter, I first run models that approximately replicate those of the literature inspiring my work, the main points of departure (where appropriate) being (1.) the substitution of [HR Scores](https://dataverse.harvard.edu/dataverse/HumanRightsScores) for the authors' outcomes and my selected treatments for theirs, and (2.) the use of both unimputed (in line with the authors' methodologies) and multiply-imputed data. I do so to test whether the introduction of new key variables and/or multiple imputation immediately yields divergent results. More on these replications can be found in @sec-ch1-rep, @sec-ch2-rep, and @sec-ch3-rep.
 
-### Preprocessing
+### Preprocessing {#sec-gen-prep}
 
-#### Data Wrangling
+#### Data Wrangling {#sec-gen-prep-dw}
 
-Before running the replication and novel models, I assemble a dataset, $\textbf{X}$, through data wrangling. The first (and perhaps most involved) step in this process is the creation of the treatment variables, a task which generally demands significant transformations to the raw data to ultimately render them in panel (i.e., country-year) format. How these treatments are sourced and generated is discussed further in @sec-ch1-treats, @sec-ch2-treats, and @sec-ch3-treats.
+##### Treatments
 
-Secondly, I consolidate the outcome (HR Scores) and covariates, and I create additional covariates where necessary. Common to all three chapters are the following covariates:
+Before running the replication and novel models, I assemble a dataset, $\textbf{X}$, through data wrangling. The first (and perhaps most involved) step in this process is the construction of each treatment variable, $D$, a task which generally demands significant transformations to the raw data to ultimately render them in country-year (i.e., panel) format. How these treatments are sourced and generated---and how missingness is handled---is discussed further in @sec-ch1-treats, @sec-ch2-treats, and @sec-ch3-treats.
 
-1.  All [V-Dem](https://www.v-dem.net/) high-level and mid-level indices.
-2.  [Polity Score](https://www.systemicpeace.org/polityproject.html).
-3.  World Development Indicators (World Bank) pertaining to:^[These variables are proximately sourced from the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset.]
-  i. Trade (sum of exports and imports of goods and services, % of GDP).
-  ii. Foreign direct investment (net inflows and outflows, % of GDP).
-  iii. Population density.
-4.  Regime durability.^[This variable is also sourced from the QoG dataset.]
-5.  Latent estimates of GDP, GDPpc, and population (logged).
-6.  Balance of payments (% of GDP).
+##### Covariates
 
-Decisions about outlier countries (which ones are included, which ones aren't, how some are coded).
+Afterwards, I consolidate the outcome, $Y$, and covariates, $X = (X_{i}, ..., X_{n})$. I also create additional covariates where necessary. $X$ is nearly identical across the three chapters, featuring the following common elements:
 
-#### Multiple Imputation
+1.  All [V-Dem](https://www.v-dem.net/) high-level and mid-level indices.^[$n = 26$]
+2.  From the [Polity Project](https://www.systemicpeace.org/polityproject.html), Polity Score and Regime Durability.^[The proximate sources of these variables are V-Dem and the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset, respectively.]
+3.  World Development Indicators (World Bank) pertaining to:^[These variables are sourced from the QoG.]
+    i.  Trade.^[Sum of exports and imports of goods and services, % of country-year GDP.]
+    ii. Foreign direct investment (FDI).^[Net inflows and outflows, % of country-year GDP.]
+    iii. Population density.
+4.  From [Fariss et al. (2022)](https://dataverse.harvard.edu/dataverse/LatentGDP), latent estimates of GDP, GDPpc, and population (logged).
+5.  Balance of payments.^[% of country-year GDP.]
 
-From here, remaining missingness in the covariates of $\textbf{X}$ are handled through multiple imputation.
+Justifications for the inclusion of these covariates, as well as exceptions to the common elements of $X$, are present in @sec-ch1-covs, @sec-ch2-covs, and @sec-ch3-covs.
 
-#### Spatial Lagging
+##### Case Selection & Coding
+
+During the assembly of $\textbf{X}$, I make several decisions on handling observations featuring missingness in numerous or critical areas and irregular coding attributes. Most of these cases involve (1.) small-nation status, (2.) partial international recognition, and (3.) post-Cold War transitions.
+
+In the first instance, I omit from $\textbf{X}$ all countries failing to appear in V-Dem, coverage in HR Scores notwithstanding. Constituting the lion's share of these cases are microstates, as classified by the [Correlates of War (COW) project](https://correlatesofwar.org/). Though this omission comes at the cost of circumscribing my studies' external validity---namely, to non-microstates---it likely improves the robustness of my final inferences vis-à-vis future replications. Indeed, V-Dem indices constitute the majority of dimensions in each chapter's $X$, meaning conclusions drawn from imputed V-Dem data for microstates would be generally and greatly sensitive to the randomness immanent in the imputation process.^[More on my missingness handling method---multiple imputation---may be found in @sec-gen-prep-mi.]
+
+Moreover, I omit Palestine in view of problems originating from inconsistent coding patterns, themselves a general consequence of its incomplete international recognition. Unlike the foregoing microstates, Palestine is covered in V-Dem. However, its reported scores are disaggregated for much of the post-World War II period, with Gaza and the West Bank treated as mutually-exclusive observations, making it unclear as to how to reconcile these data with the single spatial unit that the source of my spatial data, [Natural Earth](https://www.naturalearthdata.com/), supplies for Palestine.^[A discussion of my spatial models is to be found in @sec-gen-prep-sptl.] Equally important, Palestine---absent from Gleditsch & Ward's [List of Independent States (v7)](http://ksgleditsch.com/statelist.html) on the basis of its contested international recognition^[For a discussion of Palestine's exclusion, see the list's attendant [case description](http://ksgleditsch.com/data/iisyst_casedesc.pdf).]---lacks the prerequisite for coverage in Fariss et al.'s (2022) GDP, GDPpc, and population variables,^[Only states with accompanying Gleditsch and Ward IDs (i.e., "state numbers") appear in Fariss et al.'s (2022) data.] estimates essential for computing several treatments pre-imputation.^[The computation of these treatments is outlined in @sec-ch1-treats and @sec-ch2-treats.] Owing to these theoretical and logistical roadblocks, I abstain from incorporating Palestine into my models, with the understanding that doing so comes at some inferential cost.
+
+Included in some of my models, on the other hand, are a few extinct countries, namely East Germany (formally the German Democratic Republic) and South Yemen (formally the People's Democratic Republic of Yemen). Each was a communist state that unified with its non-communist counterpart (West Germany and North Yemen, respectively) in 1990, amidst the denouement of the Cold War. The two countries enjoy complete data for HR Scores, Fariss et al.'s (2022) estimates, and virtually all V-Dem covariates, *inter alia*---yet they crucially lack shapefiles from Natural Earth, which does not offer data on historical geographical boundaries. On account of data availability, I opt to integrate East Germany and South Yemen into my non-spatial models, though this inevitably entails a greater number of cases in such models relative to that of my spatial ones. Always marginal ($\Delta = 2$), this difference is only present in models with a pre-1990 start year, before the two countries naturally "drop out" of the dataset.
+
+A further consideration resulting from post-Cold War geopolitical reconfigurations is the existence of several discrepancies in case identification---namely, differences across datasets in the coding of continuities between predecessor and successor states. These present challenges for variable collation and subsequent inference; indeed, when joining datasets on country identifiers (e.g., COW codes), the discrepancies may yield unmerited duplicates or missingness, raising doubts over inferential validity in later modelling stages. To harmonize all inputs of $\textbf{X}$, I allow decisions adopted by HR Scores and/or V-Dem---the sources of my outcome and the preponderance of covariates---to override alternative coding schemes in the following cases:
+
+1.  Czechia: coded as the successor of Czechoslovakia.
+2.  Germany: coded as the successor of West Germany.
+3.  Serbia: coded as the successor of Yugoslavia.
+4.  Yemen: coded as the successor of North Yemen.
+
+Having implemented these decisions, I arrive at my final set of cases. In general, the maximum number of countries featuring in the two-way fixed effects models is 176, whereas the equivalent for the spatial models is 174. For a full breakdown on these figures, as well as complete itemizations of the excluded and manually-coded cases discussed above, see the appendices (@sec-appx-a, @sec-appx-b, and @sec-appx-c).
+
+#### Multiple Imputation {#sec-gen-prep-mi}
+
+In the next step, I rectify remaining missingness in $X$ through the method of multiple imputation.
+
+#### Spatial Lagging {#sec-gen-prep-sptl}
 
 ![Preprocessing Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/preproc_flow_viz.png){#fig-preproc-flow}
 
-#### Start-Year Specification
+#### Start-Year Specification {#sec-gen-prep-sy}
 
-#### Temporal Lagging
+#### Temporal Lagging {#sec-gen-prep-tl}
 
-### Double/Debiased Machine Learning (DML)
+### Double/Debiased Machine Learning (DML) {#sec-gen-dml}
 
 ![DML Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/dml_flow_viz.png){#fig-dml-flow}
 
-### Pooling
+### Pooling {#sec-gen-pool}
 
 ![Pooling Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/pool_flow_viz.png){#fig-pool-flow}
 
@@ -120,11 +155,15 @@ From here, remaining missingness in the covariates of $\textbf{X}$ are handled t
 
 ### Treatments {#sec-ch1-treats}
 
+### Covariates {#sec-ch1-covs}
+
 ### Replication: Hafner-Burton (2005) {#sec-ch1-rep}
 
 ## Chapter 2: BITs {#sec-ch2}
 
 ### Treatments {#sec-ch2-treats}
+
+### Covariates {#sec-ch2-covs}
 
 ### Replication: Bodea & Ye (2020) {#sec-ch2-rep}
 
@@ -132,8 +171,21 @@ From here, remaining missingness in the covariates of $\textbf{X}$ are handled t
 
 ### Treatments {#sec-ch3-treats}
 
+### Covariates {#sec-ch3-covs}
+
 ### Replication: Peez (2025) {#sec-ch3-rep}
 
 ## Conclusion {#sec-cncl}
 
 ## Appendices {#sec-appx}
+
+### Appendix A {#sec-appx-a}
+![Table of Countries Excluded from Models](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_a_viz.png){#fig-appx-a}
+
+### Appendix B {#sec-appx-b}
+
+![Table of Manually-Coded Country IDs](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_b_viz.png){#fig-appx-b}
+
+### Appendix C {#sec-appx-c}
+
+![Table of Total Country Counts per Model](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_c_viz.png){#fig-appx-c}
