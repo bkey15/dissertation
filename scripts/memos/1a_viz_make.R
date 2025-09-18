@@ -10,48 +10,91 @@ library(patchwork)
 library(gt)
 library(rnaturalearth)
 library(countrycode)
+library(naniar)
+
+# load data ----
+load(here("data/ch1/results/imputations/imp_base.rda"))
+imp_base_1 <- imp_base |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  relocate(.imp, .id) |> 
+  mutate(
+    year = as.numeric(levels(year))[year]
+    ) |> 
+  filter(
+    .imp == 0,
+    year > 1976
+    )
+
+load(here("data/ch2/results/imputations/imp_base.rda"))
+imp_base_2 <- imp_base |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  relocate(.imp, .id) |> 
+  mutate(
+    year = as.numeric(levels(year))[year]
+    ) |> 
+  filter(
+    .imp == 0,
+    year > 1980
+    )
+
+load(here("data/ch3/results/imputations/imp_base.rda"))
+imp_base_3 <- imp_base |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  relocate(.imp, .id) |> 
+  filter(.imp == 0)
+
+rm(imp_base)
 
 # make flowcharts ----
 ## preproc 1 ----
 ### note: D = initial dataset (vars collated and created), M = imputed dataset, Y = start year
 flowchart_tbl_1 <- tibble(
   from = c(
-    "X", "X", "X", "X", "X", "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "s[1]", "s[1]", "s[2]", "s[2]", "s[3]", "s[3]", "s[4]", "s[4]", "s[5]", "s[5]"
+    "S", "S", "S", "S", "S", "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "p[1]", "p[1]", "p[2]", "p[2]", "p[3]", "p[3]", "p[4]", "p[4]", "p[5]", "p[5]"
     ),
   to = c(
-    "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "s[1]", "s[2]", "s[3]", "s[4]", "s[5]", "s[1]y[1]", "s[1]y[2]", "s[2]y[1]", "s[2]y[2]", "s[3]y[1]", "s[3]y[2]", "s[4]y[1]", "s[4]y[2]", "s[5]y[1]", "s[5]y[2]"
+    "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "p[1]", "p[2]", "p[3]", "p[4]", "p[5]", "p[1]r[1]", "p[1]r[2]", "p[2]r[1]", "p[2]r[2]", "p[3]r[1]", "p[3]r[2]", "p[4]r[1]", "p[4]r[2]", "p[5]r[1]", "p[5]r[2]"
     )
   )
 
 new_labels_1 <- c(
-  "X" = "X",
+  "S" = "S",
   "m[1]" = "m[1]",
   "m[2]" = "m[2]",
   "m[3]" = "m[3]",
   "m[4]" = "m[4]",
   "m[5]" = "m[5]",
-  "s[1]" = "s[1]",
-  "s[2]" = "s[2]",
-  "s[3]" = "s[3]",
-  "s[4]" = "s[4]",
-  "s[5]" = "s[5]",
-  "s[1]y[1]" = "y[1]",
-  "s[1]y[2]" = "y[2]",
-  "s[2]y[1]" = "y[1]",
-  "s[2]y[2]" = "y[2]",
-  "s[3]y[1]" = "y[1]",
-  "s[3]y[2]" = "y[2]",
-  "s[4]y[1]" = "y[1]",
-  "s[4]y[2]" = "y[2]",
-  "s[5]y[1]" = "y[1]",
-  "s[5]y[2]" = "y[2]"
+  "p[1]" = "p[1]",
+  "p[2]" = "p[2]",
+  "p[3]" = "p[3]",
+  "p[4]" = "p[4]",
+  "p[5]" = "p[5]",
+  "p[1]r[1]" = "r[list(1,1)]",
+  "p[1]r[2]" = "r[list(1,2)]",
+  "p[2]r[1]" = "r[list(2,1)]",
+  "p[2]r[2]" = "r[list(2,2)]",
+  "p[3]r[1]" = "r[list(3,1)]",
+  "p[3]r[2]" = "r[list(3,2)]",
+  "p[4]r[1]" = "r[list(4,1)]",
+  "p[4]r[2]" = "r[list(4,2)]",
+  "p[5]r[1]" = "r[list(5,1)]",
+  "p[5]r[2]" = "r[list(5,2)]"
   )
 
 graph_init_1 <- flowchart_tbl_1 |> 
   graph_from_data_frame()
 
 coords_1 <- graph_init_1 |> 
-  layout_as_tree(root = "X")
+  layout_as_tree(root = "S")
 
 preproc_1_g <- graph_init_1 |> 
   ggraph(layout = coords_1) +
@@ -66,7 +109,7 @@ preproc_1_g <- graph_init_1 |>
 ## preproc 2 ----
 ### Y = start year, L = lagged imputed dataset
 flowchart_tbl_2 <- tibble(
-  from = c("y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]", "y[list(i,j)]"),
+  from = c("r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]"),
   to = c("l[1]", "l[2]", "l[3]", "l[4]", "l[5]", "l[6]", "l[7]", "l[8]")
   )
 
@@ -74,7 +117,7 @@ graph_init_2 <- flowchart_tbl_2 |>
   graph_from_data_frame()
 
 coords_2 <- graph_init_2 |> 
-  layout_as_tree(root = "y[list(i,j)]")
+  layout_as_tree(root = "r[list(i,j)]")
 
 preproc_2_g <- graph_init_2 |> 
   ggraph(layout = coords_2) +
@@ -471,6 +514,129 @@ appx_c_viz <- appx_c_dat |>
     ) |> 
   tab_source_note(source_note = md("Note: values are taken from the most \"general\" models available (i.e., for chapters 1 and 2, those sans Global South/Global North conditionalities), and with temporal lag $t-1$."))
 
+# appendix d ----
+## get covars ----
+ch1_covars <- imp_base_1 |> 
+  select(
+    year,
+    starts_with(
+      c("v2x", "wdi", "e_", "p_", "bop_")
+      ),
+    ends_with("log10"),
+    inv,
+    hras
+    )
+
+ch2_covars <- imp_base_2 |> 
+  select(
+    year,
+    starts_with(
+      c("v2", "wdi", "e_", "p_", "bop_")
+      ),
+    ends_with("log10")
+    )
+
+ch3_covars <- imp_base_3 |> 
+  select(
+    gov_kill,
+    coup_success,
+    cont_elect,
+    starts_with(
+      c("v2", "wdi", "e_", "p_", "bop_", "pol_")
+      ),
+    ends_with(
+      c("log10", "west")
+      )
+    )
+
+## get miss figs ----
+### ch1 ----
+ch1_pct_miss_case_1977 <- ch1_covars |> 
+  pct_miss_case()
+ch1_avg_miss_rt_1977 <- ch1_covars |> 
+  pct_miss()
+
+ch1_pct_miss_case_1990 <- ch1_covars |> 
+  filter(year > 1989) |> 
+  pct_miss_case()
+ch1_avg_miss_rt_1990 <- ch1_covars |> 
+  filter(year > 1989) |> 
+  pct_miss()
+
+### ch2 ----
+ch2_pct_miss_case_1981 <- ch2_covars |> 
+  pct_miss_case()
+ch2_avg_miss_rt_1981 <- ch2_covars |> 
+  pct_miss()
+
+ch2_pct_miss_case_1990 <- ch2_covars |> 
+  filter(year > 1989) |> 
+  pct_miss_case()
+ch2_avg_miss_rt_1990 <- ch2_covars |> 
+  filter(year > 1989) |> 
+  pct_miss()
+
+### ch3 ----
+ch3_pct_miss_case <- ch3_covars |> 
+  pct_miss_case()
+ch3_avg_miss_rt <- ch3_covars |> 
+  pct_miss()
+
+### combine ----
+appx_d_dat <- tibble(
+  chp_mod = c(
+    rep("Chapter 1 (PTAs)", 2), rep("Chapter 2 (BITs)", 2), "Chapter 3 (Sanctions)"
+    ),
+  st_yr = c("Start 1977", "Start 1990", "Start 1981", "Start 1990", "Start 1990"),
+  pct_miss_case = c(ch1_pct_miss_case_1977, ch1_pct_miss_case_1990, ch2_pct_miss_case_1981, ch2_pct_miss_case_1990, ch3_pct_miss_case),
+  avg_miss_rt = c(ch1_avg_miss_rt_1977, ch1_avg_miss_rt_1990, ch2_avg_miss_rt_1981, ch2_avg_miss_rt_1990, ch3_avg_miss_rt)
+  )
+
+## make viz ----
+appx_d_viz <- appx_d_dat |> 
+  gt(
+    rowname_col = "st_yr",
+    groupname_col = "chp_mod"
+    ) |> 
+  tab_header(
+    title = md("**Summary of Missingness**"),
+    subtitle = md("Average missing data rate suggests $m = 5$ is sufficient")
+    ) |> 
+  cols_label(
+    pct_miss_case = md("*% Incomplete Cases*"),
+    avg_miss_rt = md("*Avg. Missing Data Rate*")
+    ) |> 
+  tab_style(
+    style = list(
+      cell_fill(color = "gray35"),
+      cell_text(color = "white")
+      ),
+    locations = cells_row_groups()
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(
+        sides = c("left", "right"),
+        style = "solid",
+        color = "gray35"
+        )
+      ),
+    locations = cells_body()
+    ) |> 
+  opt_table_outline() |> 
+  fmt_percent(
+    scale_values = FALSE,
+    decimals = 2
+    ) |> 
+  tab_footnote(
+    footnote = "Gives the proportion of country-year observations possessing at least one missing value.",
+    locations = cells_column_labels(columns = pct_miss_case)
+    ) |> 
+  tab_footnote(
+    footnote = md("Gives the proportion of values among the covariates, $X$, that are missing. These figures center on $X$ because its elements are theoretically eligible for imputation---unlike the treatments, fixed effects, and outcome, which are complete by design. Hence, ignoring structurally complete variables, these data provide a \"conservative\" picture of missingness."),
+    locations = cells_column_labels(columns = avg_miss_rt)
+    )
+
 # save ----
 ggsave(
   preproc_flow_viz,
@@ -510,4 +676,10 @@ gtsave(
   appx_c_viz,
   zoom = 5,
   filename = here("visualizations/memos/appx_c_viz.png")
+  )
+
+gtsave(
+  appx_d_viz,
+  zoom = 5,
+  filename = here("visualizations/memos/appx_d_viz.png")
   )
