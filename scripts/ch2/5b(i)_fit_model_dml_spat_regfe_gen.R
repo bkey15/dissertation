@@ -41,12 +41,14 @@ for(stat in interact_stat){
             ml_l = lrn(
               "regr.cv_glmnet",
               s = "lambda.min",
-              parallel = TRUE
+              parallel = TRUE,
+              parallel_predict = TRUE
               ),
             ml_m = lrn(
               "regr.cv_glmnet",
               s = "lambda.min",
-              parallel = TRUE
+              parallel = TRUE,
+              parallel_predict = TRUE
               ),
             n_folds = 5,
             n_rep = 3

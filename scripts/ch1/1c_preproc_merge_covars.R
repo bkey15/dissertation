@@ -36,7 +36,7 @@ load(here("data/ch1/preprocessed/bop_panel.rda"))
 ### note 1: use only high- and mid-level
 ### note 2: avoid v2x_clphy, v2cltort, v2clkill for now; too much missingness in the small countries
 vdem_small <- vdem |> 
-  select(1:117, e_polity2) |> 
+  select(1:117, v2cademmob, e_polity2) |> 
   filter(year > 1945) |> 
   rename(cow = COWcode) |> 
   relocate(cow, .before = year) |> 
@@ -53,7 +53,9 @@ vdem_small <- vdem |>
     country_name,
     cow,
     year,
-    contains("v2x"),
+    contains(
+      c("v2x", "v2c")
+      ),
     -ends_with("_codelow"),
     -ends_with("_codehigh"),
     -ends_with("_sd"),
@@ -181,7 +183,7 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
   relocate(
-    47:134,
+    48:135,
     .after = hr_score
     )
 

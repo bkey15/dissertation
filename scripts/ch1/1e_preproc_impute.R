@@ -180,6 +180,7 @@ imp_vals <- ptas_1968 |>
             "depth_",
             "enforce_",
             "v2x",
+            "v2c",
             "wdi_"
             )
           ),
@@ -233,8 +234,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 108,
-  ncol = 108,
+  nrow = 109,
+  ncol = 109,
   dimnames = dim_names
   )
 

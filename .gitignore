@@ -6,30 +6,28 @@ data/ch2/results/imputations/imp_sp_t_lags.rda
 
 ## Fits
 ### 2FE
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_gen.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_south.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_north.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
 
-data/ch1/results/fits/dml_lasso/full_dat/rc_imp_dml_fits_2fe_gen.rda
-data/ch1/results/fits/dml_lasso/full_dat/rc_imp_dml_fits_2fe_south.rda
-data/ch1/results/fits/dml_lasso/full_dat/rc_imp_dml_fits_2fe_north.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_gen.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_south.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_north.rda
+data/ch2/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
 
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_gen.rda
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_south.rda
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe_north.rda
-
-data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_2fe.gz
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe.gz
 
 ### Spatial (w/ regional FE)
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_gen.rda
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_south.rda
-data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_gen.rda
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_south.rda
-data/ch2/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-data/ch3/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe.gz
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe.gz
 
 # History files
 .Rhistory
