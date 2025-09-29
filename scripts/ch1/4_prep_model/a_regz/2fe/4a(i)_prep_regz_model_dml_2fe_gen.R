@@ -1,0 +1,291 @@
+# Prep ridge models by tuning for lambda across all imputed datasets.
+
+# load packages ----
+library(tidyverse)
+library(here)
+library(mice)
+library(DoubleML)
+library(tidymodels)
+library(data.table)
+library(janitor)
+
+# load data ----
+load(here("data/ch1/results/imputations/imp_t_lags.rda"))
+
+# truncate data ----
+## IMPORTANT: leaving out start_1968 date for now (reduces computation time & helps computer memory)
+imp_t_lags <- imp_t_lags[-1]
+
+# get imputed data ----
+## important: filter out unused treatments before initializing covar_names. These are sources of high missingness that will cause model.matrix to produce empty sets.
+m <- 1:imp_t_lags[[1]][[1]]$m
+start_yrs <- names(imp_t_lags)
+imp_t_dfs <- list()
+
+for(year in start_yrs){
+  lags <- imp_t_lags[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    imp_dat <- lags[[lag]]
+    for(i in m){
+      imp_df <- imp_dat |> 
+        mice::complete(
+          action = "long",
+          include = TRUE
+          ) |> 
+        filter(.imp == i) |> 
+        select(
+          -contains(
+            c(
+              "ss_",
+              "ns_",
+              "nn_",
+              "cpr",
+              "esr"
+              )
+            ),
+          -glb_s,
+          -last_col(),
+          -last_col(offset = 1)
+          )
+      
+      imp_t_dfs[[as.character(year)]][[as.character(lag)]][[as.character(i)]] <- imp_df
+    }
+  }
+}
+
+# get main specs ----
+## treat names ----
+treat_names <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("lech_hr")) |> 
+  names()
+
+## interact names ----
+interact_names <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("v2x_polyarchy_x_lech")) |> 
+  names()
+
+## covar names ----
+### get initial specs ----
+depth_names_gen <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("depth")) |> 
+  names()
+
+enforce_names_gen <- imp_t_dfs[[1]][[1]][[1]] |> 
+  select(starts_with("enforce")) |> 
+  names()
+
+dep_enf_ids <- c("mean", "gdp_mean", "gdppc_mean")
+
+covar_names_gen_sml <- list()
+covar_names_gen_all <- list()
+
+### finalize ----
+for(year in start_yrs){
+  lags <- imp_t_dfs[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    covar_names <- imp_t_dfs[[year]][[lag]][[1]] |> 
+      recipe(hr_score ~ .) |> 
+      step_dummy(all_nominal_predictors()) |> 
+      prep() |> 
+      bake(new_data = NULL) |> 
+      select(
+        -contains(
+          c(
+            "hr_score",
+            "mean",
+            "v2x_polyarchy_x"
+            )
+          )
+        ) |> 
+      names()
+    for(j in seq_along(depth_names_gen)){
+      k <- depth_names_gen[[j]]
+      l <- enforce_names_gen[[j]]
+      n <- dep_enf_ids[[j]]
+      
+      covar_names_gen_sml[[as.character(n)]] <- covar_names |> 
+        append(c(k, l))
+      
+      covar_names_gen_all[[as.character(year)]][[as.character(lag)]] <- covar_names_gen_sml
+    }
+  }
+}
+
+# initialize data backend ----
+## no interactions ----
+### get initial specs ----
+no_interactions <- list()
+
+### finalize ----
+for(year in start_yrs){
+  year_dfs <- imp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
+    for(i in m){
+      df_cow_yr <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(cow, year, cow_yr)
+      df_new <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        recipe(hr_score ~ .) |> 
+        step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        prep() |> 
+        bake(new_data = NULL)
+      df <- df_cow_yr |> 
+        left_join(df_new) |> 
+        as.data.table()
+      for(j in seq_along(treat_names)){
+        k <- treat_names[[j]]
+        l <- covar_names[[j]]
+        
+        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = l,
+            d_cols = k,
+            y_col = "hr_score",
+            cluster_cols = c("cow", "year")
+            )
+      }
+    }
+  }
+}
+
+### check for zero variance ----
+zerovar_1977 <- caret::nearZeroVar(
+  no_interactions[[1]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+zerovar_1990 <- caret::nearZeroVar(
+  no_interactions[[2]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+## has interactions ----
+### get initial specs ----
+has_interactions <- list()
+
+### finalize ----
+for(year in start_yrs){
+  year_dfs <- imp_t_dfs[[year]]
+  for(lag in lag_names){
+    lag_df <- year_dfs[[lag]]
+    covar_names <- covar_names_gen_all[[year]][[lag]]
+    for(i in m){
+      df_cow_yr <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(cow, year, cow_yr)
+      df_new <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        recipe(hr_score ~ .) |> 
+        step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        prep() |> 
+        bake(new_data = NULL)
+      df <- df_cow_yr |> 
+        left_join(df_new) |> 
+        as.data.table()
+      for(j in seq_along(treat_names)){
+        k <- treat_names[[j]]
+        l <- interact_names[[j]]
+        n <- covar_names[[j]]
+        
+        has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+          double_ml_data_from_data_frame(
+            x_cols = n,
+            d_cols = c(k, l),
+            y_col = "hr_score",
+            cluster_cols = c("cow", "year")
+          )
+      }
+    }
+  }
+}
+
+### check for zero variance ----
+zerovar_1977 <- caret::nearZeroVar(
+  has_interactions[[1]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+zerovar_1990 <- caret::nearZeroVar(
+  has_interactions[[2]][[1]][[1]][[1]]$data_model,
+  saveMetrics = T
+  )
+
+# all combine ----
+imp_dml_dats_2fe_gen <- list(
+  no_interactions = no_interactions,
+  has_interactions = has_interactions
+  )
+
+# create dml folds ----
+#dml_smpls <- list()
+#n_rounds <- 1:3
+#interact_stat <- names(imp_dml_dats_2fe_gen)
+
+#for(stat in interact_stat){
+#  list_1 <- imp_dml_dats_2fe_gen[[stat]]
+#  start_yrs <- names(list_1)
+#  for(year in start_yrs){
+#    list_2 <- list_1[[year]]
+#    lag_names <- names(list_2)
+#    for(lag in lag_names){
+#      list_3 <- list_2[[lag]]
+#      treat_names <- names(list_3)
+#      for(treat in treat_names){
+#        list_4 <- list_3[[treat]]
+#        m <- 1:length(list_4)
+#       for(i in m){
+#         df <- list_4[[i]]$data
+#         for(r in n_rounds){
+#           splits <- df |> 
+#             group_vfold_cv(
+#                group = cow,
+#                v = 5,
+#                repeats = 1
+#               ) |> 
+#             tidy() |> 
+#             clean_names() |>
+#             pivot_wider(
+#                names_from = fold,
+#               values_from = data
+#               ) |> 
+#             clean_names()
+            
+#            fold_names <- splits |> 
+#              select(contains("resample")) |> 
+#             names() |> 
+#              str_sort()
+            
+#            train_list <- list()
+#            test_list <- list()
+            
+#           for(f in fold_names){
+#              train_f <- splits |>
+#                filter(!!sym(f) == "Analysis") |> 
+#                pull(row)
+              
+#              test_f <- splits |> 
+#                filter(!!sym(f) == "Assessment") |> 
+#                pull(row)
+              
+#              train_list[[as.integer(gsub("\\D", "", f))]] <- train_f
+#              test_list[[as.integer(gsub("\\D", "", f))]]  <- test_f
+#            }
+            
+#            dml_smpls[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[r]] <- list(
+#              train_ids = train_list,
+#              test_ids  = test_list
+#              )
+#          }
+#        }
+#      }
+#    }
+#  }
+#}
+
+# clear glb env ----
+rm(list = setdiff(ls(), c("imp_dml_dats_2fe_gen", "dml_smpls")))
