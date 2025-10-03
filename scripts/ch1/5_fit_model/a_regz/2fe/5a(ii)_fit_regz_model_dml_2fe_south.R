@@ -9,8 +9,12 @@ library(parallel)
 library(future)
 library(tictoc)
 
+# set seed ----
+## important: set seed before running prep script
+set.seed(15275)
+
 # run prep script ----
-source(here("scripts/ch1/4a(ii)_prep_regz_model_dml_2fe_south.R"))
+source(here("scripts/ch1/4_prep_model/a_regz/2fe/4a(ii)_prep_regz_model_dml_2fe_south.R"))
 
 # set cores ----
 ## check
@@ -19,20 +23,20 @@ n <- detectCores() - 1
 ## set
 plan(strategy = "multisession", workers = n)
 
-# set seed ----
-set.seed(15275)
-
 # prep learners ----
 lrn_spec <- lrn(
-  "regr.cv_glmnet",
-  alpha = 0,
-  eps = 1e-8,
-  lambda.min.ratio = 1e-8,
-  s = "lambda.min",
-  nlambda = 50,
-  nfolds = 5,
+  "regr.glmnet",
   parallel_predict = TRUE
   )
+default_s <- lts(
+  lrn("regr.glmnet")
+  )$param_set$values$s$call
+ps_spec <- lrn(
+  "regr.glmnet",
+  alpha = 0,
+  nlambda = 1,
+  s = eval(parse(text = default_s))
+  )$param_set
 
 # fit models ----
 imp_dml_fits_2fe_south <- list()
@@ -58,6 +62,41 @@ for(stat in interact_stat){
             n_folds = 5,
             n_rep = 3
             )
+          
+          rsmp_task <- as_task_regr(
+            list_4[[i]]$data,
+            target = "hr_score"
+            )
+          rsmp_task$set_col_roles(
+            cols = "cow",
+            roles = "group"
+            )
+          rsmp_set <- rsmp(
+            "cv",
+            folds = 5
+            )
+          rsmp_set$instantiate(rsmp_task)
+          
+          tune_sets <- list(
+            terminator = trm(
+              "none"
+              ),
+            algorithm = tnr(
+              "grid_search",
+              resolution = 20,
+              batch_size = 20
+              ),
+            rsmp_tune = rsmp_set,
+            measure = list(
+              "ml_l" = msr("regr.mse"),
+              "ml_m" = msr("regr.mse")
+              )
+            )
+          par_grids <- list(
+            "ml_l" = ps_spec,
+            "ml_m" = ps_spec
+            )
+          
           tic(
             paste(
               as.character(stat),
@@ -68,7 +107,11 @@ for(stat in interact_stat){
               sep = "_"
               )
             )
-          fit <- spec$fit()
+          spec$tune(
+            param_set = par_grids,
+            tune_settings = tune_sets
+            )
+          fit <- spec$fit(store_predictions = TRUE)
           toc(log = TRUE)
           imp_dml_fits_2fe_south[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
         }

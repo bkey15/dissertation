@@ -6,7 +6,7 @@ library(ggthemes)
 library(latex2exp)
 
 # load data ----
-load(here("data/ch1/viz_prep/imp_dml_pool_viz_dfs.rda"))
+load(here("data/ch1/viz_prep/regularize/imp_dml_pool_viz_dfs.rda"))
 
 # reorganize data ----
 ## note: doing this to simplify for-loops
@@ -340,4 +340,4 @@ for(type in plot_type){
 
 # save ----
 imp_dml_pool_plots |> 
-  save(file = here("visualizations/ch1/imp_dml_pool_plots.rda"))
+  save(file = here("visualizations/ch1/regularize/imp_dml_pool_plots.rda"))

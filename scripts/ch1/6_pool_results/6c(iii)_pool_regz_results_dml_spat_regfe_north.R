@@ -4,10 +4,9 @@ library(here)
 library(DoubleML)
 library(mice)
 library(janitor)
-library(knitr)
 
 # load data ----
-load(here("data/ch1/results/fits/dml_lasso/full_dat/imp_dml_fits_spat_regfe_north.rda"))
+load(here("data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda"))
 
 # pool results ----
 imp_dml_pool_spat_regfe_north <- list()
@@ -50,4 +49,4 @@ for(stat in interact_stat){
 
 # save ----
 imp_dml_pool_spat_regfe_north |> 
-  save(file = here("data/ch1/results/fits/dml_lasso/pool/imp_dml_pool_spat_regfe_north.rda"))
+  save(file = here("data/ch1/results/fits/dml_regularize/pool/imp_dml_pool_spat_regfe_north.rda"))

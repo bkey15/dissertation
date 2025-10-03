@@ -117,6 +117,8 @@ for(year in start_yrs){
 ## no interactions ----
 ### get initial specs ----
 no_interactions <- list()
+y_name <- "hr_score"
+cl_names <- c("region", "year")
 
 ### finalize ----
 for(year in start_yrs){
@@ -136,17 +138,23 @@ for(year in start_yrs){
         bake(new_data = NULL)
       df <- df_cow_yr |> 
         left_join(df_new) |> 
+        select(-cow_yr) |> 
         as.data.table()
       for(j in seq_along(treat_names)){
         k <- treat_names[[j]]
         l <- covar_names[[j]]
         
         no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(i)]] <- df |>
+          select(
+            all_of(
+              c(y_name, cl_names, k, l)
+              )
+            ) |> 
           double_ml_data_from_data_frame(
             x_cols = l,
             d_cols = k,
-            y_col = "hr_score",
-            cluster_cols = c("cow", "year")
+            y_col = y_name,
+            cluster_cols = cl_names
             )
       }
     }
@@ -186,6 +194,7 @@ for(year in start_yrs){
         bake(new_data = NULL)
       df <- df_cow_yr |> 
         left_join(df_new) |> 
+        select(-cow_yr) |> 
         as.data.table()
       for(j in seq_along(treat_names)){
         k <- treat_names[[j]]
@@ -193,11 +202,16 @@ for(year in start_yrs){
         n <- covar_names[[j]]
         
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+          select(
+            all_of(
+              c(y_name, cl_names, k, l, n)
+              )
+            ) |> 
           double_ml_data_from_data_frame(
             x_cols = n,
             d_cols = c(k, l),
-            y_col = "hr_score",
-            cluster_cols = c("cow", "year")
+            y_col = y_name,
+            cluster_cols = cl_names
           )
       }
     }
@@ -221,71 +235,5 @@ imp_dml_dats_2fe_gen <- list(
   has_interactions = has_interactions
   )
 
-# create dml folds ----
-#dml_smpls <- list()
-#n_rounds <- 1:3
-#interact_stat <- names(imp_dml_dats_2fe_gen)
-
-#for(stat in interact_stat){
-#  list_1 <- imp_dml_dats_2fe_gen[[stat]]
-#  start_yrs <- names(list_1)
-#  for(year in start_yrs){
-#    list_2 <- list_1[[year]]
-#    lag_names <- names(list_2)
-#    for(lag in lag_names){
-#      list_3 <- list_2[[lag]]
-#      treat_names <- names(list_3)
-#      for(treat in treat_names){
-#        list_4 <- list_3[[treat]]
-#        m <- 1:length(list_4)
-#       for(i in m){
-#         df <- list_4[[i]]$data
-#         for(r in n_rounds){
-#           splits <- df |> 
-#             group_vfold_cv(
-#                group = cow,
-#                v = 5,
-#                repeats = 1
-#               ) |> 
-#             tidy() |> 
-#             clean_names() |>
-#             pivot_wider(
-#                names_from = fold,
-#               values_from = data
-#               ) |> 
-#             clean_names()
-            
-#            fold_names <- splits |> 
-#              select(contains("resample")) |> 
-#             names() |> 
-#              str_sort()
-            
-#            train_list <- list()
-#            test_list <- list()
-            
-#           for(f in fold_names){
-#              train_f <- splits |>
-#                filter(!!sym(f) == "Analysis") |> 
-#                pull(row)
-              
-#              test_f <- splits |> 
-#                filter(!!sym(f) == "Assessment") |> 
-#                pull(row)
-              
-#              train_list[[as.integer(gsub("\\D", "", f))]] <- train_f
-#              test_list[[as.integer(gsub("\\D", "", f))]]  <- test_f
-#            }
-            
-#            dml_smpls[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[r]] <- list(
-#              train_ids = train_list,
-#              test_ids  = test_list
-#              )
-#          }
-#        }
-#      }
-#    }
-#  }
-#}
-
 # clear glb env ----
-rm(list = setdiff(ls(), c("imp_dml_dats_2fe_gen", "dml_smpls")))
+rm(list = setdiff(ls(), "imp_dml_dats_2fe_gen"))

@@ -7,7 +7,9 @@ library(tidyverse)
 library(here)
 library(mice)
 library(DoubleML)
+library(tidymodels)
 library(data.table)
+library(janitor)
 
 # load data ----
 load(here("data/ch1/results/imputations/imp_sp_t_lags.rda"))
@@ -45,7 +47,6 @@ for(year in start_yrs){
               )
             ),
           -glb_s,
-          -cow,
           -last_col(),
           -last_col(offset = 1)
           )
@@ -108,13 +109,13 @@ for(year in start_yrs){
   lags <- imp_sp_t_dfs[[year]]
   lag_names <- names(lags)
   for(lag in lag_names){
-    covar_names <- model.matrix(
-      ~ . - 1,
-      data = imp_sp_t_dfs[[year]][[lag]][[1]]
-      ) |> 
-      as_tibble() |> 
+    covar_names <- imp_sp_t_dfs[[year]][[lag]][[1]] |> 
+      select(-cow) |> 
+      recipe(hr_score ~ .) |> 
+      step_dummy(all_nominal_predictors()) |> 
+      prep() |> 
+      bake(new_data = NULL) |> 
       select(
-        -1,
         -contains(
           c(
             "hr_score",
@@ -143,6 +144,8 @@ for(year in start_yrs){
 ## no interactions ----
 ### get initial specs ----
 no_interactions <- list()
+y_name <- "hr_score"
+cl_names <- c("region", "year")
 
 ### finalize ----
 for(year in start_yrs){
@@ -151,20 +154,35 @@ for(year in start_yrs){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
-      df <- model.matrix(
-        ~ . - 1,
-        data = lag_df[[i]]
-        ) |> 
+      df_cow_yr <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(region, year, cow_yr)
+      df_new <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(-cow) |> 
+        recipe(hr_score ~ .) |> 
+        step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        prep() |> 
+        bake(new_data = NULL)
+      df <- df_cow_yr |> 
+        left_join(df_new) |> 
+        select(-cow_yr) |> 
         as.data.table()
       for(j in seq_along(treat_names)){
         k <- treat_names[[j]]
         l <- covar_names[[j]]
         
         no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(i)]] <- df |>
+          select(
+            all_of(
+              c(y_name, cl_names, k, l)
+              )
+            ) |> 
           double_ml_data_from_data_frame(
             x_cols = l,
             d_cols = k,
-            y_col = "hr_score"
+            y_col = y_name,
+            cluster_cols = cl_names
             )
       }
     }
@@ -193,10 +211,19 @@ for(year in start_yrs){
     lag_df <- year_dfs[[lag]]
     covar_names <- covar_names_gen_all[[year]][[lag]]
     for(i in m){
-      df <- model.matrix(
-        ~ . - 1,
-        data = lag_df[[i]]
-        ) |> 
+      df_cow_yr <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(region, year, cow_yr)
+      df_new <- lag_df[[i]] |> 
+        mutate(cow_yr = paste(cow, year, sep = "-")) |> 
+        select(-cow) |> 
+        recipe(hr_score ~ .) |> 
+        step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        prep() |> 
+        bake(new_data = NULL)
+      df <- df_cow_yr |> 
+        left_join(df_new) |> 
+        select(-cow_yr) |> 
         as.data.table()
       for(j in seq_along(treat_names)){
         k <- treat_names[[j]]
@@ -204,10 +231,16 @@ for(year in start_yrs){
         n <- covar_names[[j]]
         
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |>
+          select(
+            all_of(
+              c(y_name, cl_names, k, l, n)
+              )
+            ) |> 
           double_ml_data_from_data_frame(
             x_cols = n,
             d_cols = c(k, l),
-            y_col = "hr_score"
+            y_col = y_name,
+            cluster_cols = cl_names
             )
       }
     }

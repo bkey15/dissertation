@@ -6,8 +6,8 @@ library(here)
 library(DoubleML)
 library(mlr3verse)
 library(parallel)
-library(tictoc)
 library(future)
+library(tictoc)
 
 # set seed ----
 ## important: set seed before running prep script
@@ -26,12 +26,17 @@ plan(strategy = "multisession", workers = n)
 # prep learners ----
 lrn_spec <- lrn(
   "regr.glmnet",
-  alpha = 0,
   parallel_predict = TRUE
   )
-ps_spec <- lts(lrn(
-  "regr.glmnet"
-  ))$param_set
+default_s <- lts(
+  lrn("regr.glmnet")
+  )$param_set$values$s$call
+ps_spec <- lrn(
+  "regr.glmnet",
+  alpha = 0,
+  nlambda = 1,
+  s = eval(parse(text = default_s))
+  )$param_set
 
 # fit models ----
 imp_dml_fits_2fe_gen <- list()
@@ -39,80 +44,76 @@ interact_stat <- names(imp_dml_dats_2fe_gen)
 
 for(stat in interact_stat){
   list_1 <- imp_dml_dats_2fe_gen[[stat]]
-  dml_smpls_l1 <- dml_smpls[[stat]]
   start_yrs <- names(list_1)
   for(year in start_yrs){
     list_2 <- list_1[[year]]
-    dml_smpls_l2 <- dml_smpls_l1[[year]]
     lag_names <- names(list_2)
     for(lag in lag_names){
       list_3 <- list_2[[lag]]
-      dml_smpls_l3 <- dml_smpls_l2[[lag]]
       treat_names <- names(list_3)
       for(treat in treat_names){
         list_4 <- list_3[[treat]]
-        dml_smpls_l4 <- dml_smpls_l3[[treat]]
         m <- 1:length(list_4)
-          for(i in m){
-            spec <- DoubleMLPLR$new(
-              data = list_4[[i]],
-              ml_l = lrn_spec,
-              ml_m = lrn_spec
+        for(i in m){
+          spec <- DoubleMLPLR$new(
+            data = list_4[[i]],
+            ml_l = lrn_spec,
+            ml_m = lrn_spec,
+            n_folds = 5,
+            n_rep = 3
+            )
+          
+          rsmp_task <- as_task_regr(
+            list_4[[i]]$data,
+            target = "hr_score"
+            )
+          rsmp_task$set_col_roles(
+            cols = "cow",
+            roles = "group"
+            )
+          rsmp_set <- rsmp(
+            "cv",
+            folds = 5
+            )
+          rsmp_set$instantiate(rsmp_task)
+          
+          tune_sets <- list(
+            terminator = trm(
+              "none"
+              ),
+            algorithm = tnr(
+              "grid_search",
+              resolution = 20,
+              batch_size = 20
+              ),
+            rsmp_tune = rsmp_set,
+            measure = list(
+              "ml_l" = msr("regr.mse"),
+              "ml_m" = msr("regr.mse")
               )
-            spec$set_sample_splitting(dml_smpls_l4[[i]])
-            
-            rsmp_task <- as_task_regr(
-              list_4[[i]]$data,
-              target = "hr_score"
+            )
+          par_grids <- list(
+            "ml_l" = ps_spec,
+            "ml_m" = ps_spec
+            )
+          
+          tic(
+            paste(
+              as.character(stat),
+              as.character(year),
+              as.character(lag),
+              as.character(treat),
+              as.character(i),
+              sep = "_"
               )
-            rsmp_task$set_col_roles(
-              cols = "cow",
-              roles = "group"
-              )
-            rsmp_set <- rsmp(
-              "cv",
-              folds = 5
-              )
-            rsmp_set$instantiate(rsmp_task)
-            
-            tune_sets <- list(
-              terminator = trm(
-                "evals",
-                n_evals = 50
-                ),
-              algorithm = tnr(
-                "random_search",
-                batch_size = 50
-                ),
-              rsmp_tune = rsmp_set,
-              measure = list(
-                "ml_l" = msr("regr.mse"),
-                "ml_m" = msr("regr.mse")
-                )
-              )
-            par_grids <- list(
-              "ml_l" = ps_spec,
-              "ml_m" = ps_spec
-              )
-            
-            tic(
-              paste(
-                as.character(stat),
-                as.character(year),
-                as.character(lag),
-                as.character(treat),
-                as.character(i),
-                sep = "_"
-                )
-              )
-            spec$tune(
-              param_set = par_grids,
-              tune_settings = tune_sets
-              )
-            fit <- spec$fit(store_predictions = T, store_models = T)
-            toc(log = TRUE)
-            
-            imp_dml_fits_2fe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+            )
+          spec$tune(
+            param_set = par_grids,
+            tune_settings = tune_sets
+            )
+          fit <- spec$fit(store_predictions = TRUE)
+          toc(log = TRUE)
+          imp_dml_fits_2fe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
         }
       }
     }
