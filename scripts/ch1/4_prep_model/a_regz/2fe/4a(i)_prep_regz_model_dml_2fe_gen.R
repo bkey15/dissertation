@@ -118,7 +118,7 @@ for(year in start_yrs){
 ### get initial specs ----
 no_interactions <- list()
 y_name <- "hr_score"
-cl_names <- c("region", "year")
+cl_names <- c("cow", "year")
 
 ### finalize ----
 for(year in start_yrs){
