@@ -4,13 +4,24 @@
 library(tidyverse)
 library(here)
 library(mice)
-library(DoubleML)
 library(tidymodels)
 library(data.table)
 library(janitor)
+library(reticulate)
 
 # load data ----
 load(here("data/ch3/results/imputations/imp_t_lags.rda"))
+
+# load python modules ----
+py_require(packages = "doubleml")
+py_require(packages = "scikit-learn")
+py_require(packages = "joblib")
+py_require(packages = "numpy")
+
+dml <- import("doubleml")
+skl <- import("sklearn")
+jlb <- import("joblib")
+np <- import("numpy")
 
 # get imputed data ----
 ## note: code below is drawn from earlier chapters; can be used in the event other start-dates are utilized
@@ -98,6 +109,7 @@ for(year in start_yrs){
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
         recipe(hr_score ~ .) |> 
         step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        step_normalize(hr_score) |> 
         prep() |> 
         bake(new_data = NULL)
       df <- df_cow_yr |> 
@@ -111,7 +123,7 @@ for(year in start_yrs){
               c(y_name, cl_names, treat, covar_names)
               )
             ) |> 
-          double_ml_data_from_data_frame(
+          dml$DoubleMLClusterData(
             x_cols = covar_names,
             d_cols = treat,
             y_col = y_name,
@@ -124,7 +136,7 @@ for(year in start_yrs){
 
 ### check for zero variance ----
 zerovar_1990 <- caret::nearZeroVar(
-  no_interactions[[1]][[1]][[1]][[1]]$data_model,
+  no_interactions[[1]][[1]][[1]][[1]][["_X"]],
   saveMetrics = T
   )
 
@@ -146,6 +158,7 @@ for(year in start_yrs){
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
         recipe(hr_score ~ .) |> 
         step_dummy(all_nominal_predictors(), -cow_yr) |> 
+        step_normalize(hr_score) |> 
         prep() |> 
         bake(new_data = NULL)
       df <- df_cow_yr |> 
@@ -161,7 +174,7 @@ for(year in start_yrs){
               c(y_name, cl_names, k, l, covar_names)
               )
             ) |> 
-          double_ml_data_from_data_frame(
+          dml$DoubleMLClusterData(
             x_cols = covar_names,
             d_cols = c(k, l),
             y_col = y_name,
@@ -174,7 +187,7 @@ for(year in start_yrs){
 
 ### check for zero variance ----
 zerovar_1990 <- caret::nearZeroVar(
-  has_interactions[[1]][[1]][[1]][[1]]$data_model,
+  has_interactions[[1]][[1]][[1]][[1]][["_X"]],
   saveMetrics = T
   )
 
@@ -185,4 +198,4 @@ imp_dml_dats_2fe <- list(
   )
 
 # clear glb env ----
-rm(list = setdiff(ls(), "imp_dml_dats_2fe"))
+rm(list = setdiff(ls(), c("imp_dml_dats_2fe", "dml", "skl", "jlb", "np")))

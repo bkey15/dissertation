@@ -197,4 +197,12 @@
 -`stacks` package uses a lasso meta-learner. See `https://stacks.tidymodels.org/reference/blend_predictions.html`
 
 # 9/26/25 #
--Have found that R workflow (mlr3 & ranger) is faster for Random Forests. On the other hand, Python workflow (scikit-learn) is faster for ridge models. Will modify code accordingly.
+-Have found that R workflow (mlr3 & ranger) is faster for Random Forests. On the other hand, Python workflow (scikit-learn) is faster for ridge models.
+
+# 10/7/25 #
+-Update re: random forests: need to use dummy vars after cluster-robust resampling by country/region + year, but this leads to unreasonably long runtimes. Will potentially return to them later.
+-For Ch. 3, concatenating results w/ clustering currently not supported, so am attempting refits for classification models w/ a new interaction b/n treatment & ordinal version of v2x_polyarchy.
+-https://github.com/DoubleML/doubleml-for-r/issues/85
+
+# 10/8/25 #
+-Have experimented with scikit-learn workflow futher, particularly for Chapter 3. Unfortunately, the performance metrics for the nusiance parameters (MSE) are very poor (e.g., MSE for ml_l = 7-ish). I've tried to make the preprocessing prior to RidgeCV resemble that of the glmnet models (manual + automatic, e.g., standardizing of Y and X vars, random [across models] grouped resampling, etc.), but I'm still getting the same poor results. Will push some of my "test" scripts, but henceforth will be relying almost exclusively on mlr3 models.
