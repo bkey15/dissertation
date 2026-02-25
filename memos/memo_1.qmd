@@ -189,43 +189,45 @@ The cardinal aim of spatial-econometric models is to enable social scientists to
 
 [^19]: For additional examples of spatial dependencies in country-year data, see Cook et al. (2023, p. 62) and Wimpy et al. (2021, p. 723).
 
-Of these models, the spatially-lagged X (SLX) model is what I select over other candidate models. I do so because recent literature on spatial econometrics, including Rüttenauer (2024; 2022) and Wimpy et al. (2021), has generally begun to recommend SLX over its counterparts---particularly the spatial autoregressive (SAR) model, which Rüttenauer notes is "by far the most prominent spatial specification" (p. 7).
+Ultimately, I select the spatially-lagged X (SLX) model over other candidates. I do so motivated by recent literature on spatial econometrics, including Rüttenauer (2024; 2022) and Wimpy et al. (2021), which foregrounds the advantages SLX enjoys over its counterparts---particularly the spatial autoregressive (SAR) model, overwhelmingly the most common implementation of spatial lags.[^20]
 
-The SAR model, which incorporates an endogenous, spatially-lagged form of the outcome ($y$) as a covariate, gives way by design to system-wide "global effects": effects beyond first-order (i.e., nearest) neighbors, where an original unit's $y$ affects not only its first-order neighbor's $y$, but also the neighbor of the first-order neighbor's $y$ via the latter (and so on); and feedback effects, where changes in $y$ in both high- and first-order neighbors return to affect the original unit's $y$. The upshot of these global effects is that they complicate inference. On the one hand, they preclude interpretation of coefficients as ordinary marginal/partial effects, or how a one-unit change in $x$ impacts $y$, *ceteris paribus*: both direct ($x_{i} \rightarrow y_{i}$) and indirect ($x_{i} \rightarrow y_{j}$) effects differ in value from the coefficients, a function of the feedback-loop dynamic,[^20] meaning said coefficients cannot be interpreted as simple $x \rightarrow y$ relationships in either sense. On the other, the assumption of global dependence is not invariably appropriate: some spatial processes may not extend to the entire system (e.g., the international level, which regional clustering of democracy, wealth, and other variables generally suggests),[^21] or may take time to become fully realized, despite that SAR diffuses global effects exactly at time $t$.[^22]
+[^20]: For more on the popularity of SAR, see Rüttenauer (2024, p. 7).
 
-[^20]: Namely, as a result of the spatial multiplier matrix.
+The SAR model, which incorporates an endogenous, spatially-lagged form of the outcome ($y$) as a covariate, gives way by design to system-wide "global effects": effects beyond first-order (i.e., nearest) neighbors, where an original unit's $y$ affects not only its first-order neighbor's $y$, but also the neighbor of the first-order neighbor's $y$ via the latter (and so on); and feedback effects, where changes in $y$ in both high- and first-order neighbors return to affect the original unit's $y$. The upshot of these global effects is that they complicate inference. On the one hand, they preclude interpretation of coefficients as ordinary marginal/partial effects, or how a one-unit change in $x$ impacts $y$, *ceteris paribus*: both direct ($x_{i} \rightarrow y_{i}$) and indirect ($x_{i} \rightarrow y_{j}$) effects differ in value from the coefficients, a function of the feedback-loop dynamic,[^21] meaning said coefficients cannot be interpreted as simple $x \rightarrow y$ relationships in either sense. On the other, the assumption of global dependence is not invariably appropriate: some spatial processes may not extend to the entire system (e.g., the international level, which regional clustering of democracy, wealth, and other variables generally suggests),[^22] or may take time to become fully realized, despite that SAR diffuses global effects exactly at time $t$.[^23]
 
-[^21]: Indeed, Wimpy et al. find that global dependencies are "relatively rare in political science" (2021, p. 737).
+[^21]: Namely, as a result of the spatial multiplier matrix.
 
-[^22]: For more on the implications of SAR's construction, including mathematical proofs thereof, see Rüttenauer (2024, pp. 11-14; 2022, pp. 731-736), and Wimpy et al. (2021, pp. 723-724).
+[^22]: Indeed, Wimpy et al. find that global dependencies are "relatively rare in political science" (2021, p. 737).
+
+[^23]: For more on the implications of SAR's construction, including mathematical proofs thereof, see Rüttenauer (2024, pp. 11-14; 2022, pp. 731-736), and Wimpy et al. (2021, pp. 723-724).
 
 ![Preprocessing Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/preproc_flow_viz.png){#fig-preproc-flow}
 
-By contrast, the SLX model is highly flexible and easy to interpret. It begins with the more conservative assumption of local dependence (i.e., relationships between first-order neighbors), though researchers may still account for more global (i.e., higher-order) dependencies should they desire to do so. Also, by eschewing global dependence as a starting point, SLX is better suited for panel data, where spatial spillovers at time $t$ may be confined to first- or low-order neighbors. Global effects being absent by default, SLX models need not entail feedback loops, enabling coefficients to be interpreted as ordinary, OLS-like marginal effects.[^23] Equally beneficial, SLX is fit for a wide range of inferential techniques, including machine-learning methods, since it merely involves introducing the spatial lags as an additional set of covariates. Finally, Rüttenauer (2022) and Wimpy et al. (2021) find that SLX is relatively robust to misspecifications of the spatially-dependent covariates.[^24] In view of these advantages, the authors posit that SLX is an apt starting point for model building, particularly absent strong theory implying that a different spatial model would be more appropriate (e.g., a valid belief in global contagion effects, in which case SAR would indeed be suitable).[^25]
+By contrast, the SLX model is highly flexible and easy to interpret. It begins with the more conservative assumption of local dependence (i.e., relationships between first-order neighbors), though researchers may still account for more global (i.e., higher-order) dependencies should they desire to do so. Also, by eschewing global dependence as a starting point, SLX is better suited for panel data, where spatial spillovers at time $t$ may be confined to first- or low-order neighbors. Global effects being absent by default, SLX models need not entail feedback loops, enabling coefficients to be interpreted as ordinary, OLS-like marginal effects.[^24] Equally beneficial, SLX is fit for a wide range of inferential techniques, including machine-learning methods, since it merely involves introducing the spatial lags as an additional set of covariates. Finally, Rüttenauer (2022) and Wimpy et al. (2021) find that SLX is relatively robust to misspecifications of the spatially-dependent covariates.[^25] In view of these advantages, the authors posit that SLX is an apt starting point for model building, particularly absent strong theory implying that a different spatial model would be more appropriate (e.g., a valid belief in global contagion effects, in which case SAR would indeed be suitable).[^26]
 
-[^23]: This point is stressed by Rüttenauer (2022, p. 735).
+[^24]: This point is stressed by Rüttenauer (2022, p. 735).
 
-[^24]: For more on their findings, see Rüttenauer (2022, p. 749) and Wimpy et al. (2021, p. 737).
+[^25]: For more on their findings, see Rüttenauer (2022, p. 749) and Wimpy et al. (2021, p. 737).
 
-[^25]: The advantages of SLX are elegantly summarized in Rüttenauer (2024, p. 23) and Wimpy et al. (2021, p. 725).
+[^26]: The advantages of SLX are elegantly summarized in Rüttenauer (2024, p. 23) and Wimpy et al. (2021, p. 725).
 
-SLX is of the basic form:[^26]
+SLX is of the basic form:[^27]
 
-[^26]: Formula taken from Wimpy et al. (2021, p. 724).
+[^27]: Formula taken from Wimpy et al. (2021, p. 724).
 
 $$\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{WZ}\boldsymbol{\theta} + \epsilon$$
 
-Above, $\mathbf{Y}$ is the outcome, $\epsilon$ the error term, $\mathbf{X}$ the matrix of independent variables, $\boldsymbol{\beta}$ the corresponding coefficients, $\mathbf{W}$ the matrix of first-order neighbor weights, $\mathbf{Z}$ the matrix of covariates (or confounders) expected to have a spatial influence, and $\boldsymbol{\theta}$ the spatial coefficients,[^27] capturing spillover effects from $\mathbf{Z}$ covariates on the outcome.[^28]
+Above, $\mathbf{Y}$ is the outcome, $\epsilon$ the error term, $\mathbf{X}$ the matrix of independent variables, $\boldsymbol{\beta}$ the corresponding coefficients, $\mathbf{W}$ the matrix of first-order neighbor weights, $\mathbf{Z}$ the matrix of covariates (or confounders) expected to have a spatial influence, and $\boldsymbol{\theta}$ the spatial coefficients,[^28] capturing spillover effects from $\mathbf{Z}$ covariates on the outcome.[^29]
 
-[^27]: Wimpy et al. label $\mathbf{X}$ and $\mathbf{Z}$ differently to convey that their contents may vary (2021, p. 724). For example, $\mathbf{X}$ may contain both the treatment(s) and covariates, whereas $\mathbf{Z}$ may contain the latter, exclusively.
+[^28]: Wimpy et al. label $\mathbf{X}$ and $\mathbf{Z}$ differently to convey that their contents may vary (2021, p. 724). For example, $\mathbf{X}$ may contain both the treatment(s) and covariates, whereas $\mathbf{Z}$ may contain the latter, exclusively.
 
-[^28]: More on interpreting the SLX formula may be found in Rüttenauer (2024, p. 8).
+[^29]: More on interpreting the SLX formula may be found in Rüttenauer (2024, p. 8).
 
-$\mathbf{W}$, an $N \times N$ row-normalized matrix,[^29] is of especial import, containing the base information needed to compute the "spatial lags"---versions of each covariate from $\mathbf{Z} \in \mathbb{R}^{N \times v}$ that take the mean of any given observation's neighbors, and the inclusion of which ultimately makes for an SLX model. Together, $\mathbf{WZ}$ denote the spatial lags. $\mathbf{W}$ is of the form:[^30]
+$\mathbf{W}$, an $N \times N$ row-normalized matrix,[^30] is of especial import, containing the base information needed to compute the "spatial lags"---versions of each covariate from $\mathbf{Z} \in \mathbb{R}^{N \times v}$ that take the mean of any given observation's neighbors, and the inclusion of which ultimately makes for an SLX model. Together, $\mathbf{WZ}$ denote the spatial lags. $\mathbf{W}$ is of the form:[^31]
 
-[^29]: That is, a two-dimensional matrix wherein each row sums to 1.
+[^30]: That is, a two-dimensional matrix wherein each row sums to 1.
 
-[^30]: This matrix depiction is taken from Rüttenauer (2024, p. 3).
+[^31]: This matrix depiction is taken from Rüttenauer (2024, p. 3).
 
 $$\mathbf{W} =
 \begin{bmatrix}
@@ -277,48 +279,309 @@ $$\mathbf{Y} =
 \mathbf{W}^{n}\mathbf{Z}\boldsymbol{\theta}_{n} + 
 \epsilon$$
 
-Though these higher-order lags are easy to generate, they may entail high computation and storage costs at the modeling stage. Specifically, introducing more spatial lags increases the number of dimensions for each dataset, hampering fit speed and enlarging file sizes, whilst suggesting the implementation of individual models for each maximum order, $n$. Moreover, as regards my research, scant evidence or theory exists on which to justifiably set $n$ beyond $n = 1$. Altogether, these considerations motivate me to limit my spatial lags to the first order, though doing so doesn't foreclose the possibility of implementing higher-order lags as robustness checks.
+Though these higher-order lags are easy to generate, they may entail high computation and storage costs at the modeling stage. Specifically, introducing more spatial lags increases the number of dimensions for each dataset, hampering fit speed and enlarging file sizes, whilst suggesting the implementation of individual models for each maximum order, $n$. Moreover, as regards my research, scant evidence or theory exists on which to justifiably set $n$ beyond $n = 1$. Altogether, these considerations motivate me to restrict my spatial lags to the first order, though doing so does not foreclose the possibility of implementing higher-order lags as robustness checks.
 
-To compute the spatial lags, $\mathbf{WZ}$, I first obtain the spatial data needed to derive the weight matrix, $\mathbf{W}$. This data is sourced from Natural Earth, a public domain map dataset containing polygons for all of the world's countries and land objects, and accessed through [`rnaturalearth::ne_countries`](https://github.com/ropensci/rnaturalearth). From these polygons, and for every year $t$, I use [`sf::st_distance`](https://r-spatial.github.io/sf/reference/geos_measures.html) to generate an $N \times N$ matrix, wherein each element gives the minimum great-circle distance separating the borders of any two countries. The resultant matrix is structured such that---for countries $i$ and $j$ separated by a minimum distance $d$:[^31]
+To compute the spatial lags, $\mathbf{WZ}$, I first obtain the spatial data needed to derive the weight matrix, $\mathbf{W}$. This data is sourced from Natural Earth, a public domain map dataset containing polygons for all of the world's countries and land objects, and accessed through [`rnaturalearth::ne_countries`](https://github.com/ropensci/rnaturalearth). From these polygons, and for every year $t$, I use [`sf::st_distance`](https://r-spatial.github.io/sf/reference/geos_measures.html) to generate an $N \times N$ matrix, wherein each element gives the minimum great-circle distance separating the borders of any two countries. The resultant matrix is structured such that---for countries $i$ and $j$ separated by a minimum distance $d$:[^32]
 
-[^31]: By default, `st_distance` gives $d$ in meters.
+[^32]: By default, `st_distance` gives $d$ in meters.
 
 1.  $d_{i,i} = 0$ and $d_{j,j} = 0$,
 2.  $d_{i,j} = 0$ and $d_{j,i} = 0$ when $i$ and $j$ share contiguous borders, and
 3.  $d_{i,j} > 0$ and $d_{j,i} > 0$ when $i$ and $j$ do not share contiguous borders.
 
-Subsequently, I specify neighbors for the annual country-distance matrices under a binary neighborhood-membership criterion.[^32] Of course, one could define neighbors as a country-pair sharing contiguous borders under a "rook" rule; but doing so is to presume that many countries lacking shared borders (e.g., island states) do not belong to any geographical "neighborhood" and are thus immune to spatial processes. This assumption seems unrealistic, so I adopt the distance-threshold rule of 200 kilometers suggested by Ward & Gleditsch (2007, p. 12) to decide neighborhood membership. Under this criterion, with respect to country $i$, country $j$ qualifies for membership in $i$'s neighborhood if $d_{i,j} \leq 200 \text{km}$. Every neighbor relationship being specified, I derive $\mathbf{W}$ using [`spdep::nb2listw`](https://r-spatial.github.io/spdep/reference/nb2listw.html). Finally, with both $\mathbf{W}$ and $\mathbf{Z}$---the common covariates enumerated in @sec-gen-prep-dw, as well as any chapter-specific covariates---I compute the spatial lags, relying on [`spdep::lag.listw`](https://r-spatial.github.io/spdep/reference/lag.listw.html) to do so.
+Subsequently, I specify neighbors for the annual country-distance matrices under a binary neighborhood-membership criterion.[^33] Of course, one could define neighbors as a country-pair sharing contiguous borders under a "rook" rule; but doing so is to presume that many countries lacking shared borders (e.g., island states) do not belong to any geographical "neighborhood" and are thus immune to spatial processes. This assumption seems unrealistic, so I adopt the distance-threshold rule of 200 kilometers suggested by Ward & Gleditsch (2007, p. 12) to decide neighborhood membership. Under this criterion, with respect to country $i$, country $j$ qualifies for membership in $i$'s neighborhood if $d_{i,j} \leq 200 \text{km}$. Every neighbor relationship being specified, I derive $\mathbf{W}$ using [`spdep::nb2listw`](https://r-spatial.github.io/spdep/reference/nb2listw.html). Finally, with both $\mathbf{W}$ and $\mathbf{Z}$---the common covariates enumerated in @sec-gen-prep-dw, as well as any chapter-specific covariates---I compute the spatial lags, relying on [`spdep::lag.listw`](https://r-spatial.github.io/spdep/reference/lag.listw.html) to do so.
 
-[^32]: Put differently, under the criterion, country $i$ is classified with respect to country $j$ as either a neighbor (1) or a non-neighbor (0). Ergo, no "partial" neighbor exists.
+[^33]: Put differently, under the criterion, country $i$ is classified with respect to country $j$ as either a neighbor (1) or a non-neighbor (0). Ergo, no "partial" neighbor exists.
 
-In calculating $\mathbf{WZ}$, `lag.listw` produces `NA` values for lags where at least one neighbor's information is missing. These values can be handled in one of two ways: by imputing them, or by first imputing missingness in $\mathbf{Z}$---thus forming $(\mathbf{m}_{i})_{i=1}^5$---and subsequently computing $\mathbf{WZ}$ for each $\mathbf{m}_{i}$. The first option, relying solely on the multiple-imputation algorithm, generates values without enforcing the spatial constraints imposed by $\mathbf{WZ}$, where each element must be an average of the values of country $i$'s neighbors. Consequently, the imputed figures are unlikely to approximate the mean of country $i$'s non-missing neighbors---a reasonable starting point for estimating the true value of the lags---and they may vary significantly by $\mathbf{m}_{i}$. The second option, by contrast, respects $\mathbf{WZ}$'s spatial constraints, computing the lags more-or-less normally---namely, by directly considering known neighbor values, supplementing these inputs with imputations where necessary. As a result, these estimates hew closer to the mean of country $i$'s non-missing neighbors and are therefore more realistic.[^33] To wit, the second method yields more consistent, accurate, and theoretically-valid estimates of the lags across each $\mathbf{m}_{i}$. It is clearly preferable, so for each dataset $\mathbf{S}$, I proceed by finding $\mathbf{WZ}$ from imputed datasets $(\mathbf{m}_{i})_{i=1}^5$. These lags are then appended to each $\mathbf{m}_{i}$, making five expanded imputed datasets, $(\mathbf{p}_{i})_{i=1}^5$, where $\mathbf{p}_{i} = [\mathbf{Y \; D \; X \; WZ}] \in \mathbb{R}^{N \times (1 + q + k + v)}$
+In calculating $\mathbf{WZ}$, `lag.listw` produces `NA` values for lags where at least one neighbor's information is missing. These values can be handled in one of two ways: by imputing them, or by first imputing missingness in $\mathbf{Z}$---thus forming $(\mathbf{m}_{i})_{i=1}^5$---and subsequently computing $\mathbf{WZ}$ for each $\mathbf{m}_{i}$. The first option, relying solely on the multiple-imputation algorithm, generates values without enforcing the spatial constraints imposed by $\mathbf{WZ}$, where each element must be an average of the values of country $i$'s neighbors. Consequently, the imputed figures are unlikely to approximate the mean of country $i$'s non-missing neighbors---a reasonable starting point for estimating the true value of the lags---and they may vary significantly by $\mathbf{m}_{i}$. The second option, by contrast, respects $\mathbf{WZ}$'s spatial constraints, computing the lags more-or-less normally---namely, by directly considering known neighbor values, supplementing these inputs with imputations where necessary. As a result, these estimates hew closer to the mean of country $i$'s non-missing neighbors and are therefore more realistic.[^34] To wit, the second method yields more consistent, accurate, and theoretically-valid estimates of the lags across each $\mathbf{m}_{i}$. It is clearly preferable, so for each dataset $\mathbf{S}$, I proceed by finding $\mathbf{WZ}$ from imputed datasets $(\mathbf{m}_{i})_{i=1}^5$. These lags are then appended to each $\mathbf{m}_{i}$, making five expanded imputed datasets, $(\mathbf{p}_{i})_{i=1}^5$, where $\mathbf{p}_{i} = [\mathbf{Y \; D \; X \; WZ}] \in \mathbb{R}^{N \times (1 + q + k + v)}$
 
-[^33]: For example, for country $i$ with neighbors $j$, $k$, and $l$, and with respect to variable $z$, let $z_{j}$ be missing but $z_{k}$ and $z_{l}$ be non-missing. Using exclusively known data, $\bar{z} = 0.5(z_{k} + z_{l})$. Should $z_{j}$ be imputed, however, this value may be introduced to the equation, in which case $\bar{z} = 0.33(z_{j} + z_{k}  + z_{l})$. The second $\bar{z}$ is likely to resemble the first, provided that $z_{j}$ is not an outlier, since the underlying equations differ only by the presence of $z_{j}$ (as well as corresponding adjustments to the averaging weight).
+[^34]: For example, for country $i$ with neighbors $j$, $k$, and $l$, and with respect to variable $z$, let $z_{j}$ be missing but $z_{k}$ and $z_{l}$ be non-missing. Using exclusively known data, $\bar{z} = 0.5(z_{k} + z_{l})$. Should $z_{j}$ be imputed, however, this value may be introduced to the equation, in which case $\bar{z} = 0.33(z_{j} + z_{k}  + z_{l})$. The second $\bar{z}$ is likely to resemble the first, provided that $z_{j}$ is not an outlier, since the underlying equations differ only by the presence of $z_{j}$ (as well as corresponding adjustments to the averaging weight).
 
 #### Start-Year Specification {#sec-gen-prep-sy}
 
-Upon completing the spatial lags, I specify the "start years"---the year at which at each $\mathbf{p}_{i}$ may begin---where necessary. The exact justifications for these start years may be found in @sec-ch1, @sec-ch2, and @sec-ch3; but at this juncture, a few clarifying points merit mentioning. First, they serve one of two purposes: to align with those adopted by the authors inspiring my work, or to test alternative theories in which another start year may plausibly yield different results. Second, the maximum number of start years set for any given chapter is two: although data availability generally allowed for a third start year beginning before those used by the authors, introducing it in preliminary model testing revealed prohibitive computational costs.[^34] Third, Chapter 3 specifies 1990---exclusively---as the start year, since setting start years more recent than this entails inferential risks.[^35] Ultimately, in specifying start years, there now exist iterations $\mathbf{r}_{i,j}$ for each $\mathbf{p}_{i}$, where $j$ signifies the index number of the start years, ordered chronologically.[^36] In chapters 1 and 2, two start years are specified, such that $j \in \{1, 2\}$. By contrast, in Chapter 3, there is no variation in start years, so $j = 1$.
+Upon completing the spatial lags, I specify the "start years"---the year at which at each $\mathbf{p}_{i}$ may begin---where necessary. The exact justifications for these start years may be found in @sec-ch1, @sec-ch2, and @sec-ch3; but at this juncture, a few clarifying points merit mentioning. First, they serve one of two purposes: to align with those adopted by the authors inspiring my work, or to test alternative theories in which another start year may plausibly yield different results. Second, the maximum number of start years set for any given chapter is two: although data availability generally allowed for a third start year beginning before those used by the authors, introducing it in preliminary model testing revealed prohibitive computational costs.[^35] Third, Chapter 3 specifies 1990---exclusively---as the start year, since setting start years more recent than this entails inferential risks.[^36] Ultimately, in specifying start years, there now exist iterations $\mathbf{t}_{i,j}$ for each $\mathbf{p}_{i}$, where $j$ signifies the index number of the start years, ordered chronologically.[^37] In chapters 1 and 2, two start years are specified, such that $j \in \{1, 2\}$. By contrast, Chapter 3 features a single start year, so $j = 1$.
 
-[^34]: To be precise, running a task with three start years usually led to memory limits being reached, after which the task would fail.
+[^35]: To be precise, running a task with three start years usually led to memory limits being reached, after which the task would fail.
 
-[^35]: Indeed, because the sample in this chapter is already limited to "Global South" countries, and in consideration of subsequent temporal lagging, a later start year would very likely give way to sample sizes so small that they violate Rubin's pooling rules.
+[^36]: Indeed, because the sample in this chapter is already limited to "Global South" countries, and in consideration of subsequent temporal lagging, a later start year would very likely give way to sample sizes so small that they violate Rubin's pooling rules.
 
-[^36]: For example, for Chapter 1, with start years 1977 and 1990, $j \in \{1, 2\}$ corresponds to $\{1977, 1990\}$.
+[^37]: For example, for Chapter 1, with start years 1977 and 1990, $j \in \{1, 2\}$ corresponds to $\{1977, 1990\}$.
 
 #### Temporal Lagging {#sec-gen-prep-tl}
 
-The final preprocessing step involves temporally lagging all independent variables---the treatments ($\mathbf{D}$), covariates ($\mathbf{X}$), and spatial lags ($\mathbf{WZ}$)---for each $\mathbf{r}_{i,j}$ with respect to the outcome ($\mathbf{Y}$).
+To evaluate whether the treatment effects of interest are delayed,[^38] I perform my final preprocessing step: temporally lagging all independent variables---the treatments ($\mathbf{D}$), covariates ($\mathbf{X}$), and spatial lags ($\mathbf{WZ}$)---for each $\mathbf{t}_{i,j}$ with respect to the outcome ($\mathbf{Y}$). Namely, I lag the independent variables by $t - l$, where $t$ is a given year for any observation of $\mathbf{Y}$, $l$ the number of years prior to $t$ from which values of the independent variables are taken and aligned with $\mathbf{Y}$ at $t$, and $l \in \{1, ..., 8\}$.[^39] Doing so transforms $\mathbf{t}_{i,j}$ to iterations $\mathbf{v}_{i,j, l}$, the ultimate datasets passed through my models.
+
+[^38]: That is, whether the treatments require certain time spans to elapse before their effects can be realized or detected.
+
+[^39]: The lower bound of the lags ($l = 1$) is the most basic and common temporal lag employed by social scientists. The upper bound ($l = 8$), on the other hand, seeks to test whether the intended outcome of a policy implemented at the onset of a hypothetical, consecutive two-term U.S. presidency may eventually be realized by its very end.
+
+Temporal lagging is typical of inferential models, especially those concerned with international policy questions and country-year panel data. Nevertheless, the technique poses a few complications for my research owing to the idiosyncrasies of my overall methodology. First, absent extant data preceding the first chosen start year, $N$---the sample size of $\mathbf{v}_{i,j, l}$---inevitably shrinks as $l \rightarrow \infty$.[^40] This is a structural feature of temporal lagging and is not problematic *per se*. However, pooling my results---the final step of the multiple imputation process and my models writ large (see @sec-gen-pool)---requires that $N > 1000$ be satisfied. Indeed, pooling demands the specification of the degrees of freedom of the complete datasets, $df_{com}$; but as the DML method (see @sec-gen-dml) prevents the consistent location of such a value---$N$ varies over cross fits, and the number of model parameters may likewise vary over cross fits depending on the selected learner---it is safer to assume that $df_{com} = \infty$, which is only acceptable when $N$ is sufficiently large.[^41] Fortunately, virtually every $\mathbf{v}_{i,j, l}$ satisfies the aforementioned condition, though there are a few instances---particularly as $l \rightarrow 8$ and in Chapter 3, where the universe of cases is intentionally small (see @sec-ch3) and the single start year (1990) is more recent---where it does not. I will identify such instances where appropriate, and the results thereof should be interpreted with caution.
+
+[^40]: Specifically, under such conditions, when independent variables are temporally lagged with respect to $\mathbf{Y}$, early observations take on missing values and are effectively dropped as a result. For instance, if the independent variables are lagged by $t - 1$ (i.e., one year), their values for start year $t_{sy}$ appear when $\mathbf{Y}$ is at $t_{sy} + 1$. Because there naturally exist no data at $t_{sy} - 1$ (i.e., the year prior to $t_{sy}$) from which to complete the lag, all independent variables corresponding to $\mathbf{Y}$ at $t_{sy}$ become missing. In the country-year case, this means that for every country, when $\mathbf{Y}$ is at $t_{sy}$, all independent variables are missing, and $N$ is simply reduced by the total number of countries (since one observation per country now features missingness).
+
+[^41]: For more on $df_{com}$ and when $df_{com} = \infty$ is appropriate, see [`?mice::pool.table()`](https://cran.r-project.org/web/packages/mice/mice.pdf).
+
+Second is the infeasibility of implementing finite distributed lag models (FDLs). An option available to political scientists interested in spatio-temporal processes,[^42] FDLs attempt to capture cumulative delayed effects ending at time $t$ but beginning at $t - l$ by including both contemporary independent variables ($\mathbf{X}_{t}$) and lagged versions thereof spanning the sequence of discrete time points (e.g., years) from $t - 1$ through $t - l$ ($\mathbf{X}_{t-1}, ..., \mathbf{X}_{t-l}$). For example, in a simple FDL, where $l = 1$:[^43]
+
+[^42]: A discussion of FDLs and their utility for political-science research may be found in Cook et al. (2023).
+
+[^43]: For equation, see Cook et al. (2023, p. 64).
+
+$$
+y_{t} = \beta x_{t} + \gamma x_{t-1} + \epsilon_{t}
+$$
+
+Here, both $x_{t}$ and $x_{t-1}$ feature in the model, and the cumulative effect of $x$ on $y$ beginning at $t-1$ is found simply by summing the estimates of $\beta$ and $\gamma$.
+
+Typical problems attending FDLs arise from the selection of $l$---an arbitrary, user-defined limit---and multicollinearity (especially as $l \rightarrow \infty$), since each $\mathbf{X}$ is usually highly correlated with its temporal neighbor(s) along the lag sequence.[^44] A more unique complication, however, appears in the context of DML. As we shall soon see (@sec-gen-dml-plr), the DML models I deploy partly rely on predicting the treatment itself from the remaining independent variables. FDLs in this paradigm, therefore, inexorably entail utilizing later treatment observations to predict earlier ones. From our previous example, estimating effect $\gamma$ (i.e., the impact of $x_{t-1}$ on $y_{t}$) necessitates computing:
+
+[^44]: For a brief discussion of these issues, see Mignon (2024, p. 271).
+
+$$
+x_{t-1} = \beta x_{t} + \epsilon_{t}
+$$
+
+Nonetheless, modeling $x_{t-1}$ as a function of $x_{t}$ violates an obvious and elementary rule of causality: that cause $x$ must temporally precede effect $y$. Because syntheses of FDLs and DML suggest such impossible event sequences---namely, effects occurring before their causes---the two methods are fundamentally incompatible. I proceed, then, by forgoing the use of FDLs, finding treatment effects at each $t-l$ independently (i.e., for each $\mathbf{v}_{i,j, l}$), though doing so admittedly precludes the potential for further investigation into cumulative effects.
 
 ### Double/Debiased Machine Learning (DML) {#sec-gen-dml}
 
-Partially-linear regression model:
+#### Introduction {#sec-gen-dml-intro}
+
+With preprocessing complete, I turn to executing my models, which in all chapters operate under the double/debiased machine learning (DML) framework. First introduced by Chernozhukov et al. (2018), DML is an emerging class of inferential, econometric models. It involves solving at least two problems---a "main" equation predicting the outcome of interest ($\mathbf{Y} \in \mathbb{R}^{N \times 1}$), and an "auxiliary" one predicting the policy variable of interest itself ($\mathbf{D} \in \mathbb{R}^{N \times 1}$)---in order to obtain an estimate of a true treatment effect ($\hat{\theta}_{0}$ of $\theta_{0}$); hence, it entails "double prediction."[^45] Furthermore, its chief purpose is to mitigate the regularization bias and overfitting that ordinarily occur when machine-learning (ML) methods (e.g., ridge, lasso, random forests, boosted trees, neural nets, SVMs, ensembles, stacks, etc.) are naively employed to estimate $\theta_{0}$, making the approach "debiased."[^46]
+
+[^45]: Note that now $\mathbf{D} \in \mathbb{R}^{N \times 1}$ rather than $\mathbf{D} \in \mathbb{R}^{N \times q}$, a notational adjustment I maintain for the remainder of the section. I do so not only align with the DML literature---wherein $\mathbf{D}$ is almost always discussed as a single treatment---but also to emphasize that even in the multi-treatment case, $\mathbf{D} \in \mathbb{R}^{N \times 1}$ for any computation of $\hat{\theta}_{0}$, since the DML procedure must be implemented on each treatment to find each $\hat{\theta}_{0}$. This point will become clearer towards the end of @sec-gen-dml-plr, wherein I elaborate on DML in the multi-treatment case.
+
+[^46]: For more on the fundaments of DML, see Chernozhukov et al. (2018, pp. C1-C8).
+
+DML is motivated in the first instance by high-dimensional cases, where $\eta_{0}$---the "nuisance parameter" needed to find $\theta_{0}$---is highly complex, usually because the covariate coefficients comprising $\eta_{0}$ are similar to or larger in number than the total observations ($P \geq N$).[^47] Nevertheless, the framework is a general means of achieving valid estimation of $\theta_{0}$, even from datasets where $P < N$. First, these cases may still exhibit high-dimensionality absent a "pre-specified, known parametric model for \[$\eta_{0}$\]" (Ahrens et al., 2025, p. 3). Indeed, the "true" model for $\eta_{0}$ may be nonparametric or depend on covariates unknown *ex ante*---possibilities especially germane to observational studies. Second, in both high- and low-dimension settings, DML guarantees flexibility, freeing researchers to estimate $\eta_{0}$ (and with it, $\theta_{0}$) using ML methods of all kinds, including nonparametric/nonlinear ones.[^48] Last, researchers working with $P < N$ data benefit from knowing they may safely increase $P$ if desired (e.g., for robustness checks) without needing to entertain major model alterations, since DML is constructed to accommodate $P \geq N$. Therefore, even though $P < N$ for every $\mathbf{v}_{i,j, l}$ at present, DML remains a valid and useful framework for estimating my treatment effects of interest.
+
+[^47]: The nuisance parameter ($\eta_{0}$) is denominated as such because although it is necessary for obtaining the target parameter ($\theta_{0}$), it is not of direct interest.
+
+[^48]: For more on this advantage of DML, see Ahrens et al. (2025, p. 4).
+
+#### Partially-Linear Regression (PLR) {#sec-gen-dml-plr}
+
+The specific DML model I elect to use is the partially-linear regression (PLR) model. I do so because it is the most generally appropriate---additional assumptions are needed to justify the use of other DML models (e.g., those containing instrumental variables)---and is the simplest, making it the easiest to interpret.[^49] The model is initially of the form:
+
+[^49]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. A full enumeration of the DML models currently available in statistical software may be found in the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
 
 $$
 \begin{align*}
-Y = D\theta_{0} + g_{0}(X) + \zeta, \qquad \mathbb{E}(\zeta|D,X) = 0 \\
-D = m_{0}(X) + V, \qquad \mathbb{E}(V|X) = 0
+\mathbf{Y} = \mathbf{D}\theta_{0} + g_{0}(\mathbf{X}) + \boldsymbol{\zeta}, \qquad \mathbb{E}[\boldsymbol{\zeta}|\mathbf{D},\mathbf{X}] = 0 \\
+\mathbf{D} = m_{0}(\mathbf{X}) + \mathbf{V}, \qquad \mathbb{E}[\mathbf{V}|\mathbf{X}] = 0
 \end{align*}
 $$
+
+As before, $\mathbf{Y}$ is the outcome, $\mathbf{D}$ the treatment, $\theta_{0}$ the effect of interest, and $\mathbf{X}$ the covariates. Additionally, $g_{0}$ and $m_{0}$ are the nuisance functions, where $\eta_{0} = (m_{0}, g_{0})$, and $\boldsymbol{\zeta}$ and $\mathbf{V}$ are the stochastic error terms. In the main equation, a user-specified machine learner predicts $\mathbf{Y}$ by estimating $g_{0}$, whereas in the auxiliary equation, another chosen learner predicts $\mathbf{D}$ by estimating $m_{0}$.
+
+As aforementioned, ML methods are vulnerable to overfitting and regularization bias when used naively. On the one hand, since they are often highly complex and flexible, ML models are prone to virtual memory of training data, compromising external validity.[^50] On the other, the regularization parameters employed in ML models to guard against overfitting (e.g., $\alpha$ and $\lambda$ in the elastic-net paradigm) introduce a new type of bias by forcing said models towards simplicity (e.g., shrinking coefficients towards $0$ in lasso and ridge), perhaps artificially so.[^51] To overcome these forms of bias, DML relies on two techniques: (1.) orthogonalization and (2.) cross-fitting.
+
+[^50]: Put differently, such models may do well at prediction using the original samples on which they are trained yet perform poorly when presented with new samples. Further heuristic definitions of overfitting are given in Chernozhukov et al. (2024, pp. 71 & 255).
+
+[^51]: The example of "shrinkage bias," a type of regularization bias, is given in Chernozhukov et al. (2024, p 74).
+
+The first---orthogonalization---serves to counter regularization bias. In the PLR case, this occurs through the "partialling-out" procedure, wherein the residuals of the main and auxiliary equations are extracted, and the former is regressed on the latter using ordinary least squares (OLS), yielding not only the regression coefficient $\hat{\theta}_{0}$, but also the accompanying standard error and confidence interval.[^52] Specifically, consider the original PLR equation transmuted to residualized form:[^53]
+
+[^52]: PLR is "partially linear," then: OLS is mandatory in the final step, but nonlinear (e.g., tree-based) models are permissible to estimate $\eta_{0}$.
+
+[^53]: The equation here assumes the selection of the standard score function, which does not estimate $g_{0}(\mathbf{X})$ directly, but instead estimates $\ell_{0}(\mathbf{X}) := \mathbb{E}[\mathbf{Y}|\mathbf{X}] = \mathbb{E}[\mathbf{D}|\mathbf{X}]\theta_{0} + g_{0}(\mathbf{X})$ (see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html)). This explains why $\ell_{0}$ now replaces $g_{0}$. Below, I will elaborate on the role of score functions in DML.
+
+$$
+\begin{align*}
+\mathbf{Q} = \mathbf{V}\theta_{0} + \mathbf{\zeta}, \qquad \mathbb{E}[\mathbf{\zeta}|\mathbf{D},\mathbf{X}] = 0 \\
+\mathbf{Q} = \mathbf{Y} - \ell_{0}(\mathbf{X}), \qquad \ell_{0}(X) = \mathbb{E}[\mathbf{Y}|\mathbf{X}] \\
+\mathbf{V} = \mathbf{D} - m_{0}(\mathbf{X}), \qquad m_{0}(X) = \mathbb{E}[\mathbf{D}|\mathbf{X}]
+\end{align*}
+$$
+
+Here, the residuals $\mathbf{Q}$ and $\mathbf{V}$ correspond to $\mathbf{Y}$ and $\mathbf{D}$, respectively, after partialling out (i.e., subtracting) the effect of $\mathbf{X}$ on each. In practice, DML estimates these residuals using the plug-in estimators of the nuisance functions, $\hat{\ell}_{0}$ of $\ell_{0}$ and $\hat{m}_{0}$ of $m_{0}$, initially found by the learners predicting $\mathbf{Y}$ and $\mathbf{D}$:
+
+$$
+\begin{align*}
+\mathbf{\hat{Q}} = \mathbf{Y} - \hat{\ell}_{0}(\mathbf{X}) \\
+\mathbf{\hat{V}} = \mathbf{D} - \hat{m}_{0}(\mathbf{X})
+\end{align*}
+$$
+
+$\hat{\theta}_{0}$ is then obtained simply by regressing $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$.[^54]
+
+[^54]: This explanation of PLR is adapted mostly from Bach et al. (2024, pp. 7 & 10-12). For an additional simple discussion of PLR, see Chernozhukov et al. (2024, pp. 249-251).
+
+The partialling-out operation results in a debiased $\hat{\theta}_{0}$ for two reasons. First, the Frisch–Waugh–Lovell (FWL) Theorem guarantees that it actually gives $\hat{\theta}_{0}$. Namely, since FWL demonstrate that the population regression coefficient, $\theta_{0}$, may be recovered by regressing the true residualized $\mathbf{Y}$ on the true residualized $\mathbf{D}$---that is, $\mathbf{Q}$ on $\mathbf{V}$---it follows that in the sample analogue,[^55] regressing $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$ returns $\hat{\theta}_{0}$.[^56] Second, in obeying Neyman orthogonality, partialling out alleviates regularization bias affecting $\hat{\theta}_{0}$. All DML models estimate $\theta_{0}$ using score functions $\psi(\mathbf{S};\theta,\eta)$ that solve the sample analogue of the moment condition:[^57]
+
+[^55]: The term "sample analogue" is also referred to in the DML literature as the "empirical analogue." I use the former term, however, to preserve lexical consistency with earlier discussions involving samples $\mathbf{v}_{i,j,l}$.
+
+[^56]: See Chernozhukov et al. (2024, pp. 24-25) for more on the FWL Theorem.
+
+[^57]: This condition may be found in Bach et al. (2024, p. 12).
+
+$$
+\begin{align*}
+\mathbb{E}[\psi(\mathbf{S};\theta_{0},\eta_{0})] = 0
+\end{align*}
+$$
+
+Specifically:[^58]
+
+[^58]: The generic DML estimator is expressed as such in Chernozhukov et al. (2018, p. C8).
+
+$$
+\begin{align*}
+\frac{1}{n}\sum_{i \in I}\psi(\mathbf{S};\hat{\theta}_{0},\hat{\eta}_{0}) = 0
+\end{align*}
+$$
+
+Here, $\mathbf{S} := (\mathbf{Y}, \mathbf{D}, \mathbf{X})$.[^59] The function $\psi$ also obeys the Neyman-orthogonality condition:[^60]
+
+[^59]: The DML literature typically uses $\mathbf{W}$ to denote the observations, but I use $\mathbf{S}$ to maintain alignment with the notation seen in @sec-gen-prep-dw.
+
+[^60]: The condition is expressed as such in Chernozhukov et al. (2018, p. C8). In Bach et al. (2024, p. 12), it is writtenn similarly as: $\partial_{\eta}\mathbb{E}[\psi(\mathbf{S};\theta_{0},\eta_{0})]\bigg|^{}_{\eta = \eta_{0}} = 0$
+
+$$
+\begin{align*}
+\partial_{\eta}\mathbb{E}[\psi(\mathbf{S};\theta_{0},\eta_{0})][\eta - \eta_{0}] = 0
+\end{align*}
+$$
+
+Heuristically, this property guarantees that the moment-condition estimator is insensitive to minor deviations of the plug-in nuisance parameter $\hat{\eta}_{0}$ about its true value $\eta_{0}$.[^61] It follows that DML ensures a $\hat{\theta}_{0}$ robust to regularization bias, a common source of such perturbations in ML. In the case of PLR, partialling out indeed implies a Neyman-orthogonal score function. Under the standard approach:[^62]
+
+[^61]: A more formal definition of the property is that $\partial_{\eta}$, "the Gateaux derivative operator with respect to $\eta$\[,\] vanishes when evaluated at the true parameter values" (Chernozhukov et al., 2018, p. C8). Additional heuristic explanations of Neyman orthogonality may be found in Bach et al. (2024, p. 12), Chernozhukov et al. (2018, pp. C8-C9), and Chernozhukov et al. (2024, pp. 107-108), for example.
+
+[^62]: The function presented here is "standard" insofar as it is the default for PLR computations in statistical software. For more on this score function's alternative---one that is typically reserved for instrumental-variable models---see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/scores.html). For a proof of its Neyman orthogonality, see Chernozhukov et al. (2024, p. 283).
+
+$$
+\begin{align*}
+\psi(\mathbf{S};\theta,\eta) := [\mathbf{Y} - \ell(\mathbf{X}) - \theta(\mathbf{D} - m(\mathbf{X}))][\mathbf{D} - m(\mathbf{X})]\
+\end{align*}
+$$
+
+Accordingly, PLR provides the same assurance as that on offer from DML models generally: debiased estimates of $\theta_{0}$.[^63]
+
+[^63]: That the partialling-out operation (i.e., regressing residuals $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$ to obtain $\hat{\theta}$) implies the foregoing score function may not be immediately apparent to the reader. To obviate any misunderstandings, therefore, I offer a simple proof in @sec-appx-e demonstrating how the OLS solution to $\hat{\theta}_{0}$ may be recovered from it.
+
+The second bias-tackling technique---cross-fitting---handles the problem of overfitting by preventing data leakage, thereby ensuring that the observations used to obtain $\hat{\eta}_{0}$ is independent of those used subsequently to find $\hat{\theta}_{0}$.[^64] In generic terms, the procedure begins by randomly splitting sample $\mathbf{S}$ into $K$ folds of observation indices $[N] = \{1,...,N\}$ and of size $n = N/K$, returning index sets $(I_{k})_{k = 1}^{K}$ as well as their complements, $I_{k}^{c} = [N] \backslash I_{k}$.[^65] Next, the learners estimating $\eta_{0}$ (e.g., those finding $\hat{\ell}_{0}$ and $\hat{m}_{0}$, respectively) are fit on training data $I_{k}^{c}$ to return:
+
+[^64]: For more on why cross-fitting helps address overfitting, see Chernozhukov et al. (2024, p. 273).
+
+[^65]: If $\mathbf{S}$ cannot be partitioned evenly into $K$ splits, then $n \approx N/K$.
+
+$$
+\begin{align*}
+\hat{\eta}_{0,k} = \hat{\eta}_{0,k}(\mathbf{S}_{I_{k}^{c}})
+\end{align*}
+$$
+
+This is performed for each $k \in [K] = \{1,...,K\}$. Finally, $\hat{\theta}_{0}$ is obtained from a user-specified algorithm aggregating evaluations on test data $I_{k}$ that themselves use $\hat{\eta}_{0,k}$. Optionally, the entire operation may be repeated $R$ times, where $r \in [R] = \{1,...,R\}$, in which case the median of parameters $\boldsymbol{\hat{\theta}_{0}}$ is selected as the final causal estimate.[^66]
+
+[^66]: This explanation is adapted from Ahrens et al. (2025, p. 19), Bach et al. (2024, pp. 16-17) and Chernozhukov et al. (2018, p. C23). A useful visualization of cross-fitting may also be seen in the [DoubleML YouTube channel](https://www.youtube.com/watch?v=NWEoLe8mZqM).
+
+As aforementioned, the user sets the algorithm aggregating the test-data evaluations. The recommended and software-default algorithm, which I opt to follow, is of the form:[^67]
+
+[^67]: This algorithm is labeled "DML2" in both the literature and software. The alternative, DML1, obtains $\hat{\theta}_{0}$ by averaging $\check{\theta}_{0,k}$, preliminary estimates of $\hat{\theta}_{0}$ solved at each $k$ fold. DML2 is generally preferred over its counterpart because it tends to behave more stably. For more on the two algorithms, including the recommendation of DML2, see Bach et al. (2024, pp. 16-17) and Chernozhukov et al. (2018, p. C24).
+
+$$
+\begin{align*}
+\frac{1}{N}\sum_{k = 1}^{K}\sum_{i \in I_{k}}\psi(\mathbf{S};\hat{\theta}_{0},\hat{\eta}_{0,k}) = 0
+\end{align*}
+$$
+
+Here, each $\hat{\eta}_{0,k}$ is plugged into the moment-condition estimator simultaneously, such that $\hat{\theta}_{0}$ may be found from a single equation conducting all $N$ evaluations.[^68] In the PLR case, this entails:
+
+[^68]: Put differently, unlike DML1, preliminary estimates $\check{\theta}_{0,k}$ of $\hat{\theta}_{0}$ need not be found first.
+
+1.  Extracting residuals $\mathbf{\hat{Q}}_{k}$ and $\mathbf{\hat{V}}_{k}$, themselves found by predicting on observations $I_{k}$ with their corresponding $\hat{\eta}_{0,k}$,
+2.  Concatenating the residuals such that $\mathbf{\hat{Q}} = (\mathbf{\hat{Q}}_{k = 1}, ..., \mathbf{\hat{Q}}_{K})$ and $\mathbf{\hat{V}} = (\mathbf{\hat{V}}_{k = 1}, ..., \mathbf{\hat{V}}_{K})$,
+3.  Regressing $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$ with OLS, thus yielding $\hat{\theta}_{0}$ (as well as the standard error and confidence interval thereof).[^69]
+
+[^69]: A heuristic description of this procedure is found in Chernozhukov et al. (2024, p. 251).
+
+Further set by the user are the numbers of $K$ sample partitions and $R$ cross-fitting rounds. As $K \approx 5$ is usually sufficient for medium-sized datasets, the software-default number of folds is $K = 5$.[^70] This setting is indeed a suitable starting point for my work, since each $\mathbf{v}_{i,j, l}$ is approximately medium-sized: $N$ is always more than a few thousand but never on the order of tens or hundreds of thousands. More important to my selection of $K$, however, are computational and time costs, which invariably increase as $K \rightarrow \infty$. In fact, in the context of two-way cluster-robust fold splitting---a technique I subsequently implement (see @sec-gen-dml-fits)---these expenses balloon exponentially at a rate of $K^{2}$. With $K = 5$, virtually all of my models feature runtimes of several hours (see @sec-appx-f) and the high computational costs these normally imply. In the interest of easing model replication, I hew to this baseline throughout, refraining from any increases to $K$. Similarly, I select $R$ mainly in consideration of cost. Although the software default is $R = 1$, I prefer to set $R > 1$ so as to enhance confidence of the inference about $\hat{\theta}_{0}$.[^71] However, increasing $R$ also increases expenses by $R(K)$ (for regular splitting) or $R(K^{2})$ (for two-way cluster-robust splitting). The smallest $R > 1$ number allowing for the ordinary median of $\boldsymbol{\hat{\theta}_{0}}$ to be drawn is $R = 3$; yet even at this setting (and with $K = 5$), runtimes are regularly several-hours long (see again @sec-appx-f). Therefore, to access the benefits of repeated cross-fitting whilst minimizing costs, I keep $R = 3$ for every chapter.
+
+[^70]: For more on the general appropriateness of $K = 5$, see Chernozhukov et al. (2024, p. 276).
+
+[^71]: To be precise, as $R \rightarrow \infty$, one can be surer that the inference about the chosen $\hat{\theta}_{0}$ is not an outlier, as per the Central Limit Theorem.
+
+A final remark on PLR is that it is, like all other DML models, compatible with the multi-treatment case. Given a $p1$ number of treatments $\mathbf{D}_{1},...,\mathbf{D}_{p1}$ with estimated effects $\hat{\theta}_{0,1},...,\hat{\theta}_{0,p1}$, DML finds each $\hat{\theta}_{0}$ iteratively in typical fashion, the only departure being that for any $\mathbf{D}$, all remaining treatments are added to covariates $\mathbf{X}$. In the PLR case, this amounts to regressing $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$ for every $\mathbf{D}$, where $\mathbf{X}$ contains all treatments not $\mathbf{D}$.[^72]
+
+[^72]: For more on DML and PLR with multiple treatments, see Bach et al. (2024, pp. 20-21) and the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/se_confint.html). Support in `DoubleML` for simultaneous inference based on multiplier-bootstrapped test statistics is currently unavailable for clustered data (see the following [`DoubleML` for R GitHub Discussion](https://github.com/DoubleML/doubleml-for-r/discussions/190)), hence why such inference does not appear in my robustness checks.
+
+Though simple, the multi-treatment procedure merits mentioning for a few reasons. First---and most obviously---it is implemented wherever I appraise multiple treatment effects simultaneously. Second, it underscores a key technical constraint DML imposes, one that limits me to obtaining and reporting effects on the treatments exclusively. Because every $\hat{\theta}_{0}$ must be found individually in DML---indeed, the moment-condition estimator permits only one $\hat{\theta}_{0}$ to be obtained at a time---costs in the multi-treatment case rise at a rate of $R(K)p1$ or $R(K^{2})p1$. It follows that if one were to estimate the effects of not only every $\mathbf{D}$, but also all $P$ covariates of $\mathbf{X}$, costs would rise by $R(K)(p1 + P)$ or $R(K^{2})(p1 + P)$. So it is that expenses would explode estimating every effect of every dimension for datasets where $p1 + P$ is large, such as $\mathbf{v}_{i,j, l}$.[^73] The upshot of any such undertaking is that costs may prove not only hard to justify---runtimes may mushroom to the order of days---but also prohibitive, inasmuch as models may reach memory limits, and thus fail, on even the most high-performing personal computers. Thus, for my project, where the great size of $P$ effectively guarantees such obstacles, finding $\hat{\theta}_{0}$ for every dimension is not merely impractical, but virtually impossible. My choice of DML, then, admittedly implies a major tradeoff: quantity of $\hat{\theta}_{0}$ for quality of $\hat{\theta}_{0}$---that is, effect estimates of all independent variables for debiased estimates of the treatment effects. This is a compromise with which I am comfortable---the treatment effects are of principal interest to my research agenda, after all---but it goes without saying that the inability to produce estimates of all covariates' effects likely complicates future efforts to elucidate causal pathways.
+
+[^73]: Specifically, for $\mathbf{v}_{i,j, l}$, $p1 + P > 100$ or $p1 + P > 200$ is typical. Of course, this explosion of costs is especially encumbering in the high-dimensional case ($P > N$), for which DML is originally designed.
+
+#### Learner Selection {#sec-gen-dml-lrn}
+
+##### Considerations {#sec-gen-dml-lrn-cnds}
+
+A cornerstone of DML, as suggested by its very name, is the use of machine learners estimating $\eta_{0}$. These learners are always chosen by the practitioner, largely after contemplating three considerations: (1.) appropriateness, (2.) cost, and (3.) performance.
+
+Central to any appraisal of the first consideration---appropriateness---is an understanding of one's data. First and foremost, users must know the variable types of the outcomes they specify for the main and auxiliary equations. If the outcome is continuous, they should select a regression learner; but if the outcome is binary, they should opt for a classification learner. Users also benefit from attention to multicollinearity among the predictors, a possibility especially likely in large-$P$ settings. Indeed, some learners are better-equipped to handle highly-correlated predictors than others, such that the former are preferred wherever multicollinearity obtains.
+
+The consideration of cost, on the other hand, is evaluated chiefly with respect to two factors: hardware constraints and user tolerance. As aforementioned, some models may exhaust computer memory, prompting model failure. In many cases, this occurs due to the complexity of the learner itself---particularly at the tuning stage (see @sec-gen-dml-tune), where an appreciable number of complex fits being performed and stored simultaneously can quickly occupy total memory. Therefore, complex learners may prove strictly prohibitive, in which case simpler learners may be not just desirable, but necessary. Further affected by hardware are runtimes, which decrease on higher-performing computers (e.g., those with many cores), but which may still prove long for complex learners. Here, users must weigh the runtimes they are willing to tolerate, whether they be several-hours long or even days long, especially when accounting for any replications they or others may seek to execute.
+
+Performance---the final consideration---is perhaps the most amenable to rigorous assessment. Many of the most common machine learners (e.g., regularized regressions, tree-based methods, neural networks, etc.) plausibly satisfy the DML-optimal convergence requirement of $\hat{\eta}_{0}$ to $\eta_{0}$:[^74]
+
+[^74]: For more on the convergence requirement and the learners that satisfy it, see Ahrens et al. (2025, pp. 17-18), Bach et al. (2024, pp. 14-15), and Chernozhukov et al. (2018, pp. C25-C26; 2024, pp. 272-273), for example.
+
+$$
+\begin{align*}
+N^{1/4}\parallel \hat{\eta}_{0} - \eta_{0} \parallel_{L^{2}} \; \approx 0
+\end{align*}
+$$
+
+Such learners immediately qualify as possible candidates for practitioners. Yet even among these, results may vary greatly for the same prediction task (e.g., in the PLR case, predictions of $\mathbf{Y}$ with $\hat{\ell}_{0}$ or $\mathbf{D}$ with $\hat{m}_{0}$), in which case the reliability of not only $\hat{\theta}_{0}$, but also the inference about it, may be jeopardized. Fortunately, users may buttress confidence around $\hat{\theta}_{0}$ simply by locating the best-performing learner from among select candidates---that is, the learner most likely vis-à-vis its peers to minimize $\parallel \hat{\eta}_{0} - \eta_{0} \parallel_{L^{2}}$ and thus the upper bound on its bias.[^75] Doing so is easily achieved by comparing the cross-fitted performance metrics for each prediction task, from which the best learner may be identified and causal claims made.[^76] Typical (and usually-sufficient) performance metrics for regression tasks are out-of-sample mean squared error (MSE) and root mean square error (RMSE).[^77] For classification tasks, on the other hand, users benefit from weighing a wider array of metrics minding not only their research goals (e.g., equally-accurate prediction of both positive and negative cases), but also the structure of their outcome (e.g., balance between positive and negative cases).
+
+[^75]: In theory and in general, higher-performing learners are likelier to minimize $\parallel \hat{\eta}_{0} - \eta_{0} \parallel_{L^{2}}$ because their plug-in parameter $\hat{\eta}_{0}$ is likelier to approximate $\eta_{0}$.
+
+[^76]: Broadly speaking, cross-fitted performance metrics capture the difference between test-set predictions and their actual values. The processes and import of learner selection based on out-of-sample predictive performance is described in Ahrens et al. (2025, pp. 30-35), Chernozhukov et al. (2024, pp. 252-253), and the [DoubleML Choice of Learners Guide](https://docs.doubleml.org/dev/examples/learners/py_learner.html).
+
+[^77]: Needless to say, for the purpose of comparison (i.e., to determine whether a value is relatively large, small, or similar), the two metrics essentially convey the same information, insofar as the latter is simply the square root of the former. They are the default performance metrics for `DoubleML` and `mlr3`. For the former, see the [DoubleML Choice of Learners Guide](https://docs.doubleml.org/dev/examples/learners/py_learner.html). For the latter, see `?mlr3::default_measures()`.
+
+##### Decisions {#sec-gen-dml-lrn-dcns}
+
+Guided by considerations of appropriateness, cost, and performance, I select the ridge method as my baseline learner.[^78] First, since my treatments (i.e., auxiliary-equation outcomes) are either continuous or binary,[^79] ridge---as with most qualifying machine learners---is minimally appropriate, being compatible with both regression and classification tasks.[^80] Additionally---and more vitally---ridge is suitable for multicollinear environments, such as datasets $\mathbf{v}_{i,j, l}$, which indeed feature highly-correlated predictors (e.g., the V-Dem indicators, covariates $\mathbf{X}$ and spatial lags $\mathbf{WZ}$, etc.). Between ridge and lasso, the cornerstone regularized-regression learners, it is well-known that the former outperforms the latter---oftentimes greatly so---when multicollinearity prevails.[^81] Accounting for this disparity are their distinct approaches to coefficient estimation: selection versus shrinkage. Empowered to minimize predictor coefficients all the way to $0$, lasso effectively performs feature selection. Nonetheless, when presented with both highly-correlated predictors and changing model specifications (e.g., new training data during cross-fitting), lasso's choices tend to vary, delivering erratic estimates. Ridge, meanwhile, may shrink the coefficients of correlated features towards but never at $0$, such that all features contribute to their prediction task in some form. Also, ridge tends to shrink correlated predictors towards each other, meaning their joint influence on the outcome is usually similar fit-to-fit.[^82] In tandem, these qualities enable ridge to offer improved predictive stability over lasso, thereby promising smaller $\parallel \hat{\eta}_{0} - \eta_{0} \parallel_{L^{2}}$ for my DML models.
+
+[^78]: As they are well-established and exceedingly commonplace in econometric, machine-learning, and other research and applied settings, the candidate learners considered herein will not be delineated to any significant degree. That is, cursory research should normally suffice to locate the *ad rem* algorithms and procedures. As to ridge, lasso, and elastic net, however, the author submits Hastie et al. (2017, pp. 61-73) and the [`glmnet` Vignette](https://glmnet.stanford.edu/articles/glmnet.html) as useful theoretical and practical primers.
+
+[^79]: Recall that HR Scores, a continuous variable, is the outcome of interest for each chapter. This means that every main equation features a continuous outcome.
+
+[^80]: Ridge, specifically, may execute either task by setting the algorithm as linear for the former or logistic for the latter.
+
+[^81]: Ridge's superiority over lasso in the multicollinear setting is especially true when $N > P$ (e.g., for datasets such as $\mathbf{v}_{i,j, l}$). For more on the limitations of lasso and advantages of ridge vis-à-vis multicollinearity, see Hastie et al. (2015, p. 56) and Zou & Hastie (2005, p. 302).
+
+[^82]: For more on ridge's tendencies given multicollinearity, see the [`glmnet` Vignette](https://glmnet.stanford.edu/articles/glmnet.html).
+
+As to cost, regularized-regression learners such as ridge are relatively inexpensive. First, they enjoy fast runtimes and occupy little memory, since each estimate need only rely on a single solution to a least-squares optimization problem. Second, they are easy to tune. Indeed, the maximum number of hyperparameters that any of these learners may tune is $2$---though $1$ is standard for ridge---such that one may reasonably capture the spectra of possible hyperparameter values (and their combinations, where applicable) with lower-resolution tuning grids.[^83] This, in turn, means regularized-regression learners promise quick runtimes and lower-memory usage still further.[^84] By contrast, tree-based learners (e.g., random forests and boosted trees), which handle multicollinearity at least as well as ridge,[^85] are far more costly. On the one hand, to produce a single estimate, tree-based learners must aggregate the results of hundreds or thousands of fitted trees, a procedure necessarily entailing larger time and memory expenses. On the other, a higher number of hyperparameters can and ought to be tuned to optimize performance; for example, following recommendations set forth in Bischl et al. (2023), [`mlr3`](https://mlr3tuningspaces.mlr-org.com/index.html) gives default tuning spaces of $4$ and $8$ hyperparameters, respectively, for random forests and boosted trees. Higher-resolution tuning grids are thus essential, compounding already-great time and memory requirements.[^86] Ultimately, these costs proved prohibitively expensive during my preliminary testing of tree-based methods---model failure due to memory limits being reached on my personal computer was unavoidable, even at the tuning stage---rendering a learner such as ridge easily preferable absent supercomputing access.
+
+[^83]: Specifically, elastic-net models usually tune for both $\alpha$ and $\lambda$, whereas ridge ($\alpha = 0$) and lasso ($\alpha = 1$) models may only tune $\lambda$. Tuning grids are discussed in greater detail in @sec-gen-dml-tune.
+
+[^84]: To be precise, low-resolution tuning grids entail a smaller number of tuning fits and *ipso facto* shorter runtimes.
+
+[^85]: Tree-based learners, which randomly select features to inform their decision rules, virtually guarantee that only subsets of highly-correlated predictors contribute to any given tree, hence why their predictions are robust to multicollinearity. For more on this strength of tree-based learners, see [Kuhn & Johnson (2019)](https://bookdown.org/max/FES/recursive-feature-elimination.html), for instance.
+
+[^86]: A common solution to the problem of capturing possible combinations of several hyperaparameters is to randomly select such combinations a user-specified number of times (e.g., via [`mlr3tuning::tnr("random_search")`](https://mlr3tuning.mlr-org.com/reference/mlr_tuners_random_search.html).) However, this approach is riskier
+
+Finally, ridge is likely high-performing in estimating $\eta_{0}$. We have already seen how---in general---ridge is known to perform well amid multicollinearity, meaning we may justifiably expect it to prove high-performing given datasets $\mathbf{v}_{i,j, l}$. And indeed, during tuning, the best ridge models were shown to perform approximately as well as the best tree-based models.[^87] However, as we have also seen, more complex learners demand currently-prohibitive costs, complicating efforts at comparison. A complete accounting of ridge's performance thus awaits robustness checks leveraging supercomputing access, my plans for which I shall discuss in @sec-cncl.
+
+[^87]: I have yet to compile performance metrics from the tree-based learners due to aforementioned model failures, but I can do so if requested.
+
+#### Software & Hardware {#sec-gen-dml-shw}
+
+The DML method is readily executable with [`DoubleML`](https://docs.doubleml.org/stable/index.html), a package available in both Python and R via respective dependencies [`scikit-learn`](https://scikit-learn.org/stable/) and [`mlr3`](https://mlr3.mlr-org.com/). Though I experimented with each version, I settled on R's by reason of user-friendliness, performance, and speed. First, offering the more streamlined experience was `mlr3`, whose dependencies automatically handle a variety of necessary and performance-enhancing preprocessing, pre-tuning, and post-fit tasks.[^88] Second---and likely relatedly---`mlr3` performed far better than `scikit-learn` in preliminary tests, despite my efforts to manually replicate the former's workflow using the latter.[^89] Finally, the runtimes in Python and R were effectively the same, meaning continued (and time-costly) efforts to improve the performance of the Python models stood to yield no patent benefits.[^90] DML in R, then, emerged as the more sensible choice for my work, guaranteeing ease of use and performance safety without sacrificing much---if any---speed.
+
+[^88]: For example, the `glmnet` package, which `mlr3` uses to execute regularized regressions, automatically performs covariate and dependent-variable standardization, $\lambda$-sequence generation, and coefficient reverse standardization. For more on these built-in capacities, see the [Introduction to `glmnet`](https://glmnet.stanford.edu/articles/glmnet.html#commonly-used-function-arguments) page.
+
+[^89]: Specifically, during tuning for the main DML equation in Chapter 3, I observed that the best MSEs were closer to $0.5$ for `mlr3` but $7$ for `scikit-learn`---a sizable difference considering the modest spread of HR Scores. I have not saved the latter results, but I can supply them if requested, since I did retain the `scikit-learn` scripts.
+
+[^90]: Again, I did not save the former runtimes directly, but I can reproduce them if necessary due to my keeping the original scripts.
+
+As we have seen, a major drawback of DML are the high time costs that it (and machine learning more generally) tend to imply. Mitigating this problem to a large degree, fortunately, is the compatibility of `DoubleML` with parallel processing. In brief  in R with `future`.
+
+#### Hyperparameter Tuning {#sec-gen-dml-tune}
+
+![DML Tuning Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/dml_flow_viz_1.png){#fig-dml-flow_1}
+
+#### Final Fits {#sec-gen-dml-fits}
 
 ![DML Flowchart](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/dml_flow_viz.png){#fig-dml-flow}
 
@@ -352,20 +615,111 @@ $$
 
 ## Conclusion {#sec-cncl}
 
+## Bibliography
+
+Ahrens, A., Chernozhukov, V., Hansen, C., Kozbur, D., Schaffer, M., & Wiemann, T. (2025). An Introduction to Double/Debiased Machine Learning (Version 1). arXiv. https://doi.org/10.48550/ARXIV.2504.08324
+
+Bach, P., Kurz, M. S., Chernozhukov, V., Spindler, M., & Klaassen, S. (2024). DoubleML: An Object-Oriented Implementation of Double Machine Learning in R. Journal of Statistical Software, 108(3). https://doi.org/10.18637/jss.v108.i03
+
+Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. The Econometrics Journal, 21(1), C1–C68. https://doi.org/10.1111/ectj.12097
+
+Chernozhukov, V., Hansen, C., Kallus, N., Spindler, M., & Syrgkanis, V. (2024). Applied Causal Inference Powered by ML and AI (No. arXiv:2403.02467). arXiv. https://doi.org/10.48550/arXiv.2403.02467
+
+Hastie, T., Tibshirani, R., & Wainwright, M. (2015). Statistical Learning with Sparsity: The Lasso and Generalizations. CRC Press, Taylor & Francis Group.
+
+Hastie, T., Friedman, J., & Tisbshirani, R. (2017). The Elements of Statistical Learning: Data Mining, Inference, and Prediction, Second Edition (2nd ed.). Springer. https://doi.org/10.1007/978-0-387-84858-7
+
+Zou, H., & Hastie, T. (2005). Regularization and Variable Selection Via the Elastic Net. Journal of the Royal Statistical Society Series B: Statistical Methodology, 67(2), 301–320. https://doi.org/10.1111/j.1467-9868.2005.00503.x
+
 ## Appendices {#sec-appx}
 
-### Appendix A {#sec-appx-a}
+### Appendix A: Excluded Countries {#sec-appx-a}
 
 ![Table of Countries Excluded from Models](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_a_viz.png){#fig-appx-a}
 
-### Appendix B {#sec-appx-b}
+### Appendix B: Countries Coded Manually {#sec-appx-b}
 
 ![Table of Manually-Coded Country IDs](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_b_viz.png){#fig-appx-b}
 
-### Appendix C {#sec-appx-c}
+### Appendix C: Country Totals {#sec-appx-c}
 
 ![Table of Total Country Counts per Model](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_c_viz.png){#fig-appx-c}
 
-### Appendix D {#sec-appx-d}
+### Appendix D: Missingness Summaries {#sec-appx-d}
 
 ![Table Summarizing Missingness](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/appx_d_viz.png){#fig-appx-d}
+
+### Appendix E: PLR Score Function to OLS {#sec-appx-e}
+
+Recall that the generic DML estimator solves the moment condition:
+
+$$
+\begin{align*}
+\frac{1}{n}\sum_{i \in I}\psi(\mathbf{S};\hat{\theta}_{0},\hat{\eta}_{0}) = 0
+\end{align*}
+$$
+
+Also recall the standard PLR score function, which may be further expanded:
+
+$$
+\begin{align*}
+\psi(\mathbf{S};\theta,\eta) := [\mathbf{Y} - \ell(\mathbf{X}) - \theta(\mathbf{D} - m(\mathbf{X}))][\mathbf{D} - m(\mathbf{X})]\ \\
+= -\theta(\mathbf{D} - m(\mathbf{X}))^{2} + (\mathbf{Y} - \ell(\mathbf{X}))(\mathbf{D} - m(\mathbf{X}))
+\end{align*}
+$$
+
+Solving the moment-condition estimator gives:[^91]
+
+[^91]: The distribution of the mean operator $\left(\frac{1}{n}\sum_{i \in I}\right)$ and the constant ($-\hat{\theta}$) follows from the linearity of expectation.
+
+$$
+\begin{align*}
+0 = \frac{1}{n}\sum_{i \in I}[-\hat{\theta}_{0}(\mathbf{D} - \hat{m}(\mathbf{X}))^{2} + (\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X}))] \\
+\Longrightarrow 0 = -\hat{\theta}_{0}\frac{1}{n}\sum_{i \in I}(\mathbf{D} - \hat{m}(\mathbf{X}))^{2} + \frac{1}{n}\sum_{i \in I}(\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X})) \\
+\Longrightarrow \hat{\theta}_{0}\frac{1}{n}\sum_{i \in I}(\mathbf{D} - \hat{m}(\mathbf{X}))^{2} = \frac{1}{n}\sum_{i \in I}(\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X})) \\
+\Longrightarrow \hat{\theta}_{0} = \frac{\sum_{i \in I}(\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X}))}{\sum_{i \in I} (\mathbf{D} - \hat{m}(\mathbf{X}))^{2}}
+\end{align*}
+$$
+
+Where:
+
+$$
+\begin{align*}
+\mathbf{\hat{Q}} = \mathbf{Y} - \hat{\ell}_{0}(\mathbf{X}) \\
+\mathbf{\hat{V}} = \mathbf{D} - \hat{m}_{0}(\mathbf{X})
+\end{align*}
+$$
+
+And where $\hat{\ell}_{0}$ and $\hat{m}_{0}$ are plug-in estimators of the conditional expectations:
+
+$$
+\begin{align*}
+\ell_{0}(\mathbf{X}) = \mathbb{E}[\mathbf{Y}|\mathbf{X}] \\
+m_{0}(\mathbf{X}) = \mathbb{E}[\mathbf{D}|\mathbf{X}]
+\end{align*}
+$$
+
+Now, consider a simple linear regression, wherein OLS predicts an outcome $\mathbf{Y}$ from a single treatment $\mathbf{D}$.[^92] The true coefficient on the explanator may be expressed as:[^93]
+
+[^92]: To wit: $\mathbf{Y} = \beta_{0} + \beta_{1}\mathbf{D} + \epsilon_{i}$
+
+[^93]: That is, $\beta_{1} = \frac{\text{Cov}(\mathbf{D}, \mathbf{Y})}{\text{Var}(\mathbf{D})}$. In the bivariate case, $\mathbb{E}[\mathbf{D}] = \bar{\mathbf{D}}$ and $\mathbb{E}[\mathbf{Y}] = \bar{\mathbf{Y}}$. The basic formula may be found in Rice (2007, p. 544), for example, albeit in scalar notation.
+
+$$
+\begin{align*}
+\beta_{1} = \frac{\sum_{i \in I}(\mathbf{Y} - \mathbb{E}[\mathbf{Y}])(\mathbf{D} - \mathbb{E}[\mathbf{D}])}{\sum_{i \in I} (\mathbf{D} - \mathbb{E}[\mathbf{D}])^{2}}
+\end{align*}
+$$
+
+Or, in the multivariate case, with covariates $\mathbf{X}$, regressing residualized $\mathbf{Y}$ on residualized $\mathbf{D}$ implies (as per the FWL Theorem):
+
+$$
+\begin{align*}
+\beta_{1} = \frac{\sum_{i \in I}(\mathbf{Y} - \mathbb{E}[\mathbf{Y|X}])(\mathbf{D} - \mathbb{E}[\mathbf{D|X}])}{\sum_{i \in I} (\mathbf{D} - \mathbb{E}[\mathbf{D|X}])^{2}} \\
+= \frac{\sum_{i \in I}(\mathbf{Y} - \ell_{0}(\mathbf{X}))(\mathbf{D} - m_{0}(\mathbf{X}))}{\sum_{i \in I} (\mathbf{D} - m_{0}(\mathbf{X}))^{2}}
+\end{align*}
+$$
+
+The solutions to $\hat{\theta}_{0}$ and the sample analogue $\hat{\beta}_{1}$ of $\beta_{1}$ are thus the selfsame, sufficing to illustrate how partialling out---that is, regressing $\mathbf{\hat{Q}}$ on $\mathbf{\hat{V}}$ to obtain $\hat{\theta}_{0}$ using OLS---implies the standard PLR score function.
+
+### Appendix F: Model Runtimes {#sec-appx-f}
