@@ -206,3 +206,17 @@
 
 # 10/8/25 #
 -Have experimented with scikit-learn workflow futher, particularly for Chapter 3. Unfortunately, the performance metrics for the nusiance parameters (MSE) are very poor (e.g., MSE for ml_l = 7-ish). I've tried to make the preprocessing prior to RidgeCV resemble that of the glmnet models (manual + automatic, e.g., standardizing of Y and X vars, random [across models] grouped resampling, etc.), but I'm still getting the same poor results. Will push some of my "test" scripts, but henceforth will be relying almost exclusively on mlr3 models.
+-Worth noting that the scikit-learn coefficients were generally significant, while the mlr3 ones have not been.
+
+# 10/21/25 #
+-Tuning result (e.g., regr.mse for each lambda) represents the average result applied to each fold. See default relationship between "aggregator" and "average" in https://mlr3.mlr-org.com/reference/Measure.html
+
+# 4/23/26 #
+-To confirm: in model prep scripts, am re-attaching `cow` and `year` variables, because although they are "dummied," they are still needed for grouping/clustering at the tuning/fitting steps.
+
+# 6/22/26 #
+-Technically, grouped resampling/cluster-robust DML resampling by "region" does so by both region and country: since countries may only belong to one region, they will always appear in either the training or test set---never simultaneously both. As a result, there's a good argument to be made that the "region" models do the most to alleviate data leakage.
+-Grouped resampling by region + year is technically possible in mlr3. Code-wise, this would work by creating a new variable that interacts region*year and groups on that basis (e.g., north-america_2000, north-america_2001, etc.). However, you'd still probably have observations of the same region (e.g., north-america) or the same year (e.g., 2000, 2001, etc.) in both the training and test sets, hence why it doesn't work in terms of establishing true group-wise mutual exclusivity.
+
+# 7/9/26 #
+-Heuristic (and general) note on bias: makes model overly simple, causing estimated target parameter (e.g., $\hat{\theta}$) to differ increasingly from the true target parameter (e.g., $\theta$).

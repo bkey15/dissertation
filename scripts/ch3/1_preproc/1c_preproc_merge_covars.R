@@ -50,6 +50,7 @@ vdem <- vdem |>
   select(
     cow,
     year,
+    e_v2x_polyarchy_5C,
     v2elwestmon,
     v2elmonden,
     v2elmonref,
@@ -222,7 +223,8 @@ one_sided_violence <- one_sided_violence |>
 ## vdem, hr_score, & ch.2 covars
 merge_base <- vdem |> 
   left_join(bits_final) |> 
-  relocate(hr_score, .after = year)
+  relocate(hr_score, .after = year) |> 
+  relocate(e_v2x_polyarchy_5C, .after = v2x_polyarchy)
 
 ## wdi vars
 merge_base <- merge_base |> 
@@ -268,11 +270,6 @@ merge_base <- merge_base |>
 ## remove cases where hr_score is NA
 merge_base <- merge_base |> 
   filter(!is.na(hr_score))
-
-## remove non-glb_s cases (save for Slovenia & Saudi Arabia, only cases w/ sanctions where glb_s == 0)
-merge_base <- merge_base |> 
-  filter(glb_s == 1 | !is.na(any_inforce)) |> 
-  select(-glb_s)
 
 # save ----
 merge_base |> 

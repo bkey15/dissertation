@@ -3,7 +3,7 @@ library(tidyverse)
 library(here)
 
 # load data ----
-files <- dir("data/ch3/results/fits/dml_lasso/pool/", full.names = TRUE)
+files <- dir("data/ch3/results/fits/dml_regularize/pool/", full.names = TRUE)
 
 for(file in files){
   load(here(file))

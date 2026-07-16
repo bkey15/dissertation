@@ -5,6 +5,8 @@ library(tidyverse)
 library(here)
 library(igraph)
 library(ggraph)
+library(ggforce)
+library(tidygraph)
 library(latex2exp)
 library(patchwork)
 library(gt)
@@ -55,14 +57,85 @@ imp_base_3 <- imp_base |>
 rm(imp_base)
 
 # make flowcharts ----
+## methodology ----
+flowchart_tbl_0 <- tibble(
+  from = c(
+    "Data Wrangling",
+    "Multiple Imputation (1)",
+    "Lags & Start-Years",
+    "DML"
+    ),
+  to = c(
+    "Multiple Imputation (1)",
+    "Lags & Start-Years",
+    "DML",
+    "Multiple Imputation (2)"
+    )
+  )
+
+graph_init_0 <- flowchart_tbl_0 |> 
+  graph_from_data_frame()
+coords_0 <- graph_init_0 |> 
+  layout_as_tree(root = "Data Wrangling")
+
+left_curve <- tibble(
+  x = c(0, -0.1, 0),
+  y = c(3, 1.5, 0),
+  group = "left"
+  )
+right_curve <- tibble(
+  x = c(0, 0.1, 0),
+  y = c(3, 1.5, 0),
+  group = "right"
+  )
+curves <- left_curve |> 
+  full_join(right_curve)
+
+method_flow_viz <- graph_init_0 |> 
+  ggraph(layout = coords_0) +
+  geom_edge_link(
+    arrow = arrow(length = unit(2, "mm")),
+    aes(end_cap = square(10, "mm")),
+    color = "#586e75"
+    ) +
+  geom_bezier(
+    data = curves,
+    aes(
+      x = x,
+      y = y,
+      group = group
+      ),
+    linetype = "dotted",
+    color = "#586e75"
+    ) +
+  geom_node_label(
+    aes(label = name),
+    color = "#586e75"
+    ) +
+  theme_graph(background = "#fdf6e3") +
+  plot_annotation(
+    title = "Methodology",
+    subtitle = "A Bird's-Eye View"
+    ) &
+  theme(
+    plot.title = element_text(color = "#586e75"),
+    plot.subtitle = element_text(color = "#586e75"),
+    plot.background = element_rect("#fdf6e3"),
+    legend.position = "none"
+    )
+
 ## preproc 1 ----
 ### note: D = initial dataset (vars collated and created), M = imputed dataset, Y = start year
 flowchart_tbl_1 <- tibble(
   from = c(
-    "S", "S", "S", "S", "S", "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "p[1]", "p[1]", "p[2]", "p[2]", "p[3]", "p[3]", "p[4]", "p[4]", "p[5]", "p[5]"
+    rep("S", 5),
+    paste0("m[", 1:5, "]"),
+    str_sort(rep(paste0("p[", 1:5, "]"), 2))
     ),
   to = c(
-    "m[1]", "m[2]", "m[3]", "m[4]", "m[5]", "p[1]", "p[2]", "p[3]", "p[4]", "p[5]", "p[1]r[1]", "p[1]r[2]", "p[2]r[1]", "p[2]r[2]", "p[3]r[1]", "p[3]r[2]", "p[4]r[1]", "p[4]r[2]", "p[5]r[1]", "p[5]r[2]"
+    paste0("m[", 1:5, "]"),
+    paste0("p[", 1:5, "]"),
+    str_sort(paste0("p[", rep(1:5, 2), "]t[", 1:2, "]"))
     )
   )
 
@@ -78,16 +151,16 @@ new_labels_1 <- c(
   "p[3]" = "p[3]",
   "p[4]" = "p[4]",
   "p[5]" = "p[5]",
-  "p[1]r[1]" = "r[list(1,1)]",
-  "p[1]r[2]" = "r[list(1,2)]",
-  "p[2]r[1]" = "r[list(2,1)]",
-  "p[2]r[2]" = "r[list(2,2)]",
-  "p[3]r[1]" = "r[list(3,1)]",
-  "p[3]r[2]" = "r[list(3,2)]",
-  "p[4]r[1]" = "r[list(4,1)]",
-  "p[4]r[2]" = "r[list(4,2)]",
-  "p[5]r[1]" = "r[list(5,1)]",
-  "p[5]r[2]" = "r[list(5,2)]"
+  "p[1]t[1]" = "t[list(1,1)]",
+  "p[1]t[2]" = "t[list(1,2)]",
+  "p[2]t[1]" = "t[list(2,1)]",
+  "p[2]t[2]" = "t[list(2,2)]",
+  "p[3]t[1]" = "t[list(3,1)]",
+  "p[3]t[2]" = "t[list(3,2)]",
+  "p[4]t[1]" = "t[list(4,1)]",
+  "p[4]t[2]" = "t[list(4,2)]",
+  "p[5]t[1]" = "t[list(5,1)]",
+  "p[5]t[2]" = "t[list(5,2)]"
   )
 
 graph_init_1 <- flowchart_tbl_1 |> 
@@ -98,7 +171,10 @@ coords_1 <- graph_init_1 |>
 
 preproc_1_g <- graph_init_1 |> 
   ggraph(layout = coords_1) +
-  geom_edge_link(color = "#586e75") +
+  geom_edge_link(
+    arrow = arrow(length = unit(2, "mm")),
+    aes(end_cap = square(10, "mm")),
+    color = "#586e75") +
   geom_node_label(
     parse = TRUE,
     aes(label = new_labels_1),
@@ -107,21 +183,25 @@ preproc_1_g <- graph_init_1 |>
   theme_graph(background = "#fdf6e3")
 
 ## preproc 2 ----
-### Y = start year, L = lagged imputed dataset
+### Y = start year, V = lagged imputed dataset
 flowchart_tbl_2 <- tibble(
-  from = c("r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]", "r[list(i,j)]"),
-  to = c("l[1]", "l[2]", "l[3]", "l[4]", "l[5]", "l[6]", "l[7]", "l[8]")
+  from = rep("t[list(i,j)]", 8),
+  to = paste0("v[list(i,j,", 1:8, ")]")
   )
 
 graph_init_2 <- flowchart_tbl_2 |> 
   graph_from_data_frame()
 
 coords_2 <- graph_init_2 |> 
-  layout_as_tree(root = "r[list(i,j)]")
+  layout_as_tree(root = "t[list(i,j)]")
 
 preproc_2_g <- graph_init_2 |> 
   ggraph(layout = coords_2) +
-  geom_edge_link(color = "#586e75") +
+  geom_edge_link(
+    arrow = arrow(length = unit(2, "mm")),
+    aes(end_cap = square(10, "mm")),
+    color = "#586e75"
+    ) +
   geom_node_label(
     parse = TRUE,
     aes(label = name),
@@ -142,64 +222,351 @@ preproc_flow_viz <- preproc_1_g / preproc_2_g + plot_annotation(
   )
 
 ## dml ----
-### note: L = single lag-model, R = repeat, F = fold, B = final repeat fit (using "best" lambda), F = selected repeat fit (median of these)
+### tuning ----
+#### get base tbl
 flowchart_tbl_3 <- tibble(
   from = c(
-    "l[list(i,j,p)]", "l[list(i,j,p)]", "l[list(i,j,p)]", "r[1]", "r[1]", "r[1]", "r[1]", "r[1]", "r[2]", "r[2]", "r[2]", "r[2]", "r[2]", "r[3]", "r[3]", "r[3]", "r[3]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[4]", "r[1]k[5]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[4]", "r[2]k[5]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[4]", "r[3]k[5]", "theta[1]", "theta[2]", "theta[3]"
+    rep("v[list(i,j,l)]", 9),
+    "dummy",
+    "lambda",
+    paste0("k[", 1:5, "]"),
+    "tilde(lambda)",
+    "hat(lambda)",
+    "dummy[list(\u2113,1)]",
+    "lambda[list(\u2113,1)]",
+    paste0("lambda[list(\u2113,1)]e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,1)]",
+    "hat(lambda)[\u2113]",
+    "dummy[list(\u2113,n)]",
+    "lambda[list(\u2113,n)]",
+    paste0("lambda[list(\u2113,n)]e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,n)]",
+    "hat(lambda)[list(n,none)]",
+    "dummy[list(m,1)]",
+    "lambda[list(m,1)]",
+    paste0("lambda[list(m,1)]e[", 1:5, "]"),
+    "tilde(lambda)[list(m,1)]",
+    "hat(lambda)[m]"
     ),
   to = c(
-    "r[1]", "r[2]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[4]", "r[1]k[5]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[4]", "r[2]k[5]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[4]", "r[3]k[5]", "theta[1]", "theta[1]", "theta[1]", "theta[1]", "theta[1]", "theta[2]", "theta[2]", "theta[2]", "theta[2]", "theta[2]", "theta[3]", "theta[3]", "theta[3]", "theta[3]", "theta[3]", "tilde(theta)[list(i,j,p)]", "tilde(theta)[list(i,j,p)]", "tilde(theta)[list(i,j,p)]"
+    "dummy",
+    "lambda",
+    paste0("k[", 1:5, "]"),
+    "tilde(lambda)",
+    "hat(lambda)",
+    "dummy[list(\u2113,1)]",
+    "lambda[list(\u2113,1)]",
+    paste0("lambda[list(\u2113,1)]e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,1)]",
+    "hat(lambda)[\u2113]",
+    "dummy[list(\u2113,n)]",
+    "lambda[list(\u2113,n)]",
+    paste0("lambda[list(\u2113,n)]e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,n)]",
+    "hat(lambda)[list(n,none)]",
+    "dummy[list(m,1)]",
+    "lambda[list(m,1)]",
+    paste0("lambda[list(m,1)]e[", 1:5, "]"),
+    "tilde(lambda)[list(m,1)]",
+    "hat(lambda)[m]",
+    "dummy[list(m,n)]",
+    "lambda[list(m,n)]",
+    paste0("lambda[list(m,n)]e[", 1:5, "]"),
+    "tilde(lambda)[list(m,n)]",
+    "hat(lambda)[list(m,none)]"
     )
   )
 
+#### get new labels
 new_labels_3 <- c(
-  "l[list(i,j,p)]" = "l[list(i,j,p)]",
+  "v[list(i,j,l)]" = "v[list(i,j,l)]",
+  "dummy" = NA,
+  "lambda" = NA,
+  "k[1]" = "k[1]",
+  "k[2]" = "k[2]",
+  "k[3]" = "k[3]",
+  "k[4]" = "k[4]",
+  "k[5]" = "k[5]",
+  "tilde(lambda)" = NA,
+  "hat(lambda)" = NA,
+  "dummy[list(\u2113,1)]" = NA,
+  "lambda[list(\u2113,1)]" = "lambda[list(\u2113,1)]",
+  "lambda[list(\u2113,1)]e[1]" = "e[1]",
+  "lambda[list(\u2113,1)]e[2]" = "e[2]",
+  "lambda[list(\u2113,1)]e[3]" = "e[3]",
+  "lambda[list(\u2113,1)]e[4]" = "e[4]",
+  "lambda[list(\u2113,1)]e[5]" = "e[5]",
+  "tilde(lambda)[list(\u2113,1)]" = "tilde(lambda)[list(\u2113,1)]",
+  "hat(lambda)[\u2113]" = "hat(lambda)[\u2113]",
+  "dummy[list(\u2113,n)]" = NA,
+  "lambda[list(\u2113,n)]" = "lambda[list(\u2113,n)]",
+  "lambda[list(\u2113,n)]e[1]" = "e[1]",
+  "lambda[list(\u2113,n)]e[2]" = "e[2]",
+  "lambda[list(\u2113,n)]e[3]" = "e[3]",
+  "lambda[list(\u2113,n)]e[4]" = "e[4]",
+  "lambda[list(\u2113,n)]e[5]" = "e[5]",
+  "tilde(lambda)[list(\u2113,n)]" = "tilde(lambda)[list(\u2113,n)]",
+  "hat(lambda)[list(n,none)]" = NA,
+  "dummy[list(m,1)]" = NA,
+  "lambda[list(m,1)]" = "lambda[list(m,1)]",
+  "lambda[list(m,1)]e[1]" = "e[1]",
+  "lambda[list(m,1)]e[2]" = "e[2]",
+  "lambda[list(m,1)]e[3]" = "e[3]",
+  "lambda[list(m,1)]e[4]" = "e[4]",
+  "lambda[list(m,1)]e[5]" = "e[5]",
+  "tilde(lambda)[list(m,1)]" = "tilde(lambda)[list(m,1)]",
+  "hat(lambda)[m]" = "hat(lambda)[m]",
+  "dummy[list(m,n)]" = NA,
+  "lambda[list(m,n)]" = "lambda[list(m,n)]",
+  "lambda[list(m,n)]e[1]" = "e[1]",
+  "lambda[list(m,n)]e[2]" = "e[2]",
+  "lambda[list(m,n)]e[3]" = "e[3]",
+  "lambda[list(m,n)]e[4]" = "e[4]",
+  "lambda[list(m,n)]e[5]" = "e[5]",
+  "tilde(lambda)[list(m,n)]" = "tilde(lambda)[list(m,n)]",
+  "hat(lambda)[list(m,none)]" = NA
+  )
+
+#### get base tree coordinates
+graph_init_3 <- graph_from_data_frame(flowchart_tbl_3)
+coords_3 <- layout_as_tree(graph_init_3, root = "v[list(i,j,l)]")
+
+#### add, remove, edit edges
+##### get vertex indices from: V(graph_init_3)$name
+graph_init_3 <- graph_init_3 |> 
+  add_edges(
+    c(
+      12, 13,
+      13, 14,
+      14, 15,
+      15, 16,
+      16, 17,
+      17, 18,
+      18, 19,
+      21, 22,
+      22, 23,
+      23, 24,
+      24, 25,
+      25, 26,
+      26, 27,
+      27, 19,
+      30, 31,
+      31, 32,
+      32, 33,
+      33, 34,
+      34, 35,
+      35, 36,
+      36, 37,
+      39, 40,
+      40, 41,
+      41, 42,
+      42, 43,
+      43, 44,
+      44, 45,
+      45, 37
+      )
+    )
+
+##### get edge indices from: print(E(graph_init_3), full = T)
+graph_init_3 <- graph_init_3 |> 
+  delete_edges(
+    c(1, 2, 8, 9, 10, 11, 17, 18, 19, 20, 26, 27, 28, 29, 35, 36, 37, 38, 44, 45)
+    )
+
+#### adjust coords
+coords_3 <- coords_3 |> 
+  as_tibble() |> 
+  mutate(
+    V2 = case_when(
+      V1 == 4 & V2 == 3 ~ 2.5, 
+      V1 == 4 & V2 == 1 ~ 0.5,
+      .default = V2
+      )
+    ) |> 
+  as.matrix()
+
+#### specify custom edges
+arrow_edges_base <- tibble(
+  node1.name = c(
+    rep("v[list(i,j,l)]", 5),
+    "lambda[list(\u2113,1)]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,1)]",
+    "lambda[list(\u2113,n)]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,n)]",
+    "lambda[list(m,1)]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(m,1)]",
+    "lambda[list(m,n)]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(m,n)]"
+    ),
+  x = c(rep(0, 5), rep(-3:3, 4)),
+  y = c(rep(5, 5), rep(3, 7), rep(2, 7), rep(1, 7), rep(0, 7)),
+  node2.name = c(
+    paste0("k[", 1:5, "]"),
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,1)]",
+    "hat(lambda)[\u2113]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(\u2113,n)]",
+    "hat(lambda)[\u2113]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(m,1)]",
+    "hat(lambda)[m]",
+    paste0("e[", 1:5, "]"),
+    "tilde(lambda)[list(m,n)]",
+    "hat(lambda)[m]"
+    ),
+  xend = c(-2:2, rep(-2:4, 4)),
+  yend = c(rep(4, 5), rep(3, 6), 2.5, rep(2, 6), 2.5, rep(1, 6), 0.5, rep(0, 6), 0.5),
+  edge.id = c(1:5, 26:53),
+  lty = rep("solid", 33),
+  label = case_when(
+    str_detect(node1.name, "^tilde") & str_detect(node1.name, "1\\)\\]$") ~ "either",
+    str_detect(node1.name, "^tilde") & str_detect(node1.name, "n\\)\\]$") ~ "or",
+    .default = NA
+    )
+  )
+
+label_edges <- arrow_edges_base |> 
+  filter(!is.na(label))
+arrow_edges <- arrow_edges_base |> 
+  filter(is.na(label)) |> 
+  select(-label)
+
+dot_edges <- tibble(
+  x = rep(-2:2, 4),
+  y = c(rep(4, 5), rep(3, 5), rep(2, 5), rep(1, 5)),
+  xend = rep(-2:2, 4),
+  yend = c(rep(3, 5), rep(2, 5), rep(1, 5), rep(0, 5)),
+  edge.id = c(6:25),
+  lty = rep("dotted", 20)
+  )
+
+#### finalize
+dml_flow_viz_1 <- graph_init_3 |> 
+  as_tbl_graph() |> 
+  ggraph(layout = coords_3) +
+  geom_edge_link(
+    data = arrow_edges,
+    arrow = arrow(length = unit(2, "mm")),
+    aes(
+      linetype = lty,
+      end_cap = square(10, "mm")
+      ),
+    color = "#586e75"
+    ) +
+  geom_edge_link(
+    data = label_edges,
+    arrow = arrow(length = unit(2, "mm")),
+    aes(
+      label = label,
+      linetype = lty,
+      end_cap = square(10, "mm")
+      ),
+    angle_calc = "along",
+    label_dodge = unit(2.5, "mm"),
+    label_push = unit(-1.5, "mm"),
+    label_size = 2.5,
+    label_colour = "#586e75",
+    color = "#586e75"
+    ) +
+  geom_edge_link(
+    data = dot_edges,
+    aes(
+      linetype = lty,
+      start_cap = square(1, "mm"),
+      end_cap = square(1, "mm")
+      ),
+    color = "#586e75"
+    ) +
+  geom_node_label(
+    parse = TRUE,
+    aes(label = new_labels_3),
+    color = "#586e75"
+    ) +
+  scale_edge_linetype_manual(
+    values = c(
+      "solid" = "solid",
+      "dotted" = "dotted",
+      show.legend = FALSE
+      )
+    ) +
+  theme_graph(
+    background = "#fdf6e3"
+    ) +
+  plot_annotation(
+    title = "DML Modeling",
+    subtitle = "Hyperparameter Tuning (Ridge)"
+    ) &
+  theme(
+    plot.title = element_text(color = "#586e75"),
+    plot.subtitle = element_text(color = "#586e75"),
+    plot.background = element_rect("#fdf6e3"),
+    legend.position = "none"
+    )
+
+### fits ----
+### note: L = single lag-model, R = repeat, F = fold, theta = final repeat fit (using "best" lambda), theta tilde = selected repeat fit (median of these)
+flowchart_tbl_4 <- tibble(
+  from = c(
+    "v[list(i,j,l)]", "v[list(i,j,l)]", "v[list(i,j,l)]", "r[1]", "r[1]", "r[1]", "r[1]", "r[1]", "r[2]", "r[2]", "r[2]", "r[2]", "r[2]", "r[3]", "r[3]", "r[3]", "r[3]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[...]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[...]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[...]", "r[3]k[K^2]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[3]"
+    ),
+  to = c(
+    "r[1]", "r[2]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[...]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[...]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[...]", "r[3]k[K^2]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]"
+    )
+  )
+
+new_labels_4 <- c(
+  "v[list(i,j,l)]" = "v[list(i,j,l)]",
   "r[1]" = "r[1]",
   "r[2]" = "r[2]",
   "r[3]" = "r[3]",
   "r[1]k[1]" = "k[1]",
   "r[1]k[2]" = "k[2]",
   "r[1]k[3]" = "k[3]",
-  "r[1]k[4]" = "k[4]",
-  "r[1]k[5]" = "k[5]",
+  "r[1]k[...]" = "k[...]",
+  "r[1]k[K^2]" = "k[K^2]",
   "r[2]k[1]" = "k[1]",
   "r[2]k[2]" = "k[2]",
   "r[2]k[3]" = "k[3]",
-  "r[2]k[4]" = "k[4]",
-  "r[2]k[5]" = "k[5]",
+  "r[2]k[...]" = "k[...]",
+  "r[2]k[K^2]" = "k[K^2]",
   "r[3]k[1]" = "k[1]",
   "r[3]k[2]" = "k[2]",
   "r[3]k[3]" = "k[3]",
-  "r[3]k[4]" = "k[4]",
-  "r[3]k[5]" = "k[5]",
-  "theta[1]" = "theta[1]",
-  "theta[2]" = "theta[2]",
-  "theta[3]" = "theta[3]",
-  "tilde(theta)[list(i,j,p)]" = "tilde(theta)[list(i,j,p)]"
+  "r[3]k[...]" = "k[...]",
+  "r[3]k[K^2]" = "k[K^2]",
+  "tilde(theta)[1]" = "tilde(theta)[1]",
+  "tilde(theta)[2]" = "tilde(theta)[2]",
+  "tilde(theta)[3]" = "tilde(theta)[3]",
+  "hat(theta)[list(i,j,l)]" = "hat(theta)[list(i,j,l)]"
   )
 
-graph_init_3 <- graph_from_data_frame(flowchart_tbl_3)
+graph_init_4 <- graph_from_data_frame(flowchart_tbl_4)
 
-coords_3 <- layout_as_tree(graph_init_3, root = "l[list(i,j,p)]")
-coords_3[which(V(graph_init_3)$name == "theta[1]"), ] <- coords_3[which(V(graph_init_3)$name == "r[1]k[3]"), ] + c(0, -1)
-coords_3[which(V(graph_init_3)$name == "theta[2]"), ] <- coords_3[which(V(graph_init_3)$name == "r[2]k[3]"), ] + c(0, -1)
-coords_3[which(V(graph_init_3)$name == "theta[3]"), ] <- coords_3[which(V(graph_init_3)$name == "r[3]k[3]"), ] + c(0, -1)
-coords_3[which(V(graph_init_3)$name == "tilde(theta)[list(i,j,p)]"), ] <- coords_3[which(V(graph_init_3)$name == "theta[2]"), ] + c(0, -1)
+coords_4 <- layout_as_tree(graph_init_4, root = "v[list(i,j,l)]")
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[1]"), ] <- coords_4[which(V(graph_init_4)$name == "r[1]k[3]"), ] + c(0, -1)
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] <- coords_4[which(V(graph_init_4)$name == "r[2]k[3]"), ] + c(0, -1)
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[3]"), ] <- coords_4[which(V(graph_init_4)$name == "r[3]k[3]"), ] + c(0, -1)
+coords_4[which(V(graph_init_4)$name == "hat(theta)[list(i,j,l)]"), ] <- coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] + c(0, -1)
 
-dml_flow_viz <- graph_init_3 |> 
-  ggraph(layout = coords_3) +
+dml_flow_viz_2 <- graph_init_4 |> 
+  ggraph(layout = coords_4) +
   geom_edge_link(color = "#586e75") +
   geom_node_label(
     parse = TRUE,
-    aes(label = new_labels_3),
+    aes(label = new_labels_4),
     color = "#586e75"
     ) +
   theme_graph(
     background = "#fdf6e3"
     ) +
   plot_annotation(
-    title = "DML Modelling",
-    subtitle = "Features Repeated K-Fold Cross-Validation"
+    title = "DML Modeling",
+    subtitle = TeX("With Repeated $K^2$ Cluster-Robust Cross-Fitting")
     ) &
   theme(
     plot.title = element_text(color = "#586e75"),
@@ -207,24 +574,123 @@ dml_flow_viz <- graph_init_3 |>
     plot.background = element_rect("#fdf6e3")
     )
 
-## pool ----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 flowchart_tbl_4 <- tibble(
   from = c(
-    "tilde(theta)[list(1,j,p)]",
-    "tilde(theta)[list(2,j,p)]",
-    "tilde(theta)[list(3,j,p)]",
-    "tilde(theta)[list(4,j,p)]",
-    "tilde(theta)[list(5,j,p)]"
+    "v[list(i,j,l)]", "v[list(i,j,l)]", "v[list(i,j,l)]", "r[1]", "r[1]", "r[1]", "r[2]", "r[2]", "r[2]", "r[3]", "r[3]", "r[3]", "r[1]k[1]", "r[1]k[1]", "r[1]k[...]", "r[1]k[...]", "r[1]k[K^2]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[1]", "r[2]k[...]", "r[2]k[...]", "r[2]k[K^2]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[1]", "r[3]k[...]", "r[3]k[...]", "r[3]k[K^2]", "r[3]k[K^2]", "r[1]k[1]e[list(1,\u2113)]", "r[1]k[1]e[list(1,m)]", "r[1]k[...]e[list(...,\u2113)]", "r[1]k[...]e[list(...,m)]", "r[1]k[K^2]e[list(K^2,\u2113)]", "r[1]k[K^2]e[list(K^2,m)]", "r[2]k[1]e[list(1,\u2113)]", "r[2]k[1]e[list(1,m)]", "r[2]k[...]e[list(...,\u2113)]", "r[2]k[...]e[list(...,m)]", "r[2]k[K^2]e[list(K^2,\u2113)]", "r[2]k[K^2]e[list(K^2,m)]", "r[3]k[1]e[list(1,\u2113)]", "r[3]k[1]e[list(1,m)]", "r[3]k[...]e[list(...,\u2113)]", "r[3]k[...]e[list(...,m)]", "r[3]k[K^2]e[list(K^2,\u2113)]", "r[3]k[K^2]e[list(K^2,m)]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[3]"
     ),
-  to = c(rep("theta[list(j,p)]", 5))
+  to = c(
+    "r[1]", "r[2]", "r[3]", "r[1]k[1]", "r[1]k[...]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[...]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[...]", "r[3]k[K^2]", "r[1]k[1]e[list(1,\u2113)]", "r[1]k[1]e[list(1,m)]", "r[1]k[...]e[list(...,\u2113)]", "r[1]k[...]e[list(...,m)]", "r[1]k[K^2]e[list(K^2,\u2113)]", "r[1]k[K^2]e[list(K^2,m)]", "r[2]k[1]e[list(1,\u2113)]", "r[2]k[1]e[list(1,m)]", "r[2]k[...]e[list(...,\u2113)]", "r[2]k[...]e[list(...,m)]", "r[2]k[K^2]e[list(K^2,\u2113)]", "r[2]k[K^2]e[list(K^2,m)]", "r[3]k[1]e[list(1,\u2113)]", "r[3]k[1]e[list(1,m)]", "r[3]k[...]e[list(...,\u2113)]", "r[3]k[...]e[list(...,m)]", "r[3]k[K^2]e[list(K^2,\u2113)]", "r[3]k[K^2]e[list(K^2,m)]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]"
+    )
+  )
+
+new_labels_4 <- c(
+  "v[list(i,j,l)]" = "v[list(i,j,l)]",
+  "r[1]" = "r[1]",
+  "r[2]" = "r[2]",
+  "r[3]" = "r[3]",
+  "r[1]k[1]" = "k[1]",
+  "r[1]k[...]" = "k[...]",
+  "r[1]k[K^2]" = "k[K^2]",
+  "r[2]k[1]" = "k[1]",
+  "r[2]k[...]" = "k[...]",
+  "r[2]k[K^2]" = "k[K^2]",
+  "r[3]k[1]" = "k[1]",
+  "r[3]k[...]" = "k[...]",
+  "r[3]k[K^2]" = "k[K^2]",
+  "r[1]k[1]e[list(1,\u2113)]" = "e[list(1,\u2113)]",
+  "r[1]k[1]e[list(1,m)]" = "e[list(1,m)]",
+  "r[1]k[...]e[list(1,\u2113)]" = "e[list(...,\u2113)]",
+  "r[1]k[...]e[list(1,m)]" = "e[list(...,m)]",
+  "r[1]k[K^2]e[list(1,\u2113)]" = "e[list(K^2,\u2113)]",
+  "r[1]k[K^2]e[list(1,m)]" = "e[list(K^2,m)]",
+  "r[2]k[1]e[list(1,\u2113)]" = "e[list(1,\u2113)]",
+  "r[2]k[1]e[list(1,m)]" = "e[list(1,m)]",
+  "r[2]k[...]e[list(1,\u2113)]" = "e[list(...,\u2113)]",
+  "r[2]k[...]e[list(1,m)]" = "e[list(...,m)]",
+  "r[2]k[K^2]e[list(1,\u2113)]" = "e[list(K^2,\u2113)]",
+  "r[2]k[K^2]e[list(1,m)]" = "e[list(K^2,m)]",
+  "r[3]k[1]e[list(1,\u2113)]" = "e[list(1,\u2113)]",
+  "r[3]k[1]e[list(1,m)]" = "e[list(1,m)]",
+  "r[3]k[...]e[list(1,\u2113)]" = "e[list(...,\u2113)]",
+  "r[3]k[...]e[list(1,m)]" = "e[list(...,m)]",
+  "r[3]k[K^2]e[list(1,\u2113)]" = "e[list(K^2,\u2113)]",
+  "r[3]k[K^2]e[list(1,m)]" = "e[list(K^2,m)]",
+  "tilde(theta)[1]" = "tilde(theta)[1]",
+  "tilde(theta)[2]" = "tilde(theta)[2]",
+  "tilde(theta)[3]" = "tilde(theta)[3]",
+  "hat(theta)[list(i,j,l)]" = "hat(theta)[list(i,j,l)]"
   )
 
 graph_init_4 <- graph_from_data_frame(flowchart_tbl_4)
-coords_4 <- layout_as_tree(graph_init_4, root = "theta[list(j,p)]", flip.y = F)
 
-pool_flow_viz <- graph_init_4 |> 
+coords_4 <- layout_as_tree(graph_init_4, root = "v[list(i,j,l)]")
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[1]"), ] <- coords_4[which(V(graph_init_4)$name == "r[1]k[...]"), ] + c(0, -2)
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] <- coords_4[which(V(graph_init_4)$name == "r[2]k[...]"), ] + c(0, -2)
+coords_4[which(V(graph_init_4)$name == "tilde(theta)[3]"), ] <- coords_4[which(V(graph_init_4)$name == "r[3]k[...]"), ] + c(0, -2)
+coords_4[which(V(graph_init_4)$name == "hat(theta)[list(i,j,l)]"), ] <- coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] + c(0, -1)
+
+dml_flow_viz_2 <- graph_init_4 |> 
   ggraph(layout = coords_4) +
   geom_edge_link(color = "#586e75") +
+  geom_node_label(
+    parse = TRUE,
+    aes(label = new_labels_4),
+    color = "#586e75"
+  ) +
+  theme_graph(
+    background = "#fdf6e3"
+  ) +
+  plot_annotation(
+    title = "DML Modeling",
+    subtitle = TeX("With Repeated $K^2$ Cluster-Robust Cross-Fitting")
+  ) &
+  theme(
+    plot.title = element_text(color = "#586e75"),
+    plot.subtitle = element_text(color = "#586e75"),
+    plot.background = element_rect("#fdf6e3")
+  )
+
+
+
+
+
+
+## pool ----
+flowchart_tbl_5 <- tibble(
+  from = paste0("hat(theta)[list(", 1:5, ",j,l)]"),
+  to = rep("hat(theta)[list(j,l)]", 5)
+  )
+
+graph_init_5 <- graph_from_data_frame(flowchart_tbl_5)
+coords_5 <- layout_as_tree(graph_init_5, root = "hat(theta)[list(j,l)]", flip.y = F)
+
+pool_flow_viz <- graph_init_5 |> 
+  ggraph(layout = coords_5) +
+  geom_edge_link(
+    arrow = arrow(length = unit(2, "mm")),
+    aes(end_cap = square(10, "mm")),
+    angle_calc = "along",
+    label_dodge = unit(2.5, "mm"),
+    label_size = 2.5,
+    label_colour = "#586e75",
+    color = "#586e75"
+    ) +
   geom_node_label(
     parse = TRUE,
     aes(label = name),
@@ -235,7 +701,7 @@ pool_flow_viz <- graph_init_4 |>
     ) +
   plot_annotation(
     title = "Pooling of Coefficients",
-    subtitle = TeX("$\\tilde{\\theta}_{i..n,j,p}$ Generated from DML Modelling")
+    subtitle = TeX("All $\\hat{\\theta}_{i,j,l}$ Generated from DML Modeling")
     ) &
   theme(
     plot.title = element_text(color = "#586e75"),
@@ -639,6 +1105,13 @@ appx_d_viz <- appx_d_dat |>
 
 # save ----
 ggsave(
+  method_flow_viz,
+  width = 1200,
+  height = 1740,
+  units = "px",
+  file = here("visualizations/memos/method_flow_viz.png")
+  )
+ggsave(
   preproc_flow_viz,
   width = 1787,
   height = 2587,
@@ -646,11 +1119,18 @@ ggsave(
   file = here("visualizations/memos/preproc_flow_viz.png")
   )
 ggsave(
-  dml_flow_viz,
+  dml_flow_viz_1,
   width = 2587,
   height = 1787,
   units = "px",
-  file = here("visualizations/memos/dml_flow_viz.png")
+  file = here("visualizations/memos/dml_flow_viz_1.png")
+  )
+ggsave(
+  dml_flow_viz_2,
+  width = 2587,
+  height = 1787,
+  units = "px",
+  file = here("visualizations/memos/dml_flow_viz_2.png")
   )
 ggsave(
   pool_flow_viz,

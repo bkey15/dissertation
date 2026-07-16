@@ -4,24 +4,13 @@
 library(tidyverse)
 library(here)
 library(mice)
+library(DoubleML)
 library(tidymodels)
 library(data.table)
 library(janitor)
-library(reticulate)
 
 # load data ----
 load(here("data/ch3/results/imputations/imp_t_lags.rda"))
-
-# load python modules ----
-py_require(packages = "doubleml")
-py_require(packages = "scikit-learn")
-py_require(packages = "joblib")
-py_require(packages = "numpy")
-
-dml <- import("doubleml")
-skl <- import("sklearn")
-jlb <- import("joblib")
-np <- import("numpy")
 
 # get imputed data ----
 ## note: code below is drawn from earlier chapters; can be used in the event other start-dates are utilized
@@ -53,22 +42,32 @@ for(year in start_yrs){
 
 # get main specs ----
 ## treat names ----
-treat_names <- c(
-  "any_inforce_X1",
-  "v2x_polyarchy_x_any_inforce"
+treat_names <- "any_inforce_X1"
+
+## interact names ----
+interact_names <- c(
+  "v2x_polyarchy_x_any_inforce",
+  "e_v2x_polyarchy_5C_x_any_inforce"
+  )
+
+## poly_names ----
+poly_names <- c(
+  "v2x_polyarchy",
+  "e_v2x_polyarchy_5C"
   )
 
 ## covar names ----
 ### get initial specs ----
-covar_names_all <- list()
+single_treat_covars_all <- list()
+multi_treat_covars_all <- list()
 
 ### finalize ----
-#### standard ----
+#### single treat ----
 for(year in start_yrs){
   lags <- imp_t_dfs[[year]]
   lag_names <- names(lags)
   for(lag in lag_names){
-    covar_names <- imp_t_dfs[[year]][[lag]][[1]] |> 
+    covar_names_base <- imp_t_dfs[[year]][[lag]][[1]] |> 
       recipe(hr_score ~ .) |> 
       step_dummy(all_nominal_predictors()) |> 
       prep() |> 
@@ -78,39 +77,57 @@ for(year in start_yrs){
           c(
             "n_ems",
             "any_inforce",
+            "polyarchy",
             "hr_score"
             )
           )
         )|> 
       names()
-    
-    covar_names_all[["std"]][[as.character(year)]][[as.character(lag)]] <- covar_names
+    for(poly in poly_names){
+      k <- treat_names
+      covar_names <- covar_names_base |> 
+        append(poly)
+      single_treat_covars_all[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(poly)]] <- covar_names
+    }
   }
 }
 
-#### multi treat manual ----
-man_stat <- covar_names_all |> 
-  names()
+#### multi treat (manual) ----
+##### main treat ----
+for(year in start_yrs){
+  lags <- single_treat_covars_all[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    lag_covars <- lags[[lag]]
+    treats <- names(lag_covars)
+    for(treat in treats){
+      treat_covars <- lag_covars[[treat]]
+      poly_stat <- names(treat_covars)
+      for(j in seq_along(poly_stat)){
+        k <- interact_names[[j]]
+        covar_names <- treat_covars[[j]] |> 
+          append(k)
+        multi_treat_covars_all[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(k)]] <- covar_names
+      }
+    }
+  }
+}
 
-for(stat in man_stat){
-  years <- covar_names_all[[stat]]
-  year_names <- names(years)
-  for(year in year_names){
-    lags <- years[[year]]
-    lag_names <- names(lags)
-    for(lag in lag_names){
-      lag_covars <- lags[[lag]]
-      for(treat in treat_names){
-        if(str_detect(treat, "inforce_X1")){
-          covar_names <- lag_covars |> 
-            append(str_subset(treat_names, "polyarchy"))
-          covar_names_all[["multi_man"]][[as.character(treat)]][[as.character(year)]][[as.character(lag)]] <- covar_names
-        }
-        else if(str_detect(treat, "polyarchy")){
-          covar_names <- lag_covars |> 
-            append(str_subset(treat_names, "inforce_X1"))
-          covar_names_all[["multi_man"]][[as.character(treat)]][[as.character(year)]][[as.character(lag)]] <- covar_names
-        }
+##### interactions ----
+for(year in start_yrs){
+  lags <- single_treat_covars_all[[year]]
+  lag_names <- names(lags)
+  for(lag in lag_names){
+    lag_covars <- lags[[lag]]
+    treats <- names(lag_covars)
+    for(treat in treats){
+      treat_covars <- lag_covars[[treat]]
+      poly_stat <- names(treat_covars)
+      for(j in seq_along(poly_stat)){
+        k <- interact_names[[j]]
+        covar_names <- treat_covars[[j]] |> 
+          append(treat)
+        multi_treat_covars_all[[as.character(year)]][[as.character(lag)]][[as.character(k)]][[as.character(treat)]] <- covar_names
       }
     }
   }
@@ -128,7 +145,6 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[["std"]][[year]][[lag]]
     for(i in m){
       df_cow_yr <- lag_df[[i]] |> 
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
@@ -144,19 +160,24 @@ for(year in start_yrs){
         select(-cow_yr) |> 
         as.data.table()
       for(treat in treat_names){
-        if(str_detect(treat, "inforce_X1")){
-        single_treat[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |> 
-          select(
-            all_of(
-              c(y_name, cl_names, treat, covar_names)
+        treat_covars <- single_treat_covars_all[[year]][[lag]][[treat]]
+        poly_stat <- names(treat_covars)
+        for(j in seq_along(poly_stat)){
+          k <- treat_covars[[j]]
+          l <- poly_names[[j]]
+          
+          single_treat[[as.character(year)]][[as.character(lag)]][[paste(as.character(treat), as.character(l), sep = "_WITH_")]][[as.character(i)]] <- df |> 
+            select(
+              all_of(
+                c(y_name, cl_names, treat, k)
+                )
+              ) |> 
+            double_ml_data_from_data_frame(
+              x_cols = k,
+              d_cols = treat,
+              y_col = y_name,
+              cluster_cols = cl_names
               )
-            ) |> 
-          dml$DoubleMLClusterData(
-            x_cols = covar_names,
-            d_cols = treat,
-            y_col = y_name,
-            cluster_cols = cl_names
-            )
         }
       }
     }
@@ -165,7 +186,7 @@ for(year in start_yrs){
 
 ### check for zero variance ----
 zerovar_1990 <- caret::nearZeroVar(
-  single_treat[[1]][[1]][[1]][[1]][["_X"]],
+  single_treat[[1]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
@@ -178,6 +199,8 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
+    treat_covars <- multi_treat_covars_all[[year]][[lag]]
+    treats <- names(treat_covars)
     for(i in m){
       df_cow_yr <- lag_df[[i]] |> 
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
@@ -192,20 +215,44 @@ for(year in start_yrs){
         left_join(df_new) |> 
         select(-cow_yr) |> 
         as.data.table()
-      for(treat in treat_names){
-          covar_names <- covar_names_all[["multi_man"]][[treat]][[year]][[lag]]
-          multi_treat[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |> 
-            select(
-              all_of(
-                c(y_name, cl_names, treat, covar_names)
-                )
-              ) |> 
-            dml$DoubleMLClusterData(
-              x_cols = covar_names,
-              d_cols = treat,
-              y_col = y_name,
-              cluster_cols = cl_names
+      for(treat in treats){
+        if(str_detect(treat, "inforce_X1")){
+          poly_int_covars <- treat_covars[[treat]]
+          poly_interacts <- names(poly_int_covars)
+          for(j in seq_along(poly_interacts)){
+            k <- poly_int_covars[[j]]
+            l <- poly_names[[j]]
+            
+            multi_treat[[as.character(year)]][[as.character(lag)]][[paste(as.character(treat), as.character(l), sep = "_WITH_")]][[as.character(i)]] <- df |> 
+              select(
+                all_of(
+                  c(y_name, cl_names, treat, k)
+                  )
+                ) |> 
+              double_ml_data_from_data_frame(
+                x_cols = k,
+                d_cols = treat,
+                y_col = y_name,
+                cluster_cols = cl_names
               )
+          }
+        }
+      else{
+        covar_names <- treat_covars[[treat]][[1]]
+        
+        multi_treat[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |> 
+          select(
+            all_of(
+              c(y_name, cl_names, treat, covar_names)
+            )
+          ) |> 
+          double_ml_data_from_data_frame(
+            x_cols = covar_names,
+            d_cols = treat,
+            y_col = y_name,
+            cluster_cols = cl_names
+          )
+        }
       }
     }
   }
@@ -213,7 +260,7 @@ for(year in start_yrs){
 
 ### check for zero variance ----
 zerovar_1990 <- caret::nearZeroVar(
-  multi_treat[[1]][[1]][[1]][[1]][["_X"]],
+  multi_treat[[1]][[1]][[1]][[1]]$data_model,
   saveMetrics = T
   )
 
@@ -224,4 +271,4 @@ imp_dml_dats_2fe <- list(
   )
 
 # clear glb env ----
-rm(list = setdiff(ls(), c("imp_dml_dats_2fe", "dml", "skl", "jlb", "np")))
+rm(list = setdiff(ls(), "imp_dml_dats_2fe"))

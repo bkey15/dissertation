@@ -45,19 +45,27 @@ for(year in start_yrs){
 treat_names <- "n_ems"
 
 ## interact names ----
-interact_names <- "v2x_polyarchy_x_n_ems"
+interact_names <- c(
+  "v2x_polyarchy_x_n_ems",
+  "e_v2x_polyarchy_5C_x_n_ems"
+  )
+
+## poly_names ----
+poly_names <- c(
+  "v2x_polyarchy",
+  "e_v2x_polyarchy_5C"
+  )
 
 ## covar names ----
 ### get initial specs ----
 covar_names_all <- list()
 
 ### finalize ----
-#### standard ----
 for(year in start_yrs){
   lags <- imp_t_dfs[[year]]
   lag_names <- names(lags)
   for(lag in lag_names){
-    covar_names <- imp_t_dfs[[year]][[lag]][[1]] |> 
+    covar_names_base <- imp_t_dfs[[year]][[lag]][[1]] |> 
       recipe(hr_score ~ .) |> 
       step_dummy(all_nominal_predictors()) |> 
       prep() |> 
@@ -67,13 +75,17 @@ for(year in start_yrs){
           c(
             "n_ems",
             "any_inforce",
+            "polyarchy",
             "hr_score"
             )
           )
         )|> 
       names()
-    
-    covar_names_all[[as.character(year)]][[as.character(lag)]] <- covar_names
+    for(poly in poly_names){
+      covar_names <- covar_names_base |> 
+        append(poly)
+      covar_names_all[[as.character(year)]][[as.character(lag)]][[poly]] <- covar_names
+    }
   }
 }
 
@@ -85,11 +97,12 @@ y_name <- "hr_score"
 cl_names <- c("cow", "year")
 
 ### finalize ----
+#### note: no need to "select" l in final step, as it's in covar_names
 for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names_lag <- covar_names_all[[year]][[lag]]
     for(i in m){
       df_cow_yr <- lag_df[[i]] |> 
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
@@ -104,16 +117,20 @@ for(year in start_yrs){
         left_join(df_new) |> 
         select(-cow_yr) |> 
         as.data.table()
-      for(treat in treat_names){
-        no_interactions[[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- df |>
+      for(j in seq_along(poly_names)){
+        k <- treat_names
+        l <- poly_names[[j]]
+        covar_names <- covar_names_lag[[j]]
+        
+        no_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_WITH_")]][[as.character(i)]] <- df |>
           select(
             all_of(
-              c(y_name, cl_names, treat, covar_names)
+              c(y_name, cl_names, k, covar_names)
               )
             ) |> 
           double_ml_data_from_data_frame(
             x_cols = covar_names,
-            d_cols = treat,
+            d_cols = k,
             y_col = y_name,
             cluster_cols = cl_names
             )
@@ -137,7 +154,7 @@ for(year in start_yrs){
   year_dfs <- imp_t_dfs[[year]]
   for(lag in lag_names){
     lag_df <- year_dfs[[lag]]
-    covar_names <- covar_names_all[[year]][[lag]]
+    covar_names_lag <- covar_names_all[[year]][[lag]]
     for(i in m){
       df_cow_yr <- lag_df[[i]] |> 
         mutate(cow_yr = paste(cow, year, sep = "-")) |> 
@@ -152,9 +169,11 @@ for(year in start_yrs){
         left_join(df_new) |> 
         select(-cow_yr) |> 
         as.data.table()
-      for(j in seq_along(treat_names)){
-        k <- treat_names[[j]]
+      for(j in seq_along(interact_names)){
+        k <- treat_names
         l <- interact_names[[j]]
+        covar_names <- covar_names_lag[[j]]
+        
         has_interactions[[as.character(year)]][[as.character(lag)]][[paste(as.character(k), as.character(l), sep = "_AND_")]][[as.character(i)]] <- df |> 
           select(
             all_of(

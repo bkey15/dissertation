@@ -16,18 +16,21 @@ data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_south.rda
 data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_north.rda
 data/ch2/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
 
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe.gz
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_class.rda
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_regr.rda
 
 ### Spatial (w/ regional FE)
 data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
 data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
 data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_spat_regfe_gen.rda
 
 data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
 data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
 data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe.gz
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_class.rda
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_regr.rda
 
 # History files
 .Rhistory

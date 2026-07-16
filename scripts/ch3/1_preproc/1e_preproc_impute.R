@@ -30,7 +30,9 @@ imp_vals <- ems_final |>
       ),
     across(
       c(
-        starts_with(c("v2", "wdi_")),
+        starts_with(
+          c("v2", "e_v2", "wdi_")
+          ),
         ends_with("_log10"),
         e_polity2,
         p_durable,
@@ -49,7 +51,7 @@ imp_vals <- ems_final |>
 for(var in imp_vals){
   is.logical(var) |> 
     print()
-}
+  }
 
 # specify predictor cols ----
 ## get dimension names
@@ -58,8 +60,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 53,
-  ncol = 53,
+  nrow = 54,
+  ncol = 54,
   dimnames = dim_names
   )
 

@@ -105,7 +105,6 @@ covar_names_sml <- list()
 
 
 ### finalize ----
-#### important: dropping first column after creating matrix to ensure first level of factor (region) isn't included in the ridges.
 for(year in start_yrs){
   lags <- imp_sp_t_dfs[[year]]
   lag_names <- names(lags)

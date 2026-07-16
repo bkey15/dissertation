@@ -11,10 +11,16 @@ load(here("data/ch3/viz_prep/imp_dml_pool_viz_dfs.rda"))
 # get new labels ----
 ## for facet wraps
 new_labels <- c(
+  "n_ems_WITH_v2x_polyarchy" = "Econ. Sanctions (#)",
+  "n_ems_WITH_e_v2x_polyarchy_5C" = "Econ. Sanctions (#)",
   "n_ems" = "Econ. Sanctions (#)",
   "v2x_polyarchy_x_n_ems" = "Polyarchy * Econ. Sanctions (#)",
-  "any_inforce1" = "Econ. Sanction (Y/N)",
-  "v2x_polyarchy_x_any_inforce" = "Polyarchy * Econ. Sanction (Y/N)"
+  "e_v2x_polyarchy_5C_x_n_ems" = "Polyarchy * Econ. Sanctions (#)",
+  "any_inforce_X1_WITH_v2x_polyarchy" = "Econ. Sanction (Y/N)",
+  "any_inforce_X1_WITH_e_v2x_polyarchy_5C" = "Econ. Sanction (Y/N)",
+  "any_inforce_X1" = "Econ. Sanction (Y/N)",
+  "v2x_polyarchy_x_any_inforce" = "Polyarchy * Econ. Sanction (Y/N)",
+  "e_v2x_polyarchy_5C_x_any_inforce" = "Polyarchy * Econ. Sanction (Y/N)"
   )
 
 # make plots ----

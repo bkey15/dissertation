@@ -11,14 +11,21 @@ load(here("data/ch3/results/imputations/imp_base.rda"))
 
 # prep base data ----
 ## make interaction vars ----
-### note: also filtering out glb_s == 0 cases (these were aids in computing spatial lags but are no longer necessary)
+### note: also filtering out glb_s == 0 cases (these were aids in computing spatial lags but are no longer necessary). But preserving cases w/ sanctions where glb_s == 0 (Slovenia & Saudi Arabia).
 imp_base_1990 <- imp_base |> 
   mice::complete(
     action = "long",
     include = TRUE
     ) |> 
-  relocate(.imp, .id) |> 
-  filter(glb_s == "1") |> 
+  relocate(.imp, .id)
+
+inforce_glb_n <- imp_base_1990 |> 
+  filter(any_inforce == "1" & glb_s == "0") |> 
+  mutate(cow = droplevels(cow))
+inforce_glb_n <- as.character(unique(inforce_glb_n$cow))
+
+imp_base_1990 <- imp_base_1990 |> 
+  filter(glb_s == "1" | cow %in% inforce_glb_n) |> 
   mutate(
     cow = droplevels(cow),
     any_inforce = as.numeric(levels(any_inforce))[any_inforce],
@@ -26,6 +33,11 @@ imp_base_1990 <- imp_base |>
       c(n_ems, any_inforce),
       ~ .x * v2x_polyarchy,
       .names = "v2x_polyarchy_x_{.col}"
+      ),
+    across(
+      c(n_ems, any_inforce),
+      ~ .x * e_v2x_polyarchy_5C,
+      .names = "e_v2x_polyarchy_5C_x_{.col}"
       ),
     any_inforce = factor(
       any_inforce,

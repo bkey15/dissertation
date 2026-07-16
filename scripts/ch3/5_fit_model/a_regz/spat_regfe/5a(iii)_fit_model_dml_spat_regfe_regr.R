@@ -1,4 +1,4 @@
-# Fit lasso models using double machine learning (DML). Includes tuning for the lasso lambda parameter via v-fold cross-validation.
+# Fit ridge models using double machine learning (DML). Includes tuning for the ridge lambda parameter via v-fold cross-validation.
 
 # load packages ----
 library(tidyverse)
