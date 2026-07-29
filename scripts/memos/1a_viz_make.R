@@ -509,87 +509,7 @@ dml_flow_viz_1 <- graph_init_3 |>
     )
 
 ### fits ----
-### note: L = single lag-model, R = repeat, F = fold, theta = final repeat fit (using "best" lambda), theta tilde = selected repeat fit (median of these)
-flowchart_tbl_4 <- tibble(
-  from = c(
-    "v[list(i,j,l)]", "v[list(i,j,l)]", "v[list(i,j,l)]", "r[1]", "r[1]", "r[1]", "r[1]", "r[1]", "r[2]", "r[2]", "r[2]", "r[2]", "r[2]", "r[3]", "r[3]", "r[3]", "r[3]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[...]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[...]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[...]", "r[3]k[K^2]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[3]"
-    ),
-  to = c(
-    "r[1]", "r[2]", "r[3]", "r[1]k[1]", "r[1]k[2]", "r[1]k[3]", "r[1]k[...]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[2]", "r[2]k[3]", "r[2]k[...]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[2]", "r[3]k[3]", "r[3]k[...]", "r[3]k[K^2]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[2]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "tilde(theta)[3]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]", "hat(theta)[list(i,j,l)]"
-    )
-  )
-
-new_labels_4 <- c(
-  "v[list(i,j,l)]" = "v[list(i,j,l)]",
-  "r[1]" = "r[1]",
-  "r[2]" = "r[2]",
-  "r[3]" = "r[3]",
-  "r[1]k[1]" = "k[1]",
-  "r[1]k[2]" = "k[2]",
-  "r[1]k[3]" = "k[3]",
-  "r[1]k[...]" = "k[...]",
-  "r[1]k[K^2]" = "k[K^2]",
-  "r[2]k[1]" = "k[1]",
-  "r[2]k[2]" = "k[2]",
-  "r[2]k[3]" = "k[3]",
-  "r[2]k[...]" = "k[...]",
-  "r[2]k[K^2]" = "k[K^2]",
-  "r[3]k[1]" = "k[1]",
-  "r[3]k[2]" = "k[2]",
-  "r[3]k[3]" = "k[3]",
-  "r[3]k[...]" = "k[...]",
-  "r[3]k[K^2]" = "k[K^2]",
-  "tilde(theta)[1]" = "tilde(theta)[1]",
-  "tilde(theta)[2]" = "tilde(theta)[2]",
-  "tilde(theta)[3]" = "tilde(theta)[3]",
-  "hat(theta)[list(i,j,l)]" = "hat(theta)[list(i,j,l)]"
-  )
-
-graph_init_4 <- graph_from_data_frame(flowchart_tbl_4)
-
-coords_4 <- layout_as_tree(graph_init_4, root = "v[list(i,j,l)]")
-coords_4[which(V(graph_init_4)$name == "tilde(theta)[1]"), ] <- coords_4[which(V(graph_init_4)$name == "r[1]k[3]"), ] + c(0, -1)
-coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] <- coords_4[which(V(graph_init_4)$name == "r[2]k[3]"), ] + c(0, -1)
-coords_4[which(V(graph_init_4)$name == "tilde(theta)[3]"), ] <- coords_4[which(V(graph_init_4)$name == "r[3]k[3]"), ] + c(0, -1)
-coords_4[which(V(graph_init_4)$name == "hat(theta)[list(i,j,l)]"), ] <- coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] + c(0, -1)
-
-dml_flow_viz_2 <- graph_init_4 |> 
-  ggraph(layout = coords_4) +
-  geom_edge_link(color = "#586e75") +
-  geom_node_label(
-    parse = TRUE,
-    aes(label = new_labels_4),
-    color = "#586e75"
-    ) +
-  theme_graph(
-    background = "#fdf6e3"
-    ) +
-  plot_annotation(
-    title = "DML Modeling",
-    subtitle = TeX("With Repeated $K^2$ Cluster-Robust Cross-Fitting")
-    ) &
-  theme(
-    plot.title = element_text(color = "#586e75"),
-    plot.subtitle = element_text(color = "#586e75"),
-    plot.background = element_rect("#fdf6e3")
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#### get base tbl
 flowchart_tbl_4 <- tibble(
   from = c(
     "v[list(i,j,l)]", "v[list(i,j,l)]", "v[list(i,j,l)]", "r[1]", "r[1]", "r[1]", "r[2]", "r[2]", "r[2]", "r[3]", "r[3]", "r[3]", "r[1]k[1]", "r[1]k[1]", "r[1]k[...]", "r[1]k[...]", "r[1]k[K^2]", "r[1]k[K^2]", "r[2]k[1]", "r[2]k[1]", "r[2]k[...]", "r[2]k[...]", "r[2]k[K^2]", "r[2]k[K^2]", "r[3]k[1]", "r[3]k[1]", "r[3]k[...]", "r[3]k[...]", "r[3]k[K^2]", "r[3]k[K^2]", "r[1]k[1]e[list(1,\u2113)]", "r[1]k[1]e[list(1,m)]", "r[1]k[...]e[list(...,\u2113)]", "r[1]k[...]e[list(...,m)]", "r[1]k[K^2]e[list(K^2,\u2113)]", "r[1]k[K^2]e[list(K^2,m)]", "r[2]k[1]e[list(1,\u2113)]", "r[2]k[1]e[list(1,m)]", "r[2]k[...]e[list(...,\u2113)]", "r[2]k[...]e[list(...,m)]", "r[2]k[K^2]e[list(K^2,\u2113)]", "r[2]k[K^2]e[list(K^2,m)]", "r[3]k[1]e[list(1,\u2113)]", "r[3]k[1]e[list(1,m)]", "r[3]k[...]e[list(...,\u2113)]", "r[3]k[...]e[list(...,m)]", "r[3]k[K^2]e[list(K^2,\u2113)]", "r[3]k[K^2]e[list(K^2,m)]", "tilde(theta)[1]", "tilde(theta)[2]", "tilde(theta)[3]"
@@ -599,6 +519,7 @@ flowchart_tbl_4 <- tibble(
     )
   )
 
+#### get new labels
 new_labels_4 <- c(
   "v[list(i,j,l)]" = "v[list(i,j,l)]",
   "r[1]" = "r[1]",
@@ -637,39 +558,74 @@ new_labels_4 <- c(
   "hat(theta)[list(i,j,l)]" = "hat(theta)[list(i,j,l)]"
   )
 
+#### get & adjust coords
 graph_init_4 <- graph_from_data_frame(flowchart_tbl_4)
 
 coords_4 <- layout_as_tree(graph_init_4, root = "v[list(i,j,l)]")
+
 coords_4[which(V(graph_init_4)$name == "tilde(theta)[1]"), ] <- coords_4[which(V(graph_init_4)$name == "r[1]k[...]"), ] + c(0, -2)
 coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] <- coords_4[which(V(graph_init_4)$name == "r[2]k[...]"), ] + c(0, -2)
 coords_4[which(V(graph_init_4)$name == "tilde(theta)[3]"), ] <- coords_4[which(V(graph_init_4)$name == "r[3]k[...]"), ] + c(0, -2)
 coords_4[which(V(graph_init_4)$name == "hat(theta)[list(i,j,l)]"), ] <- coords_4[which(V(graph_init_4)$name == "tilde(theta)[2]"), ] + c(0, -1)
 
+#### specify custom edges
+##### get edge indices from: print(E(graph_init_4), full = T)
+label_edges_2 <- tibble(
+  node1.name = paste0("tilde(theta)[", 1:3, "]"),
+  x = c(-6, 0, 6),
+  y = 1,
+  node2.name = "hat(theta)[list(i,j,l)]",
+  xend = 0,
+  yend = 0,
+  edge.id = 49:51,
+  lty = "solid",
+  label = c(
+    "either",
+    rep("or", 2)
+    )
+  )
+
+#### finalize
 dml_flow_viz_2 <- graph_init_4 |> 
   ggraph(layout = coords_4) +
-  geom_edge_link(color = "#586e75") +
+  geom_edge_link(
+    arrow = arrow(length = unit(2, "mm")),
+    aes(end_cap = square(10, "mm")),
+    color = "#586e75"
+    ) +
+  geom_edge_link(
+    data = label_edges_2,
+    arrow = arrow(length = unit(2, "mm")),
+    aes(
+      label = label,
+      linetype = lty,
+      end_cap = square(10, "mm")
+      ),
+    angle_calc = "along",
+    label_dodge = unit(2.5, "mm"),
+    label_push = unit(-1.5, "mm"),
+    label_size = 2.5,
+    label_colour = "#586e75",
+    color = "#586e75"
+    ) +
   geom_node_label(
     parse = TRUE,
     aes(label = new_labels_4),
     color = "#586e75"
-  ) +
+    ) +
   theme_graph(
     background = "#fdf6e3"
-  ) +
+    ) +
   plot_annotation(
     title = "DML Modeling",
     subtitle = TeX("With Repeated $K^2$ Cluster-Robust Cross-Fitting")
-  ) &
+    ) &
   theme(
     plot.title = element_text(color = "#586e75"),
     plot.subtitle = element_text(color = "#586e75"),
-    plot.background = element_rect("#fdf6e3")
-  )
-
-
-
-
-
+    plot.background = element_rect("#fdf6e3"),
+    legend.position = "none"
+    )
 
 ## pool ----
 flowchart_tbl_5 <- tibble(
