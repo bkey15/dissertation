@@ -50,9 +50,9 @@ The primary advancements my dissertation endeavors to accomplish are methodologi
 
 [^1]: Indeed, at the time of writing, a brief search located two articles in the American Political Science Review leveraging DML (Ratkovic, 2023; Jares & Malhotra, 2025), but none in other major journals such as the American Journal of Political Science, International Organization, and International Security, *inter alia*.
 
-Second, this debiased methodological system is put to work, following additional design recommendations proposed in my prospectus to answer my motivating research questions.[^2] The results that follow, in many instances, are at variance with those reported in the underlying literature, challenging or qualifying the substantive claims expressed therein. As we shall later see (@sec-gen-dml-plr), restraints ineluctably imposed by the DML paradigm complicate conventional approaches to causal description. I am mindful of this limitation, and I forgo strong pronouncements on causal mechanisms as a result. Nevertheless, practitioners need not be forced to adopt an agnostic posture vis-à-vis theory. To the contrary, they remain at liberty to ensure the inclusion in their models of theoretically-salient predictors;[^3] register which theories are (or are not) compatible with their results; and invent their own workarounds for testing theory aspects, such as by creating and comparing the findings of model variants. Hence, whilst presenting my results (see @sec-ch1, @sec-ch2, and @sec-ch3), I provide commentary on the initial covariates I selected, the theories that ultimately seem most or least plausible, and both the motivations and conclusions of my model permutations. In doing so, I strive to not only model engagement with theory under DML, but also suggest where research beyond DML (e.g., collaboration with qualitative scholars) might advantage the theory-building endeavor.
+Second, this debiased methodological system is put to work, following additional design recommendations proposed in my prospectus to answer my motivating research questions.[^2] The results that follow, in many instances, are at variance with those reported in the underlying literature, challenging or qualifying the substantive claims expressed therein. As we shall later see (@sec-gen-dml-plr), restraints ineluctably imposed by the DML paradigm complicate conventional approaches to causal description. I am mindful of this limitation, and I forgo strong pronouncements on causal mechanisms as a result. Nevertheless, practitioners need not be forced to adopt an agnostic posture vis-à-vis theory. To the contrary, they remain at liberty to ensure the inclusion in their models of theoretically-salient predictors;[^3] register which theories are (or are not) compatible with their results; and invent their own workarounds for testing theory aspects, such as by creating and comparing the findings of model variants. Hence, whilst presenting my results (see @sec-res), I provide commentary on the initial covariates I selected, the theories that ultimately seem most or least plausible, and both the motivations and conclusions of my model permutations. In doing so, I strive to not only model engagement with theory under DML, but also suggest where research beyond DML (e.g., collaboration with qualitative scholars) might advantage the theory-building endeavor.
 
-[^2]: For now, I refer to my prospectus for summaries of the methodological problems I identified in the original literature and plans I made in consequence. References thereto will naturally appear, nonetheless, whilst I elaborate on my treatments and covariates in @sec-ch1, @sec-ch2, and @sec-ch3.
+[^2]: For now, I refer to my prospectus for summaries of the methodological problems I identified in the original literature and plans I made in consequence. References thereto will naturally appear, nonetheless, whilst I elaborate on my treatments and covariates in @sec-res.
 
 [^3]: This task is, in fact, not only advisable, but also virtually essential in order to alleviate omitted-variable bias.
 
@@ -77,7 +77,7 @@ As we shall see, at present, my baseline models' results suggest the following g
 The remainder of my draft is organized as follows:
 
 1.  A description of my methods for the dissertation writ large (@sec-gen-mtd).
-2.  Discussions and illustrations of the work and findings unique to each chapter (@sec-ch1, @sec-ch2, @sec-ch3).
+2.  Discussions and illustrations of the work and findings unique to each chapter (@sec-res).
 3.  A conclusion, wherein I contemplate remaining questions and future work (@sec-cncl).
 4.  Appendices (@sec-appx).
 
@@ -107,7 +107,7 @@ In the first phase of preprocessing,[^4] all relevant data are assembled and bas
 
 The DML method then starts, first by selecting the specific DML model---namely, partially-linear regression, or PLR (2.i.)---and machine learner(s) to be used (2.ii.). Fits then commence on the preprocessed data, first for hyperparameter tuning (2.iii.) and then for the final DML fits (2.iv.). Lastly, the results found from each iteration of completed data are combined, concluding multiple imputation and yielding final estimates (3.).
 
-Occurring parallel to this methodology is a modified replication of the motivating research described in my prospectus (4.). These results---as well as those found from the foregoing debiasing procedures---will be presented in @sec-ch1-rep, @sec-ch2-rep, and @sec-ch3-rep, respectively.
+Occurring parallel to this methodology is a modified replication of the motivating research described in my prospectus (4.). These results---as well as those found from the foregoing debiasing procedures---will be presented in @sec-res.
 
 ![Methodology Flowchart. Note that the final preprocessing steps and DML writ large are nested within the multiple-imputation procedure, which begins with iterative completion of missing data and ends with pooling of results.](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/method_flow_viz.png){#fig-method-flow width="65%"}
 
@@ -115,58 +115,54 @@ Occurring parallel to this methodology is a modified replication of the motivati
 
 #### Data Wrangling {#sec-gen-prep-dw}
 
-##### Outcome & Treatments
+##### Outcome & Treatments {#sec-gen-prep-dw-main-var}
 
-Before running the replication and novel models, I assemble a dataset, $\mathbf{S} = [\mathbf{Y \; D \; X}] \in \mathbb{R}^{N \times (1 + q + k)}$, through data wrangling.[^5] First, I retrieve $\mathbf{Y} \in \mathbb{R}^{N \times 1}$---namely, [Human Rights (HR) Scores](https://dataverse.harvard.edu/dataverse/HumanRightsScores) (Fariss et al., 2020), the common outcome of interest. Next, I construct the treatment variables, $\mathbf{D} \in \mathbb{R}^{N \times q}$. This second task is far more involved, one that generally demands significant transformations to the raw data to ultimately render them in country-year (i.e., panel) format. How these treatments are sourced and generated---and how missingness is handled---is discussed further in @sec-ch1-treats, @sec-ch2-treats, and @sec-ch3-treats.
+Before running the replication and novel models, I assemble a dataset, $\mathbf{S} = [\mathbf{Y \; D \; X}] \in \mathbb{R}^{N \times (1 + q + k)}$, through data wrangling.[^5] First, I retrieve $\mathbf{Y} \in \mathbb{R}^{N \times 1}$---namely, [Human Rights (HR) Scores](https://dataverse.harvard.edu/dataverse/HumanRightsScores) (Fariss et al., 2020), the common outcome of interest. Next, I construct the treatment variables, $\mathbf{D} \in \mathbb{R}^{N \times q}$. This second task is far more involved, one that generally demands significant transformations to the raw data to ultimately render them in country-year (i.e., panel) format. How these treatments are sourced and generated---and how missingness is handled---is discussed further in @sec-res.
 
 [^5]: "Data wrangling" is my preferred designation for basic dataset construction and refinement (e.g., variable aggregation and resolution of coding conflicts).
 
-##### Covariates
+##### Covariates {#sec-gen-prep-dw-covar}
 
 Afterwards, I consolidate the covariates, $\mathbf{X} \in \mathbb{R}^{N \times k}$, creating additional ones where necessary. $\mathbf{X}$ is nearly identical across the three chapters, featuring the following common regressors:
 
-1.  All 26 [V-Dem](https://www.v-dem.net/) high-level and mid-level indices.
-2.  From the [Polity Project](https://www.systemicpeace.org/polityproject.html), Polity Score and Regime Durability.[^6]
+1.  All 26 [V-Dem](https://www.v-dem.net/) high- and mid-level indices.
+2.  From the [Polity Project](https://www.systemicpeace.org/polityproject.html), Polity and Regime Durability.[^6]
 3.  World Development Indicators (WDIs) from the World Bank pertaining to:[^7]
-    i.  Trade.[^8]
-    ii. Foreign direct investment (FDI).[^9]
+    i.  Trade.
+    ii. Foreign direct investment (FDI).
     iii. Population density.
 4.  From [Fariss et al. (2022)](https://dataverse.harvard.edu/dataverse/LatentGDP), latent estimates of GDP, GDPpc, and population (logged).
-5.  Balance of payments.[^10]
+5.  Balance of payments.[^8]
 
-[^6]: The proximate sources of these variables are V-Dem and the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset, respectively.
+[^6]: I source these variables from V-Dem and the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset, respectively.
 
-[^7]: These variables are sourced from the QoG dataset.
+[^7]: These variables are similarly sourced from the QoG dataset.
 
-[^8]: Sum of exports and imports of goods and services, % of country-year GDP.
+[^8]: \% of country-year GDP.
 
-[^9]: Net inflows and outflows, % of country-year GDP.
+Descriptions of these covariates, justifications for their inclusion, and exceptions to the common elements of $\mathbf{S}$ are all provided in @sec-res.
 
-[^10]: \% of country-year GDP.
-
-Justifications for the inclusion of these covariates, as well as exceptions to the common elements of $\mathbf{S}$, are provided in @sec-ch1-covs, @sec-ch2-covs, and @sec-ch3-covs.
-
-##### Case Selection & Coding
+##### Case Selection & Coding {#sec-gen-prep-dw-case}
 
 During the assembly of $\mathbf{S}$, I make several decisions on handling observations featuring missingness in numerous or critical areas and irregular coding attributes. Most of these cases involve (1.) small-nation status, (2.) partial international recognition, and (3.) post-Cold War transitions.
 
-In the first instance, I omit from $\mathbf{S}$ all countries failing to appear in V-Dem, coverage in HR Scores notwithstanding. Constituting the lion's share of these cases are microstates, as classified by the [Correlates of War (COW) project](https://correlatesofwar.org/). Though this omission comes at the cost of circumscribing my studies' external validity---namely, to non-microstates---it improves the robustness of my final inferences vis-à-vis future replications. Indeed, V-Dem indices constitute the majority of dimensions in each chapter's $\mathbf{X}$, meaning conclusions drawn from imputed V-Dem data for microstates would be generally and greatly sensitive to the randomness immanent in the imputation process.[^11]
+In the first instance, I omit from $\mathbf{S}$ all countries failing to appear in V-Dem, coverage in HR Scores notwithstanding. Constituting the lion's share of these cases are microstates, as classified by the [Correlates of War (COW) project](https://correlatesofwar.org/). Though this omission comes at the cost of circumscribing my studies' external validity---namely, to non-microstates---it improves the robustness of my final inferences vis-à-vis future replications. Indeed, V-Dem indices constitute the majority of dimensions in each chapter's $\mathbf{X}$, meaning conclusions drawn from imputed V-Dem data for microstates would be generally and greatly sensitive to the randomness immanent in the imputation process.[^9]
 
-[^11]: More on my missingness handling method---multiple imputation---may be found in @sec-gen-prep-mi.
+[^9]: More on my missingness handling method---multiple imputation---may be found in @sec-gen-prep-mi.
 
-Moreover, I omit Palestine in view of problems originating from inconsistent coding patterns. Unlike the foregoing microstates, Palestine is covered in V-Dem. However, its reported scores are disaggregated for much of the post-World War II period, with Gaza and the West Bank treated as mutually-exclusive observations, making it unclear as to how to reconcile these data with the single spatial unit that the source of my spatial data, [Natural Earth](https://www.naturalearthdata.com/), supplies for Palestine.[^12] Equally important, Palestine---absent from Gleditsch & Ward's [List of Independent States (v7)](http://ksgleditsch.com/statelist.html) due to its contested international recognition[^13]---lacks the prerequisite for coverage in Fariss et al.'s (2022) GDP, GDPpc, and population variables,[^14] estimates essential for computing several treatments pre-imputation.[^15] Owing to these theoretical and logistical roadblocks, I abstain from incorporating Palestine into my models, with the understanding that doing so comes at some inferential cost.
+Moreover, I omit Palestine in view of problems originating from inconsistent coding patterns. Unlike the foregoing microstates, Palestine is covered in V-Dem. However, its reported scores are disaggregated for much of the post-World War II period, with Gaza and the West Bank treated as mutually-exclusive observations, making it unclear as to how to reconcile these data with the single spatial unit that the source of my spatial data, [Natural Earth](https://www.naturalearthdata.com/), supplies for Palestine.[^10] Equally important, Palestine---absent from Gleditsch & Ward's [List of Independent States (v7)](http://ksgleditsch.com/statelist.html) due to its contested international recognition[^11]---lacks the prerequisite for coverage in Fariss et al.'s (2022) GDP, GDPpc, and population variables,[^12] estimates essential for computing several treatments pre-imputation.[^13] Owing to these theoretical and logistical roadblocks, I abstain from incorporating Palestine into my models, with the understanding that doing so comes at some inferential cost.
 
-[^12]: A discussion of my spatial models is to be found in @sec-gen-prep-sptl.
+[^10]: A discussion of my spatial models is to be found in @sec-gen-prep-sptl.
 
-[^13]: For a discussion of Palestine's exclusion, see the list's attendant [case description](http://ksgleditsch.com/data/iisyst_casedesc.pdf).
+[^11]: For a discussion of Palestine's exclusion, see the list's attendant [case description](http://ksgleditsch.com/data/iisyst_casedesc.pdf).
 
-[^14]: Only states with accompanying Gleditsch and Ward IDs (i.e., "state numbers") appear in Fariss et al.'s (2022) data.
+[^12]: Only states with accompanying Gleditsch and Ward IDs (i.e., "state numbers") appear in Fariss et al.'s (2022) data.
 
-[^15]: The computation of these treatments is outlined in @sec-ch1-treats and @sec-ch2-treats.
+[^13]: The computation of these treatments is outlined in @sec-res-ch1-treats and @sec-res-ch2-treats.
 
-Included in some of my models, on the other hand, are a few extinct countries, namely East Germany (formally the German Democratic Republic) and South Yemen (formally the People's Democratic Republic of Yemen). Each was a communist state that unified with its non-communist counterpart (West Germany and North Yemen, respectively) in 1990, amidst the denouement of the Cold War. The two countries enjoy complete data for HR Scores, Fariss et al.'s (2022) estimates, and virtually all V-Dem covariates, *inter alia*---yet they crucially lack polygons from Natural Earth, which does not offer data on historical geographical boundaries on which to base spatial lags. In virtue of data availability, I opt to integrate East Germany and South Yemen into my non-spatial models, though this inevitably entails a greater number of cases in such models relative to that of my spatial ones. Always marginal ($\Delta = 2$), this difference is only present in models with a pre-1990 start year,[^16] before the two countries naturally "drop out" of the dataset.
+Included in some of my models, on the other hand, are a few extinct countries, namely East Germany (formally the German Democratic Republic) and South Yemen (formally the People's Democratic Republic of Yemen). Each was a communist state that unified with its non-communist counterpart (West Germany and North Yemen, respectively) in 1990, amidst the denouement of the Cold War. The two countries enjoy complete data for HR Scores, Fariss et al.'s (2022) estimates, and virtually all V-Dem covariates, *inter alia*---yet they crucially lack polygons from Natural Earth, which does not offer data on historical geographical boundaries on which to base spatial lags. In virtue of data availability, I opt to integrate East Germany and South Yemen into my non-spatial models, though this inevitably entails a greater number of cases in such models relative to that of my spatial ones. Always marginal ($\Delta = 2$), this difference is only present in models with a pre-1990 start year,[^14] before the two countries naturally "drop out" of the dataset.
 
-[^16]: Start years are discussed in greater detail in @sec-gen-prep-sy.
+[^14]: Start years are discussed in greater detail in @sec-gen-prep-sy.
 
 A further consideration involving post-Cold War geopolitical reconfigurations is the existence of several discrepancies in case identification---namely, differences across datasets in the coding of continuities between predecessor and successor states. These present challenges for variable collation and subsequent inference; indeed, when joining datasets on country identifiers (e.g., COW codes), the discrepancies may yield unmerited duplicates or missingness, raising doubts over inferential validity in later modelling stages. To harmonize all inputs of $\mathbf{S}$, I allow decisions adopted by HR Scores and/or V-Dem---the sources of my outcome and the preponderance of covariates---to override alternative coding schemes in the following cases:
 
@@ -179,31 +175,35 @@ These decisions being taken, I arrive at my final set of cases. In general, the 
 
 #### Making Multiply-Imputed Data {#sec-gen-prep-mi}
 
-The aim of my next step is to handle remaining missingness in $\mathbf{S}$ and hence sample selection bias.[^17] Simple methods of doing so (e.g., listwise deletion, mean imputation, etc.) are undoubtedly implementable, though these generally rest on the very strong assumption that the data is "missing completely at random" (MCAR), in which case selection bias is unlikely to be a concern of interest; produce unwarrantedly large or small standard errors; or may prove wasteful.[^18] Endeavoring to avoid these pitfalls, I opt for the more resilient method of multiple imputation. Widely regarded as ["the best general method to deal with incomplete data"](https://stefvanbuuren.name/fimd/sec-historic.html) (Van Buuren, 2018), multiple imputation broadly involves the following three steps:
+The aim of my next step is to handle remaining missingness in $\mathbf{S}$ and hence sample selection bias.[^15] Uncomplicated methods of doing so (e.g., listwise deletion, mean imputation, etc.) are commensurately easy to implement, though these generally rest on the very strong assumption that the data is "missing completely at random" (MCAR), in which case selection bias is unlikely to be a concern of interest; produce unwarrantedly large or small standard errors; or may prove wasteful.[^16] Endeavoring to avoid these pitfalls, I opt for the more resilient method of multiple imputation. Widely regarded as ["the best general method to deal with incomplete data"](https://stefvanbuuren.name/fimd/sec-historic.html) (Van Buuren, 2018), multiple imputation broadly involves the following three steps:
 
-[^17]: Put simply, this form of bias arises from nonrandom processes causing the likelihood of observations' inclusion in the sample to vary by individual or group. Left unattended, incomplete data can easily compound such bias, since observations exhibiting missingness are excluded from modeling entirely. In the context of international panel data, if some countries or years are systematically more prone to missingness (e.g., due to uncompliant or unreliable reporting in authoritarian states or conflict zones, or during periods wherein such phenomena are more abundant), then the externally validity of any subsequent findings will inevitably be compromised with respect to those countries or years.
+[^15]: Put simply, this form of bias arises from nonrandom processes causing the likelihood of observations' inclusion in the sample to vary by individual or group. Left unattended, incomplete data can easily compound such bias, since observations exhibiting missingness are excluded from modeling entirely. In the context of international panel data, if some countries or years are systematically more prone to missingness (e.g., due to uncompliant or unreliable reporting in authoritarian states or conflict zones, or during periods wherein such phenomena are more abundant), then the externally validity of any subsequent findings will inevitably be compromised with respect to those countries or years.
 
-[^18]: Indeed, listwise deletion would result in the excision of about a third of all my observations per model, as suggested by the data presented in Appendix D (@fig-appx-d). For more on "ad-hoc" solutions to handling missing data, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-simplesolutions.html).
+[^16]: Indeed, listwise deletion would result in the excision of about a third of all my observations per model, as suggested by the data presented in Appendix D (@fig-appx-d). For more on "ad-hoc" solutions to handling missing data, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-simplesolutions.html).
 
-1.  Following a user-specified algorithm, generating $m > 1$ complete versions of the incomplete dataset.
-2.  With each version, running user-defined models to estimate some parameter(s) of interest.
-3.  Under "Rubin's rules" (see @sec-gen-pool), pooling these estimates to arrive at a single estimate and accompanying variance estimate, performing causal inference accordingly.[^19]
+1.  Following a user-specified algorithm estimating the missing values, generating $m > 1$ complete datasets.
+2.  With each permuted dataset, running user-defined models to estimate some parameter(s) of interest.
+3.  Under "Rubin's rules" (see @sec-gen-pool), pooling these estimates to arrive at a single estimate and accompanying variance estimate, performing causal inference accordingly.[^17]
 
-[^19]: For more on the basics of multiple imputation, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-nutshell.html).
+[^17]: For more on the basics of multiple imputation, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-nutshell.html).
 
-Through this process, multiple imputation provides more realistic standard errors and eschews data wasting. It also need not assume MCAR. Specifically, multiple imputation is equipped to handle data that are both "missing at random" (MAR) and "missing not at random" (MNAR) [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-idconcepts.html). MAR prevails when MCAR may be assumed conditional on knowing what factor(s) explain the missingness at issue, and thus rests on safer footing than MCAR alone. MNAR, meanwhile, exists when such explanatory factors are unknown.[^20] Carrying out multiple imputation on MNAR data generally requires researchers to assemble more variables explaining the missingness, so as to establish MAR, and/or to conduct an array of sensitivity analyses [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-sensitivity.html). Lacking obvious evidence of MNAR (particularly after removing the cases described in @sec-gen-prep-dw), and guided by the advice that ["\[t\]he MAR assumption is often a suitable starting point"](https://stefvanbuuren.name/fimd/sec-whenignorable.html) (Van Buuren, 2018), I proceed naively presupposing MAR conditions.
+Through this process, multiple imputation provides more realistic standard errors and eschews data wasting. It also need not assume MCAR. Specifically, multiple imputation is equipped to handle data that are both "missing at random" (MAR) and "missing not at random" (MNAR) [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-idconcepts.html). MAR prevails when MCAR may be assumed conditional on knowing what factor(s) explain the missingness at issue, and thus rests on safer footing than MCAR alone. MNAR, meanwhile, exists when such explanatory factors are unknown.[^18] Carrying out multiple imputation on MNAR data generally requires researchers to assemble more variables explaining the missingness, so as to establish MAR, and/or to conduct an array of sensitivity analyses [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-sensitivity.html). Lacking obvious evidence of MNAR (particularly after removing the cases described in @sec-gen-prep-dw), and guided by the advice that ["\[t\]he MAR assumption is often a suitable starting point"](https://stefvanbuuren.name/fimd/sec-whenignorable.html) (Van Buuren, 2018), I proceed naively presupposing MAR conditions.
 
-[^20]: For more on MCAR, MAR, and MNAR, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-MCAR.html).
+[^18]: For more on MCAR, MAR, and MNAR, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-MCAR.html).
 
-In all three chapters, I select $m = 5$. Von Hippel (2009) and White et al. (2011) jointly suggest the following "rule of thumb" when setting $m$: ["the number of imputations should be similar to the percentage of cases that are incomplete"](https://stefvanbuuren.name/fimd/sec-howmany.html) (Van Buuren, 2018). For each chapter and start year, the proportion of observations featuring a missing value is about 30%, suggesting an $m$ in the vicinity of 30. Undercutting this rule of thumb, however, are a few practical difficulties, as [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-howmany.html) observes. First, the recommended value of $m$ is likely to be large for datasets with large numbers of variables, and indeed can only increase as dimensions are added, since observations are likelier to feature at least one missing value the more variables they possess. Second---and relatedly---increasing $m$ correspondingly increases the computational and storage costs of the analysis, as each model must be fit on each $\mathbf{m}_{i}$. [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-howmany.html) instead recommends setting $m$ to the average missing data rate (i.e., the proportion of values missing from the dataset), or to 5 when computational and storage capabilities are more limited. In fact, the average missing data rate for each chapter and start year is approximately 2%---even when excluding variables that are complete by design, namely the outcome, treatments, and fixed effects---meaning $m = 5$ is more than sufficient under the circumstances. For a complete summary of these missing data rates, see Appendix D (@sec-appx-d).
+To make multiply-imputed data, I first select $m = 5$. Von Hippel (2009) and White et al. (2011) jointly suggest the following "rule of thumb" when setting $m$: ["the number of imputations should be similar to the percentage of cases that are incomplete"](https://stefvanbuuren.name/fimd/sec-howmany.html) (Van Buuren, 2018). For each chapter and start year, the proportion of observations featuring a missing value is about 30%, suggesting an $m$ in the vicinity of 30. Undercutting this rule of thumb, however, are a few practical difficulties, as [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-howmany.html) observes. First, the recommended value of $m$ is likely to be large for datasets with large numbers of variables, and indeed can only increase as dimensions are added, since observations are likelier to feature at least one missing value the more variables they possess. Second---and relatedly---increasing $m$ correspondingly increases the computational and storage costs of the analysis, as each model must be fit on each $\mathbf{m}_{i}$. [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-howmany.html) instead recommends setting $m$ to the average missing data rate (i.e., the proportion of values missing from the dataset), or to 5 when computational and storage capabilities are more limited. In fact, the average missing data rate for each chapter and start year is approximately 2%---even when excluding variables that are complete by design, namely the outcome, treatments, and fixed effects---meaning $m = 5$ is more than sufficient under the circumstances.[^19]
 
-To create the imputed data, I avail myself of [`mice::futuremice`](https://amices.org/mice/reference/futuremice.html), which permits users to generate each $\mathbf{m}_{i}$ in parallel across individual CPU cores, significantly quickening computation time. In addition to setting $m$,[^21] I further specify the imputation method---random forests, equipped to handle both numeric and categorical data [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-modelform.html)---and the predictor variables.[^22] Finally, I set a seed to ensure reproducibility of the imputations. Implementing `futuremice` with these arguments ultimately yields five completed iterations of $\mathbf{S}$: $(\mathbf{m}_{i})_{i=1}^5$. It is from these iterations that I conduct all remaining work, pooling the results obtained from each $\mathbf{m}_{i}$ in the final stage.[^23]
+[^19]: For a complete summary of these missing data rates, see @sec-appx-d.
 
-[^21]: Technically, this is done by tolerating the default setting $m = 5$.
+Next, I avail myself of [`mice::futuremice`](https://amices.org/mice/reference/futuremice.html), which permits users to generate each $\mathbf{m}_{i}$ in parallel across individual CPU cores, significantly quickening computation time. In addition to setting $m$,[^20] I further specify the imputation method and predictors. As to the former, I choose random forests, a flexible learner equipped to handle both numeric and categorical data.[^21] As to the latter, for any given chapter, I mark all fully- and greatly-complete variables common to every model as predictors, following the "general rule" of "using every bit of available information \[in order to yield\] multiple imputations that have minimal bias and maximal efficiency" [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-modelform.html).[^22] Finally, I set a seed to ensure reproducibility. Implementing `futuremice` with these arguments ultimately yields five completed iterations of $\mathbf{S}$: $(\mathbf{m}_{i})_{i=1}^5$. It is from these iterations that I conduct all remaining work, pooling the results obtained from each $\mathbf{m}_{i}$ in the final stage.[^23]
 
-[^22]: For more on the process of and algorithm for tree-based imputation, see [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-cart.html)
+[^20]: Technically, this is done by tolerating the default setting $m = 5$.
 
-[^23]: For more on pooling, see @sec-gen-pool.
+[^21]: For a complete enumeration of the imputation methods on offer from `mice`, see [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-modelform.html). More on the process of and algorithm for tree-based imputation can also be found in [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-cart.html)
+
+[^22]: I exclude as predictors all variables wherein the missing-data rate meets or exceeds 10% for the oldest start-year, since including them tended to result in failed imputations. Some variables are exclusive to certain observations and attendant models, as we shall later see (e.g., PTA scores for Global South states), and thus would logically never relate to others (e.g., Global North states), hence why I likewise ignore these. Otherwise, I am permissive, since the main issues with specifying a great number of predictors---"multicollinearity and computational problems" [(Van Buuren, 2018)](https://stefvanbuuren.name/fimd/sec-modelform.html)---are effectively neutralized by my use of random forests (a multicollinearity-robust learner, as mentioned in @sec-gen-dml-lrn-dcns) and parallel processing. As a final remark, note that among the variables I mark as predictors is HR Scores, the main outcome, a step explicitly recommended by [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-modelform.html).
+
+[^23]: Pooling is limned at length in @sec-gen-pool.
 
 #### Spatial Lagging {#sec-gen-prep-sptl}
 
@@ -327,7 +327,7 @@ In calculating $\mathbf{WZ}$, `lag.listw` produces `NA` values for lags where at
 
 It is also amid spatial lagging that I retrieve the region covariate, given its availability in `rnaturalearth::ne_countries`. In the spatial models, region stands in lieu of country as the geographic fixed effect.[^42] The variable comes from the World Bank, which categorizes countries into one of seven regions:
 
-[^42]: My explanation for utilizing a regional fixed effect is furnished in @sec-ch1-covs.
+[^42]: My explanation for utilizing a regional fixed effect is furnished in @sec-res-gen-rem.
 
 1.  East Asia & Pacific
 2.  Europe & Central Asia
@@ -337,11 +337,11 @@ It is also amid spatial lagging that I retrieve the region covariate, given its 
 6.  South Asia
 7.  Sub-Saharan Africa
 
-Relying on the World Bank's systematization is consistent with my use of other variables the organization supplies---including its classification of countries by income (see @sec-ch1) and WDIs (see @sec-gen-prep-dw)---and is therefore sensible, in my view. Ultimately, both the region indicator and lags are appended to each $\mathbf{m}_{i}$, making five expanded imputed datasets, $(\mathbf{p}_{i})_{i=1}^5$, where $\mathbf{p}_{i} = [\mathbf{Y \; D \; X \; WZ}] \in \mathbb{R}^{N \times (1 + q + k + v)}$.
+Relying on the World Bank's systematization is consistent with my use of other variables the organization supplies---including its classification of countries by income (see @sec-res-gen-rem) and WDIs (see @sec-gen-prep-dw)---and is therefore sensible, in my view. Ultimately, both the region indicator and lags are appended to each $\mathbf{m}_{i}$, making five expanded imputed datasets, $(\mathbf{p}_{i})_{i=1}^5$, where $\mathbf{p}_{i} = [\mathbf{Y \; D \; X \; WZ}] \in \mathbb{R}^{N \times (1 + q + k + v)}$.
 
 #### Start-Year Specification {#sec-gen-prep-sy}
 
-Upon completing the spatial lags, I specify the "start years"---the year at which at each $\mathbf{p}_{i}$ may begin---where necessary. The exact justifications for these start years may be found in @sec-ch1, @sec-ch2, and @sec-ch3; but at this juncture, a few clarifying points merit mentioning. First, they serve one of two purposes: to align with those adopted by the authors inspiring my work, or to test alternative theories in which another start year may plausibly yield different results. Second, the maximum number of start years set for any given chapter is two: although data availability generally allowed for a third start year beginning before those used by the authors, introducing it in preliminary model testing revealed prohibitive computational costs.[^43] Third, Chapter 3 specifies 1990---exclusively---as the start year, since setting start years more recent than this entails inferential risks.[^44] Ultimately, in specifying start years, there now exist iterations $\mathbf{t}_{i,j}$ for each $\mathbf{p}_{i}$, where $j$ signifies the index number of the start years, ordered chronologically.[^45] In chapters 1 and 2, two start years are specified, such that $j \in \{1, 2\}$. By contrast, Chapter 3 features a single start year, so $j = 1$.
+Upon completing the spatial lags, I specify the "start years"---the year at which at each $\mathbf{p}_{i}$ may begin---where necessary. The exact justifications for these start years may be found in @sec-res; but at this juncture, a few clarifying points merit mentioning. First, they serve one of two purposes: to align with those adopted by the authors inspiring my work, or to test alternative theories in which another start year may plausibly yield different results. Second, the maximum number of start years set for any given chapter is two: although data availability generally allowed for a third start year beginning before those used by the authors, introducing it in preliminary model testing revealed prohibitive computational costs.[^43] Third, Chapter 3 specifies 1990---exclusively---as the start year, since setting start years more recent than this entails inferential risks.[^44] Ultimately, in specifying start years, there now exist iterations $\mathbf{t}_{i,j}$ for each $\mathbf{p}_{i}$, where $j$ signifies the index number of the start years, ordered chronologically.[^45] In chapters 1 and 2, two start years are specified, such that $j \in \{1, 2\}$. By contrast, Chapter 3 features a single start year, so $j = 1$.
 
 [^43]: To be precise, running a task with three start years usually led to memory limits being reached, after which the task would fail.
 
@@ -357,7 +357,7 @@ To evaluate whether the treatment effects of interest are delayed,[^46] I perfor
 
 [^47]: The lower bound of the lags ($l = 1$) is the most basic and common temporal lag employed by social scientists. The upper bound ($l = 8$), on the other hand, seeks to test whether the intended outcome of a policy implemented at the onset of a hypothetical, consecutive two-term U.S. presidency may eventually be realized by its very end.
 
-Temporal lagging is a typical feature of inferential models, especially those concerned with international policy questions and country-year panel data. Nevertheless, the technique poses a few complications for my research owing to the idiosyncrasies of my overall methodology. First, absent extant data preceding the first chosen start year, $N$---the sample size of $\mathbf{v}_{i,j,l}$---inevitably shrinks as $l \rightarrow \infty$.[^48] This is a structural feature of temporal lagging and is not problematic *per se*. However, pooling my results---the final step of the multiple imputation process and my models writ large (see @sec-gen-pool)---requires that $N > 1000$ be satisfied. Indeed, pooling demands the specification of the degrees of freedom of the complete datasets, $df_{com}$; but as the DML method (see @sec-gen-dml) prevents the consistent location of such a value---$N$ varies over cross fits, and the number of model parameters may likewise vary over cross fits depending on the selected learner---it is safer to assume that $df_{com} = \infty$, which is only acceptable when $N$ is sufficiently large.[^49] Fortunately, virtually every $\mathbf{v}_{i,j,l}$ satisfies the aforementioned condition, though there are a few instances---particularly as $l \rightarrow 8$ and in Chapter 3, where the universe of cases is intentionally small (see @sec-ch3) and the single start year (1990) is more recent---where it does not. I will identify such instances where appropriate, and the results thereof should be interpreted with caution.
+Temporal lagging is a typical feature of inferential models, especially those concerned with international policy questions and country-year panel data. Nevertheless, the technique poses a few complications for my research owing to the idiosyncrasies of my overall methodology. First, absent extant data preceding the first chosen start year, $N$---the sample size of $\mathbf{v}_{i,j,l}$---inevitably shrinks as $l \rightarrow \infty$.[^48] This is a structural feature of temporal lagging and is not problematic *per se*. However, pooling my results---the final step of the multiple imputation process and my models writ large (see @sec-gen-pool)---requires that $N > 1000$ be satisfied. Indeed, pooling demands the specification of the degrees of freedom of the complete datasets, $df_{com}$; but as the DML method (see @sec-gen-dml) prevents the consistent location of such a value---$N$ varies over cross fits, and the number of model parameters may likewise vary over cross fits depending on the selected learner---it is safer to assume that $df_{com} = \infty$, which is only acceptable when $N$ is sufficiently large.[^49] Fortunately, virtually every $\mathbf{v}_{i,j,l}$ satisfies the aforementioned condition, though there are a few instances---particularly as $l \rightarrow 8$ and in Chapter 3, where the universe of cases is intentionally small (see @sec-res-ch3) and the single start year (1990) is more recent---where it does not. I will identify such instances where appropriate, and the results thereof should be interpreted with caution.
 
 [^48]: Specifically, under such conditions, when independent variables are temporally lagged with respect to $\mathbf{Y}$, early observations take on missing values and are effectively dropped as a result. For instance, if the independent variables are lagged by $t - 1$ (i.e., one year), their values for start year $t_{sy}$ appear when $\mathbf{Y}$ is at $t_{sy} + 1$. Because there naturally exist no data at $t_{sy} - 1$ (i.e., the year prior to $t_{sy}$) from which to complete the lag, all independent variables corresponding to $\mathbf{Y}$ at $t_{sy}$ become missing. In the country-year case, this means that for every country, when $\mathbf{Y}$ is at $t_{sy}$, all independent variables are missing, and $N$ is simply reduced by the total number of countries (since one observation per country now features missingness).
 
@@ -413,7 +413,7 @@ DML is motivated initially by high-dimensional cases, where $\eta_{0}$---the "nu
 
 The specific DML model I elect to use is the partially-linear regression (PLR) model. I do so because it is the most generally appropriate---additional assumptions must be satisfied to justify the use of other DML models (e.g., those containing instrumental variables)---and is the simplest, making it the easiest to interpret.[^62] The model is initially of the form:
 
-[^62]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. A full enumeration of the DML models currently available in statistical software may be found in the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
+[^62]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. *Prima facie*, the partially-linear panel regression model (PLPR) may seem tempting considering the country-year structure of my data; but in the last analysis, the assumptions on which it rests are almost certainly disqualifying. Most crucially, it requires no feedback to predictors (e.g., last year's $\mathbf{Y}$ and $\mathbf{D}$ do not affect this year's $\mathbf{X}$) and a static panel (e.g., knowing this year's $\mathbf{X}$, this year's $\mathbf{Y}$ and $\mathbf{D}$ are independent of last year's $\mathbf{Y}$, $\mathbf{X}$, and $\mathbf{D}$), both of which seem inappropriate for international policies and behaviors. Indeed, these phenomena are known to diffuse over time and follow flexible causal processes---hence my use of temporal and spatial lagging, for example. For more on PLPR, see Clarke & Polselli (2025). For a full enumeration of the DML models currently available in statistical software, see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
 
 $$\begin{align*}
 \mathbf{Y} = \mathbf{D}\theta_{0} + g_{0}(\mathbf{X}) + \boldsymbol{\zeta}, \qquad \mathbb{E}[\boldsymbol{\zeta}|\mathbf{D},\mathbf{X}] = 0 \\
@@ -577,17 +577,13 @@ Fortunately, optimizing this choice is easily achieved by following two procedur
 
 [^94]: The process and import of learner selection based on out-of-sample predictive performance is described in Ahrens et al. (2025, pp. 30-35), Bach et al. (2024b, pp. 9-11), Chernozhukov et al. (2024, pp. 252-253), and the [DoubleML Choice of Learners Guide](https://docs.doubleml.org/dev/examples/learners/py_learner.html).
 
-Requisite for assessing out-of-sample prediction in either step, importantly, is the selection of performance metric(s). Typical (and usually-sufficient) metrics for regression tasks are mean squared error (MSE) and root mean square error (RMSE).[^95] For classification tasks, on the other hand, users benefit from weighing a wider array of metrics minding not only their research goals (e.g., equally-accurate prediction of both positive and negative cases), but also the composition of their outcome (e.g., balance between positive and negative cases). Also, to compare candidate learners in particular, Bach et al. (2024b) recommend "combined nuisance loss," which in the PLR case may be computed by:
+Requisite for assessing out-of-sample prediction in either step, importantly, is the selection of performance metric(s). Typical (and usually-sufficient) metrics for regression tasks are mean squared error (MSE) and root mean square error (RMSE).[^95] For classification tasks, on the other hand, users benefit from weighing a wider array of metrics minding not only their research goals (e.g., equally-accurate prediction of both positive and negative cases), but also the composition of their outcome (e.g., balance between positive and negative cases). Also, to compare candidate learners in particular, Bach et al. (2024b) recommend "combined nuisance loss," which in the PLR case may be computed by:[^96]
 
 [^95]: Needless to say, for comparative applications (e.g., determining whether the performance indicator for one learner is larger, smaller, or similar to others'), the two metrics essentially convey the same information, insofar as the latter is simply the square root of the former. They are the default performance metrics for `DoubleML` and `mlr3`. For the former, see the [DoubleML Choice of Learners Guide](https://docs.doubleml.org/dev/examples/learners/py_learner.html). For the latter, see `?mlr3::default_measures()`.
 
+[^96]: In their simulation study, Bach et al. (2024b) find that selecting models with the lowest combined loss generally yields the lowest error in estimating $\theta_{0}$. While their outcomes are continuous, their treatments are binary; as such, $RMSE(\hat{\ell}_{0})$ equates to the square root of the Brier score, itself equivalent to MSE for binary outcomes. For a discussion of their variables, their exact findings, and the formula for combined loss, see Bach et al. (2024b, pp. 7, 10-11, and 18). For the binary Brier-score formula, see `?mlr3measures::bbrier()`.
+
 $$RMSE(\hat{m}_{0})*\left(RMSE(\hat{m}_{0}) + RMSE(\hat{\ell}_{0})\right)$$
-
-Comparing favorably to this, they argue, is "predictive loss." Denoted as $MSE(\hat{Y})$, predictive loss may itself be found by:[^96]
-
-[^96]: In their simulation study, Bach et al. (2024b) find that selecting models with the lowest combined loss generally yields the lowest error in estimating $\theta_{0}$, though as a proxy, predictive loss on $Y$ performs only somewhat less well. For their exact findings, see Bach et al. (2024b, pp. 10-11). For the formulae of combined loss and predictive loss, see Bach et al. (2024b, pp. 18).
-
-$$\frac{1}{n}\sum_{i}^{n}(Y_{i} - \hat{\theta}D_{i} - \ell(X_{i}))^{2}$$
 
 Ultimately, users have many metrics at their disposal for judging and optimizing model performance. Nevertheless, they should make their decisions thoughtfully, paying especial attention to the metric's appropriateness and likely utility for their desired task.
 
@@ -615,7 +611,7 @@ As to cost, regularized-regression learners such as ridge are relatively inexpen
 
 [^105]: A common solution to the problem of capturing hyperparameter combinations efficiently in a high-dimensional tuning space is to randomly draw such combinations a relatively-low, user-specified number of times (e.g., via [`mlr3tuning::tnr("random_search")`](https://mlr3tuning.mlr-org.com/reference/mlr_tuners_random_search.html).) However, allowing combinations to be sampled at irregular intervals likewise allows the grid to ignore significant sections of the full tuning space. This, in turn, heightens the risk that the "best" performing combination from among those sampled---and thus selected for the final DML fits---will actually be poor-performing, a possibility becoming all the more likely as the grid's resolution shrinks. Because high-performing learners are essential to boosting confidence about $\hat{\theta}_{0}$, I avoid randomly-selected hyperparameters, accepting the added expenses my doing so entails.
 
-Finally, tuned ridge models are likely high-performing in estimating $\eta_{0}$ and thus $\theta_{0}$. We have already seen how---in general---ridge is known to perform well amid multicollinearity, meaning we may justifiably expect it to prove high-performing given datasets $\mathbf{v}_{i,j,l}$. And indeed, during tuning, the best ridge models were shown to perform approximately as well as the best tree-based models.[^106] However, as we have also seen, more complex learners demand currently-prohibitive costs, complicating efforts at comparison. A complete accounting of ridge's performance thus awaits robustness checks leveraging supercomputing access, my plans for which I shall provide in @sec-cncl. Nevertheless, at this juncture, I may still reasonably commit to following the recommendations I summarized in @sec-gen-dml-lrn-cnds---namely, those set forth by Bach et al. (2024b), who advocate comparing overall model performance with combined nuisance loss and/or predictive loss on $Y$. adsfdf Former for continuous outcomes, latter for binary. asdfad
+Finally, tuned ridge models are likely high-performing in estimating $\eta_{0}$ and thus $\theta_{0}$. We have already seen how---in general---ridge is known to perform well amid multicollinearity, meaning we may justifiably expect it to prove high-performing given datasets $\mathbf{v}_{i,j,l}$. And indeed, during tuning, the best ridge models were shown to perform approximately as well as the best tree-based models.[^106] However, as we have also seen, more complex learners demand currently-prohibitive costs, complicating efforts at comparison. A complete accounting of ridge's performance thus awaits robustness checks leveraging supercomputing access, my plans for which I shall provide in @sec-cncl. Nevertheless, at this juncture, I may still reasonably commit to following the recommendations I summarized in @sec-gen-dml-lrn-cnds---namely, those issued by Bach et al. (2024b), who advocate comparing overall model performance with combined nuisance loss.
 
 [^106]: I have yet to compile performance metrics from the tree-based learners due to aforementioned model failures, but I can do so if requested.
 
@@ -670,7 +666,7 @@ My own hyperparameter tuning may be thus generalized as follows:
 
 ![DML Tuning Flowchart (Ridge). Note that each $e_{i}$ represents an evaluation moment, wherein the candidate $\lambda$ fit on $I_{k}^{c}$ is appraised with $I_{k}$; $\tilde{\lambda}$ the aggregated performance score for the candidate (e.g., mean MSE); and $\hat{\lambda}$ the selected candidate.](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/dml_flow_viz_1.png){#fig-dml-flow_1}
 
-In most instances, I tune hewing to the default settings and recommendations of both `DoubleML` and `mlr3`. The reason I do so is twofold: to preserve model simplicity and to safeguard against selecting the worst-performing specifications.[^115] As indicated above, I cross-validate using folds split from the full sample (i.e., $\mathbf{v}_{i,j,l}$), which is in keeping with the `DoubleML` default.[^116] Though users may optionally cross-validate on each fold drawn for the final DML fits (see @sec-gen-dml-fits-final), I refrain from doing so because it is $K$-times more costly and known to perform similarly to full-sample cross-validation in any case.[^117] For the ridge models in particular, defined by hyperparameters $\lambda$ and $\alpha$, I exclusively tune $\lambda$, since ridge requires $\alpha = 0$.[^118] To do so, I set $\alpha$ properly and specify the space from which the $\lambda$ values will be sampled---namely, the range `mlr3` recommends for models using `glmnet`, the main dependency supporting ridge tasks in the `mlr3` ecosystem.[^119] Furthermore, to improve the likelihood that a representative sample of $\lambda$ values is drawn from the full range, I employ a "grid" search strategy, which simply finds $N$ equally-spaced points between and inclusive of the lower and upper bounds. Though the auto-tuner [`glmnet::cv.glmnet`](https://glmnet.stanford.edu/reference/cv.glmnet.html) effectively has a default resolution of $N = 100$ candidates,[^120] I set $N = 20$ to shorten runtimes, and because increasing $N$ beyond this seemed (in early testing) to neither yield meaningful gains to performance nor substantively change my results. The `glmnet` auto-tuner also has default folds $K = 10$, but I lower this to $K = 5$ to remain consistent with the $K$ I select for the final DML fits (see @sec-gen-dml-plr). Finally, as to the performance metrics, I keep the `mlr3` default of MSE for regression tasks, but I depart from said default for classification tasks, opting for precision-recall area under the curve (PR-AUC) in lieu of classification error. I shall elaborate on this latter choice when I cover Chapter 3 (@sec-ch3), as it is the only instance wherein I consider classification tasks. Irrespective of task, however, I aggregate the performance scores as per the `mlr3` default algorithm, which simply averages the scores found from each $k \in [K]$ evaluation on test set $I_{k}$ per $n \in [N]$ candidate.[^121] In the case of ridge regression, this results in a mean MSE for each $\lambda$, and that with the lowest mean is chosen for the final DML fits (see @fig-dml-flow_1).[^122]
+In most instances, I tune hewing to the default settings and recommendations of both `DoubleML` and `mlr3`. The reason I do so is twofold: to preserve model simplicity and to safeguard against selecting the worst-performing specifications.[^115] As indicated above, I cross-validate using folds split from the full sample (i.e., $\mathbf{v}_{i,j,l}$), which is in keeping with the `DoubleML` default.[^116] Though users may optionally cross-validate on each fold drawn for the final DML fits (see @sec-gen-dml-fits-final), I refrain from doing so because it is $K$-times more costly and known to perform similarly to full-sample cross-validation in any case.[^117] For the ridge models in particular, defined by hyperparameters $\lambda$ and $\alpha$, I exclusively tune $\lambda$, since ridge requires $\alpha = 0$.[^118] To do so, I set $\alpha$ properly and specify the space from which the $\lambda$ values will be sampled---namely, the range `mlr3` recommends for models using `glmnet`, the main dependency supporting ridge tasks in the `mlr3` ecosystem.[^119] Furthermore, to improve the likelihood that a representative sample of $\lambda$ values is drawn from the full range, I employ a "grid" search strategy, which simply finds $N$ equally-spaced points between and inclusive of the lower and upper bounds. Though the auto-tuner [`glmnet::cv.glmnet`](https://glmnet.stanford.edu/reference/cv.glmnet.html) effectively has a default resolution of $N = 100$ candidates,[^120] I set $N = 20$ to shorten runtimes, and because increasing $N$ beyond this seemed (in early testing) to neither yield meaningful gains to performance nor substantively change my results. The `glmnet` auto-tuner also has default folds $K = 10$, but I lower this to $K = 5$ to remain consistent with the $K$ I select for the final DML fits (see @sec-gen-dml-plr). Finally, as to the performance metrics, I keep the `mlr3` default of MSE for regression tasks, but I depart from said default for classification tasks, opting for precision-recall area under the curve (PR-AUC) in lieu of classification error. I shall elaborate on this latter choice when I cover Chapter 3 (@sec-res-ch3), as it is the only instance wherein I consider classification tasks. Irrespective of task, however, I aggregate the performance scores as per the `mlr3` default algorithm, which simply averages the scores found from each $k \in [K]$ evaluation on test set $I_{k}$ per $n \in [N]$ candidate.[^121] In the case of ridge regression, this results in a mean MSE for each $\lambda$, and that with the lowest mean is chosen for the final DML fits (see @fig-dml-flow_1).[^122]
 
 [^115]: To clarify my logic on the latter point, if default settings are "good enough" for most applications, then they are highly-likely to outperform at least some alternative settings. Hence, the defaults should be regarded as minimally safe, insofar as one can reasonably expect them to not be worst-performing settings.
 
@@ -704,7 +700,7 @@ Although my research agenda is ultimately more interested in inference than it i
 
 Naturally, the primary groupings inhering in panel data $\mathbf{v}_{i,j,l}$ are geography and time---namely, either country or region, as well as year. Simultaneously resampling by the two, however, is virtually impossible---or, at the very least, is surely unjustifiable. For example, because there may only be one match for each country and year (e.g., Germany-2000, Germany-2001, etc.), the total number of country-year groups is equivalent to all $N$ rows. To wit, resampling as such is futile, being no different than not resampling by group in the first place: folds will functionally split by observation if each "group" is, in fact, a single observation. In addition, although cluster-robust DML offers a method of preparing training-test set pairs disjoint along two or more dimensions for the final cross-fits, as we shall see in @sec-gen-dml-fits-final, it is neither currently-available for tuning nor attested in the literature thereof, to the best of my knowledge.[^127] Resampling by individual groups, then, is more sensible at this juncture, even if---admittedly---it cannot neutralize all sources of data leakage at once. Ultimately, I opt for resampling by spatial units (i.e., country or region), because I intuitively expect my data to cluster greater over political topographies than over time; and indeed, preliminary tests demonstrated that predictive performance from resampling by year was virtually identical to that of not resampling by group at all, intimating that the effect of data leakage originating from temporal clustering is exceedingly marginal.
 
-[^127]: Specifically, the dependencies `DoubleML` relies on for tuning (e.g., `mlr3`) do not offer the same sample-splitting procedure that cluster-robust DML uses. Though writing a custom resampling method to replicate it is theoretically possible, doing so would be time-intensive, and its accuracy would likely be hard to verify.
+[^127]: Specifically, the dependencies `DoubleML` relies on for tuning (e.g., `mlr3`) do not offer the same sample-splitting procedure that cluster-robust DML uses. Though writing a custom resampling method to replicate it is theoretically possible, doing so would be time-intensive, and its successfulness would likely be hard to verify.
 
 ##### Final Fits {#sec-gen-dml-fits-final}
 
@@ -900,43 +896,103 @@ However, because I set $df_{com} = \infty$ (see @sec-gen-prep-tl), my formula fo
 
 [^137]: For more on the implication of setting $df_{com} = \infty$, see [Van Buuren (2018)](https://stefvanbuuren.name/fimd/sec-whyandwhen.html#eq:oldnu).
 
-So it is that the results from all $(m_{i})_{i=1}^{5}$ iterations of datasets $\mathbf{v}_{i,j,l}$ are consolidated, delivering final causal estimates $\hat{\theta}_{j,l}$ (i.e., $\bar{\theta}_{j,l}$) and their attendant inferential data. These form the basis of my conclusions, the beginnings of which I proffer in @sec-ch1-res, @sec-ch2-res, and @sec-ch3-res.
+So it is that the results from all $(m_{i})_{i=1}^{5}$ iterations of datasets $\mathbf{v}_{i,j,l}$ are consolidated, delivering final causal estimates $\hat{\theta}_{j,l}$ (i.e., $\bar{\theta}_{j,l}$) and their attendant inferential data. These form the basis of my conclusions, the beginnings of which I proffer in @sec-res.
 
 ![Pooling Flowchart. Note that $\hat{\theta}_{j,l}$ is the mean of all $\hat{\theta}_{i,j,l}$.](/Users/briankey/Documents/Academics/Northwestern/dissertation/visualizations/memos/pool_flow_viz.png){#fig-pool-flow}
 
 ### Replication {#sec-gen-rep}
 
-In each chapter, I also run models that approximate those of the literature inspiring my work, the main points of departure (where appropriate) being (1.) the substitution of HR Scores for the authors' outcomes and my selected treatments for theirs, and (2.) the use of both unimputed (in line with the authors' methodologies) and multiply-imputed data. I do so to test whether the introduction of new key variables and/or multiple imputation immediately yields divergent results. More on these replications can be found in @sec-ch1-rep, @sec-ch2-rep, and @sec-ch3-rep.
+In each chapter, I also run models that approximate those of the literature inspiring my work, the main points of departure (where appropriate) being (1.) the substitution of HR Scores for the authors' outcomes and my selected treatments for theirs, and (2.) the use of both unimputed (in line with the authors' methodologies) and multiply-imputed data. I do so to test whether the introduction of new key variables and/or multiple imputation immediately yields divergent results. More on these replications can be found in @sec-res-ch1-rep, @sec-res-ch2-rep, and @sec-res-ch3-rep.
 
-## Chapter 1: PTAs {#sec-ch1}
+## Results {#sec-res}
 
-### Treatments {#sec-ch1-treats}
+### General Remarks {#sec-res-gen-rem}
 
-### Covariates {#sec-ch1-covs}
+In the interest of efficiency, I now preface my results by elaborating on the final design choices common to multiple chapters. These follow mainly from theoretical considerations, encompassing (1.) covariate selection, (2.) fixed effects, (3.) regional model variants, and (4.) interaction-term treatments.
 
-### Replication: Hafner-Burton (2005) {#sec-ch1-rep}
+#### Covariates {#sec-res-gen-rem-covar}
 
-### Results {#sec-ch1-res}
+In @sec-gen-prep-dw-covar, I enumerated the covariates featured in all three chapters. My rationale for their inclusion may be summarized as follows:
 
-## Chapter 2: BITs {#sec-ch2}
+1.  Accession to PTAs/BITs and exposure to economic sanctions may correlate with quality of democratic institutions. Hypotheses for these possible relationships include:
 
-### Treatments {#sec-ch2-treats}
+    i.  Democracies, anticipating their continued high-respect of human rights, may be more amenable to signing hard PTAs, for doing so entails little risk (Spilker & Böhmelt, 2013, p. 352).
+    ii. States with poor democratic institutions may be motivated to improve their credibility among foreign investors and thus seek membership in more BITs.[^138]
+    iii. States with poor (or decaying) democratic institutions are naturally more vulnerable to becoming targets of those sanctions expressly intended to improve democracy and human-rights respect (Peez, 2025, p. 16).
 
-### Covariates {#sec-ch2-covs}
+    The democracy scores I employ are ultimately meant to control for these scenarios. To avoid privileging a single conceptualization or measure of democracy, a typical practice in the underlying literature,[^139] I select all 26 of V-Dem's high- and mid-level indices. Importantly, I ignore the far-more numerous lower-level V-Dem indicators to contain computational expenses, and since many of these are aggregated into (and thus captured by) the mid- and high-level indices in any case.
 
-### Replication: Bodea & Ye (2020) {#sec-ch2-rep}
+2.  In a similar vein, I also include Polity and Regime Durability. Polity serves as the proxy for democracy in the PTAs/BITs literature, so its inclusion helps clarify comparability with the works thereof. Regime Durability---the number of years since the last major, structural change in a state's regime[^140]---performs a similar function, since it figures in these pieces as well. However, it may also be seen as capturing the recency of "trigger events," which precipitate meaningful changes to institutional quality and hence susceptibility to PTA/BIT accession or economic sanctions. For example, young democracies may consent to harder PTAs to "signal their commitment" to more robust human-rights standards (Spilker & Böhmelt, 2013, p. 352). Alternatively, the proximate causes of economic sanctions may lie in sudden instances of repression or backsliding.
 
-### Results {#sec-ch2-res}
+3.  The PTAs/BITs literature conditions on a set of World Development Indicators (WDIs) that generally includes:
 
-## Chapter 3: Economic Sanctions {#sec-ch3}
+    i.  Trade openness---i.e., the sum of exports and imports of goods and services as a percentage of GDP. The literature adduces research finding that flows of international commerce may influence human-rights respect, for better or worse.[^141] Although correlations with the treatment(s) are not explicitly theorized, one may reasonably expect trade-favoring states to exhibit commensurate sympathy to liberal economic treaties, including PTAs and BITs.
+    ii. Foreign direct investment (FDI). Hafner-Burton's (2005) measure sums the absolute values of net FDI inflows and outflows (p. 617), whereas Bodea & Ye (2020) focus on the inflows component (p. 965).[^142] In either case, the foregoing hypothesis linking international economic transactions and human-rights respect motivates their inclusion. However, it is likewise natural to intuit that openness to FDI correlates with agreeability to treaties such as PTAs and BITs.
+    iii. Population density (per square kilometer). Explaining its inclusion, Hafner-Burton (2005, p. 617) and Spilker & Böhment (2013, p. 351) point to scholarship raising concerns about population pressure driving resource scarcity and hence higher rates of repression. If population density affects human-rights respect in this way, however, then it would be logical to anticipate a similar link to democracy, a possible determinant of PTA/BIT membership (for reasons aforementioned).
 
-### Treatments {#sec-ch3-treats}
+    Peez (2025) does not use any of these covariates. Yet it seems intuitive that sanctions senders might be warier of targeting countries better-integrated into the global economy, lest doing so disrupt (directly or indirectly) critical transactional flows, harming their own economies in the process. Conversely, economically-isolated (or "-weak") states---mattering less to the economies of sender states---may be more vulnerable to sanctions. Targets' economic importance, captured by signals such as trade openness and FDI inflows/outflows, may thus be fairly suspected as a confounding factor. Moreover, any relationship between population density and democracy would naturally have implications for economic-sanctions vulnerability.
 
-### Covariates {#sec-ch3-covs}
+    The set of WDIs initially used in the PTAs/BITs literature therefore seems appropriate for the entire dissertation. For the most part, I utilize consistent, untransformed versions of the WDIs, the only exception being the FDI metrics. Specifically, in Chapter 1, I recreate the single measure of FDI in Hafner-Burton (2005), thus ensuring direct comparability thereto. In Chapter 2, on the other hand, I generally follow Bodea & Ye's (2020) approach, including both the inflows and outflows components as separate regressors under the assumption that the latter may also influence amenability to BITs.[^143] This design choice is repeated for Chapter 3, since I prefer the safety of variables in their original form wherever possible.
 
-### Replication: Peez (2025) {#sec-ch3-rep}
+4.  Gross domestic product per capita (GDPpc)---a proxy for national wealth---is put to work throughout the underlying literature. In the PTAs/BITs articles, GDPpc controls for the link between poverty and repression (Hafner-Burton, 2005, p. 617; Spilker & Böhmelt, p. 352); however, it is also reasonable to postulate a connection between wealth and PTA/BIT membership. Specifically, rich states may look to PTAs/BITs as a means of guaranteeing or locking in favorable market conditions, whereas poorer states may do so aiming for improved market access and accelerated development. Peez (2025), by contrast, rationalizes the use of GDPpc on a potential link to treatment assignment, theorizing that economically "weak" states may be more vulnerable to becoming sanctions targets (p. 14). Regardless, the possible confoundedness (explicitly or implicitly) motivating GDPpc's use as a common covariate seems sufficiently credible to warrant its continued inclusion in my own models.
 
-### Results {#sec-ch3-res}
+    The relevant literature do not deploy gross domestic product (GDP) or population as controls. However, an effect on treatment assignment by present or future market size---for which GDP and population serve as proxies---is not hard to conceptualize. First, the same dynamics pushing wealthy or poor states to join PTAs/BITs may well apply, respectively, to large or small states, who may seek out such treaties to lock in economic predominance or jumpstart growth. Also, large-market states may enjoy greater insulation from sanctions than small-market states, whose current or projected contributions to the global economy may be registered as less significant in the cost-benefit analyses of sanctions senders. Therefore, there exists adequate reason to incorporate GDP and population as controls throughout, too.[^144]
+
+5.  The final predictor I implement for all three chapters is balance of payments.
+
+[^138]: Bodea & Ye (2020) describe this theory but conclude that the evidence supporting it is "weak" (p. 957). Still, including democracy scores is sensible lest their view be incorrect.
+
+[^139]: Namely, Hafner-Burton (2005), Spilker & Böhmelt (2013), and Bodea & Ye (2020) use Polity, whereas Peez (2025) leverages V-Dem's Polyarchy.
+
+[^140]: Formally, the variable represents the number of years since the last occurrence of a three-point movement or greater (within a span of three years or fewer) on the Polity scale. For more, see the [QoG Codebook](https://www.gu.se/en/quality-government/our-research/publications/codebooks).
+
+[^141]: See Hafner-Burton (2005, p. 617) and Spilker & Böhmelt (2013, p. 352) for more.
+
+[^142]: Spilker & Böhmelt (2013) decline to utilize an FDI metric, largely citing theoretical correlation with trade openness and missingness in the corresponding WDIs (p. 352). Needless to say, however, my dependence on multicollinearity-robust learners and multiple imputation alleviates these concerns.
+
+[^143]: Indeed, following Bodea & Ye's (2020) own logic, major FDI senders may seek out BITs to lock in friendly investment conditions for themselves.
+
+[^144]: Technically, doing so is safest conditional on the use of multicollinearity-robust learners (such as those I employ), since GDP and population are known to covary to a high degree.
+
+#### Fixed Effects {#sec-res-gen-rem-fe}
+
+country-year + region-year (why latter?)
+
+#### Regional Models {#sec-res-gen-rem-reg-mod}
+
+#### Interactions {#sec-res-gen-rem-interact}
+
+As treatments (alongside regular treatments).
+
+### Chapter 1: PTAs {#sec-res-ch1}
+
+#### Treatments {#sec-res-ch1-treats}
+
+#### Covariates {#sec-res-ch1-covs}
+
+#### Replication: Hafner-Burton (2005) {#sec-res-ch1-rep}
+
+#### Findings {#sec-res-ch1-find}
+
+### Chapter 2: BITs {#sec-res-ch2}
+
+#### Treatments {#sec-res-ch2-treats}
+
+#### Covariates {#sec-res-ch2-covs}
+
+#### Replication: Bodea & Ye (2020) {#sec-res-ch2-rep}
+
+#### Findings {#sec-res-ch2-find}
+
+### Chapter 3: Economic Sanctions {#sec-res-ch3}
+
+#### Treatments {#sec-res-ch3-treats}
+
+#### Covariates {#sec-res-ch3-covs}
+
+#### Replication: Peez (2025) {#sec-res-ch3-rep}
+
+#### Findings {#sec-res-ch3-find}
 
 ## Conclusion {#sec-cncl}
 
@@ -993,9 +1049,9 @@ $$\begin{align*}
 = -\theta(\mathbf{D} - m(\mathbf{X}))^{2} + (\mathbf{Y} - \ell(\mathbf{X}))(\mathbf{D} - m(\mathbf{X}))
 \end{align*}$$
 
-Solving the moment-condition estimator gives:[^138]
+Solving the moment-condition estimator gives:[^145]
 
-[^138]: The distribution of the mean operator $\left(\frac{1}{n}\sum_{i \in I}\right)$ and the constant ($-\hat{\theta}$) follows from the linearity of expectation.
+[^145]: The distribution of the mean operator $\left(\frac{1}{n}\sum_{i \in I}\right)$ and the constant ($-\hat{\theta}$) follows from the linearity of expectation.
 
 $$\begin{align*}
 0 = \frac{1}{n}\sum_{i \in I}[-\hat{\theta}_{0}(\mathbf{D} - \hat{m}(\mathbf{X}))^{2} + (\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X}))] \\
@@ -1018,11 +1074,11 @@ $$\begin{align*}
 m_{0}(\mathbf{X}) = \mathbb{E}[\mathbf{D}|\mathbf{X}]
 \end{align*}$$
 
-Now, consider a simple linear regression, wherein OLS predicts an outcome $\mathbf{Y}$ from a single treatment $\mathbf{D}$.[^139] The true coefficient on the explanator may be expressed as:[^140]
+Now, consider a simple linear regression, wherein OLS predicts an outcome $\mathbf{Y}$ from a single treatment $\mathbf{D}$.[^146] The true coefficient on the explanator may be expressed as:[^147]
 
-[^139]: To wit: $\mathbf{Y} = \beta_{0} + \beta_{1}\mathbf{D} + \epsilon_{i}$
+[^146]: To wit: $\mathbf{Y} = \beta_{0} + \beta_{1}\mathbf{D} + \epsilon_{i}$
 
-[^140]: That is, $\beta_{1} = \frac{\text{Cov}(\mathbf{D}, \mathbf{Y})}{\text{Var}(\mathbf{D})}$. In the bivariate case, $\mathbb{E}[\mathbf{D}] = \bar{\mathbf{D}}$ and $\mathbb{E}[\mathbf{Y}] = \bar{\mathbf{Y}}$. The basic formula may be found in Rice (2007, p. 544), for example, albeit in scalar notation.
+[^147]: That is, $\beta_{1} = \frac{\text{Cov}(\mathbf{D}, \mathbf{Y})}{\text{Var}(\mathbf{D})}$. In the bivariate case, $\mathbb{E}[\mathbf{D}] = \bar{\mathbf{D}}$ and $\mathbb{E}[\mathbf{Y}] = \bar{\mathbf{Y}}$. The basic formula may be found in Rice (2007, p. 544), for example, albeit in scalar notation.
 
 $$\begin{align*}
 \beta_{1} = \frac{\sum_{i \in I}(\mathbf{Y} - \mathbb{E}[\mathbf{Y}])(\mathbf{D} - \mathbb{E}[\mathbf{D}])}{\sum_{i \in I} (\mathbf{D} - \mathbb{E}[\mathbf{D}])^{2}}
@@ -1039,9 +1095,9 @@ The solutions to $\hat{\theta}_{0}$ and the sample analogue $\hat{\beta}_{1}$ of
 
 ### Appendix F: Example of Cluster-Robust DML Sample Splitting {#sec-appx-f}
 
-To better-illustrate the sample-splitting procedure introduced in @sec-gen-dml-fits-final, consider a basic panel dataset comprised of countries $c \in [C] = \{1, ..., C\}$ and years $t \in [T] = \{1, ..., T\}$.[^141] In addition, let $C = 4$, $T = 4$, and $K = 2$. Now, suppose that the $C$ countries and $T$ years are randomly partitioned into the following initial subgroups:
+To better-illustrate the sample-splitting procedure introduced in @sec-gen-dml-fits-final, consider a basic panel dataset comprised of countries $c \in [C] = \{1, ..., C\}$ and years $t \in [T] = \{1, ..., T\}$.[^148] In addition, let $C = 4$, $T = 4$, and $K = 2$. Now, suppose that the $C$ countries and $T$ years are randomly partitioned into the following initial subgroups:
 
-[^141]: Recalling the notation used in @sec-gen-dml-fits-final, $C$ equates to $N$ and $T$ to $M$.
+[^148]: Recalling the notation used in @sec-gen-dml-fits-final, $C$ equates to $N$ and $T$ to $M$.
 
 $$\begin{align*}
 I_{1} = \{c_{1}, c_{3}\} \qquad J_{1} = \{t_{2}, t_{3}\} \\
