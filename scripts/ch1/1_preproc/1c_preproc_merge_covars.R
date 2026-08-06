@@ -34,13 +34,13 @@ load(here("data/ch1/preprocessed/hras.rda"))
 load(here("data/ch1/preprocessed/bop_panel.rda"))
 
 ## fin crises
-### curr_cris
-curr_cris <- read_xlsx(here("data/common/raw/fin_crises/nguyen_et_al/1-s2.0-S0264999322000165-mmc1.xlsx")) |> 
+### curr_crisis
+curr_crisis <- read_xlsx(here("data/common/raw/fin_crises/nguyen_et_al/1-s2.0-S0264999322000165-mmc1.xlsx")) |> 
   janitor::clean_names()
 
 ### sud_stop
 sud_stop <- read_dta(here("data/common/raw/fin_crises/forbes_warnock/ForbesWarnock_episodes.dta"))
-imf_prog <- zap_label(sud_stop)
+sud_stop <- zap_label(sud_stop)
 
 ### imf_prog
 imf_prog <- read_dta(
@@ -148,9 +148,90 @@ wdi_small <- wdi_small |>
   select(-cname, -cname_qog)
 
 ## fin crises ----
-### curr_cris ----
+### curr_crisis ----
+curr_crisis <- curr_crisis |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = country,
+      origin = "country.name",
+      destination = "cown"
+      )
+    ) |> 
+  filter(
+    !(country == "Serbia" & year < 1999),
+    !(country == "Yugoslavia" & year > 1998)
+    ) |> 
+  mutate(
+    cow = ifelse(
+      country == "Serbia",
+      345,
+      cow
+      )
+    ) |> 
+  filter(!is.na(cow)) |> 
+  rename(curr_crisis = currency_crises) |> 
+  select(cow, year, curr_crisis) |> 
+  arrange(cow, year)
+
 ### sud_stop ----
+#### get base data
+sud_stop <- sud_stop |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = cc_d,
+      origin = "iso2c",
+      destination = "cown"
+      )
+    ) |> 
+  filter(cc_d != "HK") |> 
+  mutate(
+    cow = if_else(
+      is.na(cow), 211, cow
+      )
+    ) |> 
+  rename(year = yr) |> 
+  select(cow, year, stop_epiTO)
+
+#### create Luxembourg rows
+lux <- sud_stop |> 
+  filter(cow == 211) |> 
+  mutate(cow = 212)
+
+#### add Luxembourg rows
+sud_stop <- sud_stop |> 
+  rbind(lux) |> 
+  arrange(cow, year)
+
+#### finalize
+sud_stop <- sud_stop |> 
+  summarize(
+    sud_stop = sum(stop_epiTO, na.rm = TRUE),
+    .by = c(cow, year)
+    ) |> 
+  mutate(
+    sud_stop = if_else(
+      sud_stop > 0, 1, 0)
+    )
+
 ### imf_prog ----
+#### note: NA vals are generally prior to IMF accession, so safe to code these as 0
+imf_prog <- imf_prog |> 
+  select(
+    ccode_cow,
+    year,
+    under
+    ) |> 
+  rename(
+    cow = ccode_cow,
+    imf_prog = under
+    ) |> 
+  filter(!is.na(cow)) |> 
+  mutate(
+    imf_prog = if_else(
+      is.na(imf_prog), 0, imf_prog
+      )
+    ) |> 
+  arrange(cow, year)
 
 # merge ----
 ## vdem & hr scores
@@ -189,6 +270,19 @@ merge_base <- merge_base |>
 ## merge_base & wdi_small
 merge_base <- merge_base |> 
   left_join(wdi_small)
+
+## merge_base & fin crises
+### curr_crisis
+merge_base <- merge_base |> 
+  left_join(curr_crisis)
+
+### sud_stop
+merge_base <- merge_base |> 
+  left_join(sud_stop)
+
+### imf_prog
+merge_base <- merge_base |> 
+  left_join(imf_prog)
 
 ## merge_base & standards
 merge_base <- merge_base |> 
