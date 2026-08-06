@@ -220,3 +220,10 @@
 
 # 7/9/26 #
 -Heuristic (and general) note on bias: makes model overly simple, causing estimated target parameter (e.g., $\hat{\theta}$) to differ increasingly from the true target parameter (e.g., $\theta$).
+
+# 8/5/26 #
+-Will add currency-crisis, sudden-stop/reversal, and IMF program indicators. These will work alongside BoP to account for the impending or ongoing crises that may motivate PTAs/BITs accession or trigger instances of repression that then motivate sanctions imposition. This is inspired by Mukherjee & Yadav (2024).
+-Note that Mukherjee & Yadav's (2024) argument is that crises are likelier to result in repression when currency + sudden-stop crises are concurrent and occur amid IMF program membership.
+-I can't find their replication data, so I will use proxies that seem to have used too.
+  -The sudden-stop indicator comes from an updated version of Forbes & Warnock (2012), which they cite directly. The currency-crisis indicator is sourced in part from Laeven & Valencia (2008 + presumably their more recent data). The IMF program indicator seems to come from Veeland (2004 + presumably his more recent data).
+  -I have retrieved (effectively) recent data for all of them. The first comes from Forbes & Warnock directly. The second comes from Nguyen et al. (2022), who expand on Laeven & Valencia's data. (Nguyen et al. provide the most recent data I could successfully retrieve.) The third also comes from Veeland directly.

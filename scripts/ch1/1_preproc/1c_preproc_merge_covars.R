@@ -1,8 +1,10 @@
 # load packages ----
 library(tidyverse)
 library(here)
+library(haven)
+library(readxl)
 library(vdemdata)
-library(naniar)
+library(countrycode)
 library(states)
 
 # load data ----
@@ -30,6 +32,22 @@ load(here("data/ch1/preprocessed/hras.rda"))
 
 ## bop
 load(here("data/ch1/preprocessed/bop_panel.rda"))
+
+## fin crises
+### curr_cris
+curr_cris <- read_xlsx(here("data/common/raw/fin_crises/nguyen_et_al/1-s2.0-S0264999322000165-mmc1.xlsx")) |> 
+  janitor::clean_names()
+
+### sud_stop
+sud_stop <- read_dta(here("data/common/raw/fin_crises/forbes_warnock/ForbesWarnock_episodes.dta"))
+imf_prog <- zap_label(sud_stop)
+
+### imf_prog
+imf_prog <- read_dta(
+  here("data/common/raw/fin_crises/vreeland/master_merge_wide.dta"),
+  col_select = -cname_gw
+  )
+imf_prog <- zap_label(imf_prog)
 
 # prep merge ----
 ## vdem ----
@@ -128,6 +146,11 @@ wdi_small <- wdi_small |>
     ) |> 
   filter(cname_qog != "Serbia and Montenegro") |> 
   select(-cname, -cname_qog)
+
+## fin crises ----
+### curr_cris ----
+### sud_stop ----
+### imf_prog ----
 
 # merge ----
 ## vdem & hr scores
