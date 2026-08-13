@@ -170,6 +170,7 @@ imp_vals <- ptas_1968 |>
             )
           ),
         starts_with("ns_"),
+        imf_prog,
         hras
         ), ~ FALSE
       ),
@@ -187,6 +188,7 @@ imp_vals <- ptas_1968 |>
         ends_with("_log10"),
         e_polity2,
         p_durable,
+        curr_crisis,
         inv,
         bop_pct_gdp
         ),
@@ -234,8 +236,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 109,
-  ncol = 109,
+  nrow = 111,
+  ncol = 111,
   dimnames = dim_names
   )
 
@@ -268,7 +270,14 @@ ptas_mice <- ptas_1968 |>
   select(-1) |> 
   mutate(
     across(
-      c(cow, year, glb_s, contains("any_inforce")),
+      c(
+        cow,
+        year,
+        glb_s,
+        curr_crisis,
+        imf_prog,
+        contains("any_inforce")
+        ),
       ~ as_factor(.x)
       )
     )

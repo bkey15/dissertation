@@ -132,7 +132,7 @@ Afterwards, I consolidate the covariates, $\mathbf{X} \in \mathbb{R}^{N \times k
     ii. Foreign direct investment (FDI).
     iii. Population density.
 4.  From Fariss et al. (2022), latent estimates of GDP, GDPpc, and population (logged).
-5.  Balance of payments.
+5.  Indicators of currency crises and International Monetary Fund (IMF) program membership, as well as balance of payments (share of GDP).
 
 [^6]: I source these variables from V-Dem and the [Quality of Governance](https://www.gu.se/en/quality-government/qog-data) (QoG) dataset, respectively.
 
@@ -247,7 +247,7 @@ Above, $\mathbf{Y}$ is the outcome, $\epsilon$ the error term, $\mathbf{X}$ the 
 
 [^34]: More on interpreting the SLX formula may be found in Rüttenauer (2024, p. 8).
 
-$\mathbf{W}$, an $N \times N$ row-normalized matrix,[^35] is of especial import, containing the base information needed to compute the "spatial lags"---versions of each covariate from $\mathbf{Z} \in \mathbb{R}^{N \times v}$ that take the mean of any given observation's neighbors, and the inclusion of which ultimately makes for an SLX model. Together, $\mathbf{WZ}$ denote the spatial lags. $\mathbf{W}$ is of the form:[^36]
+$\mathbf{W}$, an $N \times N$ row-normalized matrix,[^35] is of especial importance, containing the base information needed to compute the "spatial lags"---versions of each covariate from $\mathbf{Z} \in \mathbb{R}^{N \times v}$ that take the mean of any given observation's neighbors, and the inclusion of which ultimately makes for an SLX model. Together, $\mathbf{WZ}$ denote the spatial lags. $\mathbf{W}$ is of the form:[^36]
 
 [^35]: That is, a two-dimensional matrix wherein each row sums to 1.
 
@@ -409,7 +409,9 @@ DML is motivated initially by high-dimensional cases, where $\eta_{0}$---the "nu
 
 #### Partially-Linear Regression (PLR) {#sec-gen-dml-plr}
 
-The specific DML model I elect to use is the partially-linear regression (PLR) model. I do so because it is the most generally appropriate---additional assumptions must be satisfied to justify the use of other DML models (e.g., those containing instrumental variables)---and is the simplest, making it the easiest to interpret.[^61] The model is initially of the form:
+The specific DML model I elect to use is the partially-linear regression (PLR) model. I do so because it is the most generally appropriate---additional assumptions must be satisfied to justify the use of other DML models (e.g., those containing instrumental variables)---and is the simplest, making it the easiest to interpret.[^61] **In this section, I build the intuition for PLR...**
+
+The model is initially of the form:
 
 [^61]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. *Prima facie*, the partially-linear panel regression model (PLPR) may seem tempting considering the country-year structure of my data; but in the last analysis, the assumptions on which it rests are almost certainly disqualifying. Most crucially, it requires no feedback to predictors (e.g., last year's $\mathbf{Y}$ and $\mathbf{D}$ do not affect this year's $\mathbf{X}$) and a static panel (e.g., knowing this year's $\mathbf{X}$, this year's $\mathbf{Y}$ and $\mathbf{D}$ are independent of last year's $\mathbf{Y}$, $\mathbf{X}$, and $\mathbf{D}$), both of which seem inappropriate for international policies and behaviors. Indeed, these phenomena are known to diffuse over time and follow flexible causal processes---hence my use of temporal and spatial lagging, for example. For more on PLPR, see Clarke & Polselli (2025). For a full enumeration of the DML models currently available in statistical software, see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
 
@@ -936,9 +938,15 @@ In @sec-gen-prep-dw-covar, I enumerated the covariates featured in all three cha
 
     The relevant literature do not deploy gross domestic product (GDP) or population as controls. However, an effect on treatment assignment by present or future market size---for which GDP and population serve as proxies---needs little to entertain. First, the same dynamics pushing wealthy or poor states to join PTAs/BITs may well apply, respectively, to large or small states, who may seek out such treaties to lock in economic predominance or jumpstart growth. Also, large-market states may enjoy greater insulation from sanctions than small-market states, whose current or projected contributions to the global economy may be registered as less significant in the cost-benefit analyses of sanctions senders. Therefore, there exists adequate reason to incorporate GDP and population as controls throughout, too.[^144]
 
-    The exact variables I choose are those of Fariss et al. (2022). Generated from a latent-variable model drawing on myriad measurements of GDP, GDPpc, and population, their own estimates aim to provide better measurement coverage, certainty, and resistance to bias than any of their model's individual inputs.[^145] As such, these measures are safe relative to the available alternatives (e.g., the WDIs for GDP, GDPpc, and population, which also form a share of the foregoing inputs), making them worthy for inclusion in models such as mine.
+    The exact variables I choose are Fariss et al.'s (2022). Generated from a latent-variable model drawing on myriad measurements of GDP, GDPpc, and population, their own estimates are designed to provide enhanced measurement coverage, certainty, and resistance to bias than any of their model's individual inputs.[^145] As such, these measures are likely safer than those that do not (e.g., the WDIs for GDP, GDPpc, and population, which also form a share of the foregoing inputs), making them worthy for inclusion in models such as mine.
 
-5.  The final batch of predictors I consistently implement endeavors to account for the possible consequences stemming from both the threat and onset of financial crises. 
+5.  The final batch of predictors I invariably implement endeavors to account for impacts occasioned by the threat or onset of financial crises. A diversity of observers---including international organizations (e.g., the United Nations), watchdogs (e.g., Amnesty International), and more---have cast financial crises as a major catalyst of repression (Mukherjee & Yadav, 2024, pp. 16-17). The story typically told for this causal link is straightforward: financial crises, whose ramifications are wide-ranging and devastating, compel many disaffected citizens to mobilize against their governments, who in turn greet their dissent with repression.[^146] Mukherjee & Yadav (2024) complicate this image by pointing out that while it does not "inevitably" follow, as traditional accounts would have it (p. 17), repression is indeed a possible outcome of financial crises, particularly amid a "twin" currency and sudden-stop crisis and International Monetary Fund (IMF) program participation.[^147] In any case, the literature agrees that a correlation between financial crises and repression is to be expected in at least some cases, raising the possibility of its role as a confounder in my modeling.
+
+    Currency crises and sudden stops---the foci of Mukherjee & Yadav's (2024) study---are especially important to consider. The proximate cause of the former are usually speculative attacks by foreign-exchange traders. Though the conditions undergirding and triggers of these attacks have been elaborated by multiple "generations" of research, their upshot is the same: depletion of foreign-currency reserves (e.g., U.S. dollars) and galloping domestic-currency depreciation.[^148] Similarly, though ascribed to a variety of sources in the literature, sudden-stop crises all share the same basic pattern: a dramatic retraction of capital inflows (e.g., foreign-portfolio investment), undercutting national outputs and foreign-currency reserves in turn. In this way, sudden stops may effectuate or contribute to currency crises themselves.[^149] To avert, ameliorate, or resolve these crises, states may look to policies that improve their balance of payments (BoP) and thus rebuild their foreign-currency reserves.[^150] Of these, perhaps the most well-known is assistance from the IMF, the international "lender of last resort" (Mukherjee & Yadav, 2024, pp. 76-77). Yet it is rational to expect states to seek relief in other sources, too, including liberal trade and investment treaties. Indeed, acceding to these would in theory mitigate salient short- and long-term contributors to the financial crises at issue. In the short-term, they would lower the costs facing prospective investors and importers from foreign states, unlocking the kinds of transcations conducive to replenishing reserve currencies. Additionally, they would signal commitment to macroeconomic stability, encouraging such transactions still further. In the long-term, these benefits would compound, fueling a virtuous cycle marginalizing the specter of financial-crisis outbreak. That states follow this logic is even supported anecdotally: negotiations for a [free trade agreement between Sri Lanka and Thailand](https://investmentpolicy.unctad.org/international-investment-agreements/treaties/bit/5136/sri-lanka---thailand-fta-2024-) were accelerated in 2023, and concluded the following year, expressly to help the former rebuild its foreign-currency reserves amid its own financial crisis.[^151] Therefore, the clear implication is that currency and sudden-stop crises might well be confounders in chapters 1 and 2, increasing not only the likelihood of repression, but also PTAs/BITs accession. Although these crises may not directly trigger sanctions, their deleterious impact on democratic institutions may heighten vulnerability thereto, rendering financial crises a possible confounder in Chapter 3 as well.[^152]
+
+    Controlling for currency and sudden-stop crises is mostly simple to achieve by dint of publicly-available sources. Specifically, although Mukherjee & Yadav's (2024) replication data are as yet unpublished, to the best of my knowledge, versions of the variables cited as informing their own are easy to locate. First, Nguyen et al. (2022) provide an updated version of the Laeven & Valencia (2020) Systemic Banking Crises Database, a comprehensive tracker of several financial-crisis types, including currency crises.[^153] Most helpfully, Nguyen et al.'s (2022) dataset is rendered in country-year panel format, thereby offering a currency-crisis indicator ready for use in models such as mine. Unfortunately, none of these datasets contain an indicator for sudden-stop crises, specifically, and the sources Mukherjee & Yadav (2024, p. 152) adduce for constructing theirs exhibit poor coverage.[^154] However, because sudden stops become currency crises when sufficiently severe (Nguyen et al., 2022, p. 3), sudden-stop crises frequenly coincide with currency crises; and indeed, in Mukherjee & Yadav's (2024) sample of developing countries, the two co-occured approximately two-thirds of the time (p. 14). Consequently, following Nguyen et al. (2022), who aver that a sudden-stop crisis "can be identified through a currency crisis" (p. 3), I proceed with their currency-crisis indicator alone, presupposing that it suffices to capture sudden-stop crises as well.
+
+    To model the possible link between IMF program participation and financial-crisis onset---and, ergo, PTAs/BITs accession or financial-sanctions imposition---I also incorporate a 2023 update to Vreeland's (2007) indicator, which simply registers whether a country was party to any IMF arrangement during a given year.[^155] Though applying a somewhat-different taxonomy of eligible arrangements to form their own indicator, Mukherjee & Yadav (2024) cite his original dataset as a source (pp. 154-155), making Vreeland's indicator a credible alternative thereto. Finally, it is possible that states seek to adopt some liberal economic policies---including PTAs/BITs and those attending IMF programs---to improve their BoP in preemption of a full-bore crisis. Therefore, to capture the relative "health" of a state's BoP, which may figure prominently in their projections and calculi, I include BoP as a percentage of GDP. To create this variable, I simply take the BoP figures provided by the IMF and divide them by an unscaled version of Fariss et al.'s (2022) GDP estimates.[^156]
 
 [^137]: Bodea & Ye (2020) describe this theory but conclude that the evidence supporting it is "weak" (p. 957). Still, including democracy scores is sensible lest their view be incorrect.
 
@@ -958,9 +966,31 @@ In @sec-gen-prep-dw-covar, I enumerated the covariates featured in all three cha
 
 [^145]: See Fariss et al. (2022, p. 554) for a brief summary of the main benefits their estimates promise. For a complete list of their input variables, see Fariss et al. (2022, pp. 560-561).
 
+[^146]: My characterization distills the prevailing understanding as described in Mukherjee & Yadav (2024, pp. 15-17).
+
+[^147]: Put simply, their theory is that "shadow banks" collectively pressure IMF-program participants to renege on the conditions targeting them, prompting currency traders and foreign investors to initiate speculative attacks and withdrawals from equity markets, respectively, which in turn triggers currency and sudden-stop crises simultaneously. This scenario lowers "attribution uncertainty"---citizens are more ready to blame their governments for the twin crises---rendering dissent and therefore repression more likely. For a more complete summary, see Mukherjee & Yadav (2024, pp. 40-45). Note that the authors prefer "sudden reversal" over "sudden stop," the term more commonly used by economists. The two are synonymous, as clarified in Mukherjee & Yadav (2024, p. 28).
+
+[^148]: For summaries of the literature, see Nguyen et al. (2022, p. 2) and Mukherjee & Yadav (2024, pp. 27-28).
+
+[^149]: Recapitulations of the research on sudden stops may be found in Nguyen et al. (2022, p. 3) and Mukherjee & Yadav (2024, pp. 27-28).
+
+[^150]: The Federal Reserve Bank of St. Louis offers a useful [primer on BoP](https://www.stlouisfed.org/publications/page-one-economics/2025/oct/what-is-the-balance-of-payments). Note that "currency crises" and "balance-of-payments crises" are used interchangeably by economists owing to the fundamental problem of reserve-currency depletion. For example, see Krugman (1979).
+
+[^151]: For more on the fast-tracking and finalization of the Sri Lanka-Thailand free trade agreement, see news articles thereon from [the AP](https://apnews.com/article/politics-thailand-sri-lanka-business-406eac1bc5932d8f77dc8a2dc4ceab77), [Reuters](https://www.reuters.com/world/asia-pacific/thailand-sri-lanka-sign-free-trade-agreement-2024-02-03/), and [Al Jazeera](https://www.aljazeera.com/news/2024/2/3/sri-lanka-signs-free-trade-deal-with-thailand-to-revive-economy), for example.
+
+[^152]: Indeed, in some instances, financial crises have led to government collapse or instability, followed in turn by "severe political violence" (Mukherjee & Yadav, 2024, p. 24).
+
+[^153]: For the Nguyen et al. (2022) dataset, see [Appendix A](https://www.sciencedirect.com/science/article/abs/pii/S0264999322000165) of the online article. Mukherjee & Yadav (2024, p. 154) reference the original Laeven & Valencia (2008) dataset as a contributor to the currency-crisis component of their financial-crisis indicator. However, their sample extends to the year 2015 (Mukherjee & Yadav, 2024, p. 151), rendering it likelier that they drew on one of the more recent datasets (Laeven & Valencia, 2013; 2020).
+
+[^154]: For instance, Forbes & Warnock (2020), which updates Forbes & Warnock (2012) and contains a sudden-stop indicator, covers only 59 countries. By contrast, Nguyen et al. (2022) cover 211 countries. For more on their limited coverage, see Forbes & Warnock (2020, p. 4).
+
+[^155]: For the dataset and codebook, see Vreeland's webpage for [IMF Arrangements Data](https://vreeland.scholar.princeton.edu/imf-arrangements-data).
+
+[^156]: Technically, I source the the BoP data directly from the [World Bank](https://data360.worldbank.org/en/prosperity), which allows accessible downloading of the IMF data.
+
 #### Fixed Effects {#sec-res-gen-rem-fe}
 
-country-year + region-year (why latter?)
+Another repeated feature of my modeling is fixed effects, so as to. country-year + region-year (why latter?)
 
 #### Regional Models {#sec-res-gen-rem-reg-mod}
 
@@ -999,6 +1029,8 @@ As treatments (alongside regular treatments).
 #### Findings {#sec-res-ch3-find}
 
 ## Conclusion {#sec-cncl}
+
+Weakness of DML: exposed to criticism of "black box." Advantages: ...
 
 Collaboration between quantitative and qualitative scholars (former can identify or confirm causality, latter can describe causality.)
 
@@ -1053,9 +1085,9 @@ $$\begin{align*}
 = -\theta(\mathbf{D} - m(\mathbf{X}))^{2} + (\mathbf{Y} - \ell(\mathbf{X}))(\mathbf{D} - m(\mathbf{X}))
 \end{align*}$$
 
-Solving the moment-condition estimator gives:[^146]
+Solving the moment-condition estimator gives:[^157]
 
-[^146]: The distribution of the mean operator $\left(\frac{1}{n}\sum_{i \in I}\right)$ and the constant ($-\hat{\theta}$) follows from the linearity of expectation.
+[^157]: The distribution of the mean operator $\left(\frac{1}{n}\sum_{i \in I}\right)$ and the constant ($-\hat{\theta}$) follows from the linearity of expectation.
 
 $$\begin{align*}
 0 = \frac{1}{n}\sum_{i \in I}[-\hat{\theta}_{0}(\mathbf{D} - \hat{m}(\mathbf{X}))^{2} + (\mathbf{Y} - \hat{\ell}(\mathbf{X}))(\mathbf{D} - \hat{m}(\mathbf{X}))] \\
@@ -1078,11 +1110,11 @@ $$\begin{align*}
 m_{0}(\mathbf{X}) = \mathbb{E}[\mathbf{D}|\mathbf{X}]
 \end{align*}$$
 
-Now, consider a simple linear regression, wherein OLS predicts an outcome $\mathbf{Y}$ from a single treatment $\mathbf{D}$.[^147] The true coefficient on the explanator may be expressed as:[^148]
+Now, consider a simple linear regression, wherein OLS predicts an outcome $\mathbf{Y}$ from a single treatment $\mathbf{D}$.[^158] The true coefficient on the explanator may be expressed as:[^159]
 
-[^147]: To wit: $\mathbf{Y} = \beta_{0} + \beta_{1}\mathbf{D} + \epsilon_{i}$
+[^158]: To wit: $\mathbf{Y} = \beta_{0} + \beta_{1}\mathbf{D} + \epsilon_{i}$
 
-[^148]: That is, $\beta_{1} = \frac{\text{Cov}(\mathbf{D}, \mathbf{Y})}{\text{Var}(\mathbf{D})}$. In the bivariate case, $\mathbb{E}[\mathbf{D}] = \bar{\mathbf{D}}$ and $\mathbb{E}[\mathbf{Y}] = \bar{\mathbf{Y}}$. The basic formula may be found in Rice (2007, p. 544), for example, albeit in scalar notation.
+[^159]: That is, $\beta_{1} = \frac{\text{Cov}(\mathbf{D}, \mathbf{Y})}{\text{Var}(\mathbf{D})}$. In the bivariate case, $\mathbb{E}[\mathbf{D}] = \bar{\mathbf{D}}$ and $\mathbb{E}[\mathbf{Y}] = \bar{\mathbf{Y}}$. The basic formula may be found in Rice (2007, p. 544), for example, albeit in scalar notation.
 
 $$\begin{align*}
 \beta_{1} = \frac{\sum_{i \in I}(\mathbf{Y} - \mathbb{E}[\mathbf{Y}])(\mathbf{D} - \mathbb{E}[\mathbf{D}])}{\sum_{i \in I} (\mathbf{D} - \mathbb{E}[\mathbf{D}])^{2}}
@@ -1099,9 +1131,9 @@ The solutions to $\hat{\theta}_{0}$ and the sample analogue $\hat{\beta}_{1}$ of
 
 ### Appendix F: Example of Cluster-Robust DML Sample Splitting {#sec-appx-f}
 
-To better-illustrate the sample-splitting procedure introduced in @sec-gen-dml-fits-final, consider a basic panel dataset comprised of countries $c \in [C] = \{1, ..., C\}$ and years $t \in [T] = \{1, ..., T\}$.[^149] In addition, let $C = 4$, $T = 4$, and $K = 2$. Now, suppose that the $C$ countries and $T$ years are randomly partitioned into the following initial subgroups:
+To better-illustrate the sample-splitting procedure introduced in @sec-gen-dml-fits-final, consider a basic panel dataset comprised of countries $c \in [C] = \{1, ..., C\}$ and years $t \in [T] = \{1, ..., T\}$.[^160] In addition, let $C = 4$, $T = 4$, and $K = 2$. Now, suppose that the $C$ countries and $T$ years are randomly partitioned into the following initial subgroups:
 
-[^149]: Recalling the notation used in @sec-gen-dml-fits-final, $C$ equates to $N$ and $T$ to $M$.
+[^160]: Recalling the notation used in @sec-gen-dml-fits-final, $C$ equates to $N$ and $T$ to $M$.
 
 $$\begin{align*}
 I_{1} = \{c_{1}, c_{3}\} \qquad J_{1} = \{t_{2}, t_{3}\} \\

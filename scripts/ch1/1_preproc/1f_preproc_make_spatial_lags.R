@@ -22,6 +22,8 @@ imp_base <- imp_base |>
   mutate(
     cow = as.numeric(levels(cow))[cow],
     year = as.numeric(levels(year))[year],
+    curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
+    imf_prog = as.numeric(levels(imf_prog))[imf_prog],
     across(
       contains("any_inforce"),
       ~ as.numeric(levels(.x))[.x]
@@ -244,6 +246,18 @@ sp_lag_base <- sp_lag_base |>
       )
     )
 
+# make world_base ----
+## note: this will help make the spatially-buffered folds during fitting
+## note: this includes the maximum number of cow-countries appearing in any given year
+world_base <- imp_base_spt |> 
+  filter(
+    year == 2017,
+    .imp == 1
+    ) |> 
+  select(cow)
+
 # save ----
 sp_lag_base |> 
   save(file = here("data/ch1/results/imputations/sp_lag_base.rda"))
+world_base |> 
+  save(file = here("data/ch1/preprocessed/world_base.rda"))

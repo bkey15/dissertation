@@ -38,16 +38,14 @@ load(here("data/ch1/preprocessed/bop_panel.rda"))
 curr_crisis <- read_xlsx(here("data/common/raw/fin_crises/nguyen_et_al/1-s2.0-S0264999322000165-mmc1.xlsx")) |> 
   janitor::clean_names()
 
-### sud_stop
-sud_stop <- read_dta(here("data/common/raw/fin_crises/forbes_warnock/ForbesWarnock_episodes.dta"))
-sud_stop <- zap_label(sud_stop)
-
 ### imf_prog
 imf_prog <- read_dta(
   here("data/common/raw/fin_crises/vreeland/master_merge_wide.dta"),
   col_select = -cname_gw
   )
-imf_prog <- zap_label(imf_prog)
+imf_prog <- imf_prog |> 
+  zap_label() |> 
+  zap_labels()
 
 # prep merge ----
 ## vdem ----
@@ -173,46 +171,6 @@ curr_crisis <- curr_crisis |>
   select(cow, year, curr_crisis) |> 
   arrange(cow, year)
 
-### sud_stop ----
-#### get base data
-sud_stop <- sud_stop |> 
-  mutate(
-    cow = countrycode(
-      sourcevar = cc_d,
-      origin = "iso2c",
-      destination = "cown"
-      )
-    ) |> 
-  filter(cc_d != "HK") |> 
-  mutate(
-    cow = if_else(
-      is.na(cow), 211, cow
-      )
-    ) |> 
-  rename(year = yr) |> 
-  select(cow, year, stop_epiTO)
-
-#### create Luxembourg rows
-lux <- sud_stop |> 
-  filter(cow == 211) |> 
-  mutate(cow = 212)
-
-#### add Luxembourg rows
-sud_stop <- sud_stop |> 
-  rbind(lux) |> 
-  arrange(cow, year)
-
-#### finalize
-sud_stop <- sud_stop |> 
-  summarize(
-    sud_stop = sum(stop_epiTO, na.rm = TRUE),
-    .by = c(cow, year)
-    ) |> 
-  mutate(
-    sud_stop = if_else(
-      sud_stop > 0, 1, 0)
-    )
-
 ### imf_prog ----
 #### note: NA vals are generally prior to IMF accession, so safe to code these as 0
 imf_prog <- imf_prog |> 
@@ -276,10 +234,6 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(curr_crisis)
 
-### sud_stop
-merge_base <- merge_base |> 
-  left_join(sud_stop)
-
 ### imf_prog
 merge_base <- merge_base |> 
   left_join(imf_prog)
@@ -300,7 +254,7 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(ptas_standard) |> 
   relocate(
-    48:135,
+    50:137,
     .after = hr_score
     )
 
@@ -324,6 +278,14 @@ merge_base <- merge_base |>
       cow == 760 ~ 1,
       cow == 817 ~ 1,
       .default = glb_s
+      )
+    )
+
+# fix imf_prog ----
+merge_base <- merge_base |> 
+  mutate(
+    imf_prog = if_else(
+      is.na(imf_prog), 0, imf_prog
       )
     )
 
