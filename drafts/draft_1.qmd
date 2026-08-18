@@ -413,7 +413,7 @@ The specific DML model I elect to use is the partially-linear regression (PLR) m
 
 The model is initially of the form:
 
-[^61]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. *Prima facie*, the partially-linear panel regression model (PLPR) may seem tempting considering the country-year structure of my data; but in the last analysis, the assumptions on which it rests are almost certainly disqualifying. Most crucially, it requires no feedback to predictors (e.g., last year's $\mathbf{Y}$ and $\mathbf{D}$ do not affect this year's $\mathbf{X}$) and a static panel (e.g., knowing this year's $\mathbf{X}$, this year's $\mathbf{Y}$ and $\mathbf{D}$ are independent of last year's $\mathbf{Y}$, $\mathbf{X}$, and $\mathbf{D}$), both of which seem inappropriate for international policies and behaviors. Indeed, these phenomena are known to diffuse over time and follow flexible causal processes---hence my use of temporal and spatial lagging, for example. For more on PLPR, see Clarke & Polselli (2025). For a full enumeration of the DML models currently available in statistical software, see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
+[^61]: PLR is indeed the most basic of the DML models: it is built on two equations, clearly capturing DML's double-prediction logic, while also being reducible to an easy-to-explain OLS regression (as we shall soon see). PLR thus serves as the paradigmatic model for all introductions to DML. *Prima facie*, the partially-linear panel regression model (PLPR) may seem tempting considering the country-year structure of my data; but in the last analysis, the assumptions on which it rests are surely too restrictive for my work. Most crucially, it requires no feedback to predictors (e.g., last year's $\mathbf{Y}$ and $\mathbf{D}$ do not affect this year's $\mathbf{X}$) and a static panel (e.g., knowing this year's $\mathbf{X}$, this year's $\mathbf{Y}$ and $\mathbf{D}$ are independent of last year's $\mathbf{Y}$, $\mathbf{X}$, and $\mathbf{D}$). Although I currently do not model violations thereto directly (e.g., FDLs or LDVs, options I ultimately reject yet describe in @sec-gen-prep-tl), these assumptions seem broadly inappropriate when extended to international policies and behaviors. Indeed, such phenomena are known to persist, transform, and diffuse over time, and to follow flexible causal processes more generally. Accordingly, it difficult to accept that the histories of $\mathbf{Y}$, $\mathbf{X}$, and $\mathbf{D}$ are even conditionally-orthogonal to the present. For more on PLPR and its implementation in `DoubleML`, see Clarke & Polselli (2025) and the [`DoubleML User Guide`](https://docs.doubleml.org/stable/examples/py_double_ml_plpr.html). For a full enumeration of the DML models currently available in statistical software, see the [`DoubleML` User Guide](https://docs.doubleml.org/stable/guide/models.html).
 
 $$\begin{align*}
 \mathbf{Y} = \mathbf{D}\theta_{0} + g_{0}(\mathbf{X}) + \boldsymbol{\zeta}, \qquad \mathbb{E}[\boldsymbol{\zeta}|\mathbf{D},\mathbf{X}] = 0 \\
@@ -511,9 +511,9 @@ This is performed for each $k \in [K] = \{1,...,K\}$. Finally, $\hat{\theta}_{0}
 
 [^79]: This explanation is adapted from Ahrens et al. (2025, p. 19), Bach et al. (2024a, pp. 16-17) and Chernozhukov et al. (2018, p. C23). A useful visualization of cross-fitting may also be seen in the [DoubleML YouTube channel](https://www.youtube.com/watch?v=NWEoLe8mZqM).
 
-As aforementioned, the user sets the algorithm aggregating the test-data evaluations. The recommended and software-default algorithm, which I opt to follow, is of the form:[^80]
+As aforementioned, the user sets the algorithm aggregating the test-data evaluations. The recommended and software-default algorithm (DML2), which I opt to follow, is of the form:[^80]
 
-[^80]: This algorithm is labeled "DML2" in both the literature and software. The alternative, DML1, obtains $\hat{\theta}_{0}$ by averaging $\check{\theta}_{0,k}$, preliminary estimates of $\hat{\theta}_{0}$ solved at each $k$ fold. DML2 is generally preferred over its counterpart because it tends to behave more stably. For more on the two algorithms, including the recommendation of DML2, see Bach et al. (2024a, pp. 16-17) and Chernozhukov et al. (2018, p. C24).
+[^80]: DML2 is the conventional label in both the literature and software. The alternative algorithm, DML1, obtains $\hat{\theta}_{0}$ by averaging $\check{\theta}_{0,k}$, preliminary estimates of $\hat{\theta}_{0}$ solved at each $k$ fold. DML2 is generally preferred over its counterpart because it tends to behave more stably. For more on the two algorithms, including the recommendation of DML2, see Bach et al. (2024a, pp. 16-17) and Chernozhukov et al. (2018, p. C24).
 
 $$\begin{align*}
 \frac{1}{N}\sum_{k = 1}^{K}\sum_{i \in I_{k}}\psi(\mathbf{S};\hat{\theta}_{0},\hat{\eta}_{0,k}) = 0
@@ -715,7 +715,7 @@ After optimizing all necessary or recommended hyperparameters, I run the final D
 
 $$\hat{\eta}_{0, k\ell} = \hat{\eta}_{0}\left((\mathbf{S}_{ij})_{(i,j) \in ([N] \backslash I_{k}) \times ([M] \backslash J_{\ell})}\right)$$
 
-5.  Solve for causal estimate $\hat{\theta}_{0}$. Following the software-default algorithm given in @sec-gen-dml-plr:[^128]
+5.  Solve for causal estimate $\hat{\theta}_{0}$. Following the software-default algorithm given in @sec-gen-dml-plr (i.e., DML2):[^128]
 
 [^128]: Here, $|I_{k}|$ and $|J_{\ell}|$ signify the cardinality of sets $I_{k}$ and $J_{\ell}$---that is, the number of groups belonging to each respective subset.
 

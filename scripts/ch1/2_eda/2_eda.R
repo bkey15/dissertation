@@ -23,6 +23,9 @@ test <- imp_sp_t_lags$start_1977$l1 |>
       )
     )
 
+imp_1 <- test |> 
+  filter(.imp == 1)
+
 covar_names_1 <- test |> 
   select(!c(.imp, .id, hr_score)) |> 
   names()
@@ -37,11 +40,6 @@ for(name in covar_names_1){
     geom_point()
   plots[[as.character(name)]] <- plot
 }
-
-
-
-
-
 
 lechner <- read_delim(file = "data/ch1/raw/lechner_data/nti_201711.txt")
 indices <- read_delim(file = "data/ch1/raw/desta/desta_indices_version_02_02.txt")
@@ -69,6 +67,16 @@ cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$flexrigid)
 summary(lm(lech_hr_mean ~ flexescape, data = desta_dat))
 cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$flexescape)
 
+summary(lm(lech_hr_mean ~ enforce01, data = desta_dat))
+cor.test(x = desta_dat$lech_hr_mean, y = desta_dat$enforce01)
+
+summary(lm(lech_hr_mean ~ n_ptas, data = imp_1))
+cor.test(x = imp_1$lech_hr_mean, y = imp_1$n_ptas)
+
+pta_obs <- subset(imp_1, n_ptas > 0)
+summary(lm(lech_hr_mean ~ n_ptas, data = pta_obs))
+cor.test(x = pta_obs$lech_hr_mean, y = pta_obs$n_ptas)
+
 ## viz corrs ----
 desta_dat |> 
   ggplot(
@@ -83,6 +91,15 @@ desta_dat |>
   ggplot(
     aes(
       x = depth_rasch,
+      y = lech_hr_mean
+      )
+    ) +
+  geom_point()
+
+desta_dat |> 
+  ggplot(
+    aes(
+      x = enforce01,
       y = lech_hr_mean
       )
     ) +

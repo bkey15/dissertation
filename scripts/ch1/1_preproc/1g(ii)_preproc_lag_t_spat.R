@@ -84,8 +84,8 @@ imp_base_1968 <- imp_base_1968 |>
 # make lags ----
 ## 1968 ----
 ## note: re-leveling "year" to remove "2018", "2017", etc. as levels, which won't have any "1" (i.e., non-zero) values after lag. Doing so is important for dml initialization step.
-## note: re-leveling cow codes to account for countries potentially dropping out of the dataset
-## note: including code to re-level "region" out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
+## note: re-leveling cow codes to account for countries potentially dropping out of the dataset, although this doesn't occur. (doing so out of an abundance of caution.)
+## note: including code to re-level "region" again out of an abundance of caution (ultimately, no region drops out of the dataset, but still including code for possible future utility).
 start_1968 <- list()
 
 for(i in seq(1:8)){
