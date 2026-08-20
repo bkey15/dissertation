@@ -1,6 +1,6 @@
 # Big files
 ## Imputed data
-data/ch1/results/imputations/imp_sp_t_lags.rda
+data/ch1/results/imputations/imp_t_lags.rda
 
 data/ch2/results/imputations/imp_sp_t_lags.rda
 
@@ -18,6 +18,18 @@ data/ch2/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
 
 data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_class.rda
 data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_regr.rda
+
+### Spatial (w/ country FE)
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_gen.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_south.rda
+data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_north.rda
+
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_gen.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_south.rda
+data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_north.rda
+
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_class.rda
+data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_regr.rda
 
 ### Spatial (w/ regional FE)
 data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
