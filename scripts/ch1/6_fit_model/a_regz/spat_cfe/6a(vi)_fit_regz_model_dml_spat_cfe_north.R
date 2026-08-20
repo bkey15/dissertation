@@ -114,7 +114,7 @@ for(stat in interact_stat){
             )
           fit <- spec$fit(store_predictions = TRUE)
           toc(log = TRUE)
-          imp_dml_fits_spat_cfe_gen[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
+          imp_dml_fits_spat_cfe_north[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]] <- fit
         }
       }
     }

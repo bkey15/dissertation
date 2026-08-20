@@ -240,3 +240,7 @@
   -n_resolution = 10 (rather than 20) for tuning. Need to reduce computational expenses, and isn't leading to large reduction in performance.
   -Re: pooling: justification for dfcom = inf is probably solid given that DML generally uses plug-in estimators. Be sure to revist.
   -Also revisit simultaneous inference for multiple treatments.
+-For Ch. 1, also running models with `n_ptas`, `depth`, and `enforce` as covariates. (Leaving out `any_inforce` because this complicates interpretation of inference and is essentially captured by `n_ptas` in any case.)
+
+# 8/18/26 #
+-For multi-treatment models, in order to achieve simultaneous inference, will probably try computing pooled variance-covariance matrix (which reduces to SE^2 for the scalar, single-treatment or treatment-by-treatment, i.e., mice::pool.table cases, as described in the literature and source code). Literature implies that multitreatment variance-covariance matrix can be used for inference. May also do Wald test to see if two (or more) treatments differ.
