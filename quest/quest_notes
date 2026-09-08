@@ -1,0 +1,46 @@
+# 8/31/26 #
+-Quest info begins at: https://rcdsdocs.it.northwestern.edu/start/quest/quest-intro.html
+-Use computer's terminal to log in.
+-Login ID (MacOS): ssh -X netid@login.quest.northwestern.edu
+  -Net ID must be lower-case.
+-Login password: Net ID password.
+-Login nodes: quser31-34.
+  -To check number of users on any given login node, run: w | wc -l
+  -To switch login nodes, simply run: ssh quserXX. (XX being node number, 31-34.)
+-Note that the login nodes are used to submit jobs through the scheduler (SLURM), which are themselves run on the compute nodes. (Small jobs can technically be run on the login nodes themselves.)
+-Important bash commands:
+  -pwd: print working directory
+  -cd /: change directory. (Insert path after slash.)
+  -cd: change directory (back to working directory w/o slash).
+  -ls: list items (in current directory).
+  -ls - l: gives more info on items than "ls" on its own. (First chacter == "d": folder. First character == "-": file.) 
+  -mkdir: make directory. Give name of intended directory after "mkdir".
+  -mv: move item. After "mv", give name of item, and then name of directory in which the item should be placed.
+  -./: current directory. (E.g., can be used to move items thereto.)
+  -cp: copy item. Same arguments as "mv". Can change name of item by giving intended name thereof after giving new directory (e.g., folder/new_name.format).
+  -cp -r: copy entire directory. Give name of directory to copy, and the name of copied directory.
+  -rm -i: remove (i.e., delete) item. "-i" prints warning with name(s) of item(s) to be deleted. Give name of intended item to delete.
+    -y: Say "yes" after warning to delete item.
+  -rm -r -i: remove entire directory (with warning).
+  -homedu: print disk usage report the home directory.
+  -groups: get allocation ID(s) for group(s).
+  -checkproject: get usage/status info on project. Give allocation ID after "checkproject".
+  -checkscratch: get files to be deleted within X number of days (if allocation has scratch space associated with it, which many do not). Give X number of days after "checkscratch".
+  -exit (or logout): log out of Quest.
+  -man <command>: look at manual of given command. (Don't include <> when trying to retrieve manual; simply give name of command).
+  -https://linuxize.com/ for manuals and more info on bash commands.
+-Modules: popular software packages (e.g., R and Python) that is pre-installed on Quest for easy loading/unloading.
+-Important module commands:
+  -module avail <pattern>: see a list of available modules with matching text pattern. (Just use text pattern; don't enclose in <>).
+  -module spider: see versions of the software available. (E.g., "module spider R" gives versions of R available in Quest.)
+  -module load <module-name>/<version>: load given module and its dependencies. (Same advice from above.)
+  -module purge all: remove all loaded modules in current environment.
+  -module list: see list of all loaded modules.
+-Info on file transfers from PC to Quest using Globus: see https://rcdsdocs.it.northwestern.edu/systems/quest/user-guide/data-transfer/data-transfer.html#globus and https://rcdsdocs.it.northwestern.edu/systems/globus/globus-index.html#globus
+-To start R session, simply load the appropriate version of R and then run `R` as a line (without the marks). To exit: `q()`.
+-salloc --nodes=1 --ntasks=1 --account=<account_id> --mem=<memory> --partition=<partition> --time=<hh:mm:ss>
+
+salloc --nodes=1 --ntasks=1 --cpus-per-task=24 --mem-per-cpu=4G --account=p33143 --partition=short --time=02:00:00
+module use ~/privatemodules
+module load R/4.5.1-openblas
+scancel <slurm-jobid>

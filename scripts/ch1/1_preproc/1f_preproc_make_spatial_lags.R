@@ -24,19 +24,49 @@ imp_base <- imp_base |>
     year = as.numeric(levels(year))[year],
     curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
     imf_prog = as.numeric(levels(imf_prog))[imf_prog],
-    across(
-      contains("any_inforce"),
-      ~ as.numeric(levels(.x))[.x]
-      )
     ) |> 
   relocate(.imp, .id)
+
+## make interaction vars ----
+imp_base <- imp_base |> 
+  mutate(
+    across(
+      ends_with("any_inforce"),
+      ~ as.numeric(levels(.x))[.x]
+      ),
+    across(
+      ends_with(
+        c(
+          "n_ptas",
+          "any_inforce",
+          "_mean"
+          )
+        ),
+      ~ .x * v2x_polyarchy,
+      .names = "v2x_polyarchy_x_{.col}"
+      )
+    ) |> 
+  select(
+    -starts_with("v2x_polyarchy_x_depth"),
+    -starts_with("v2x_polyarchy_x_ns_depth"),
+    -starts_with("v2x_polyarchy_x_ss_depth"),
+    -starts_with("v2x_polyarchy_x_nn_depth"),
+    -starts_with("v2x_polyarchy_x_enforce"),
+    -starts_with("v2x_polyarchy_x_ns_enforce"),
+    -starts_with("v2x_polyarchy_x_ss_enforce"),
+    -starts_with("v2x_polyarchy_x_nn_enforce")
+    ) |> 
+  relocate(
+    contains("_x_"),
+    .before = v2x_polyarchy
+    )
 
 ## impose val == 0 to all NAs in ss & nn ----
 ## IMPORTANT: this step is necessary to ensure that the lags are executed. See note in first code line. This is probably justifiable theoretically, too.
 imp_base <- imp_base |> 
   mutate(
     across(
-      starts_with("ss_") | starts_with("nn_"),
+      contains("ss_") | contains("nn_"),
       ~ if_else(is.na(.x), 0, .x)
       )
     )

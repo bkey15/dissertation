@@ -244,3 +244,12 @@
 
 # 8/18/26 #
 -For multi-treatment models, in order to achieve simultaneous inference, will probably try computing pooled variance-covariance matrix (which reduces to SE^2 for the scalar, single-treatment or treatment-by-treatment, i.e., mice::pool.table cases, as described in the literature and source code). Literature implies that multitreatment variance-covariance matrix can be used for inference. May also do Wald test to see if two (or more) treatments differ.
+
+# 8/26/26 #
+-Tested regr.xgboost, regr.ranger, regr.plsr, and regr.lm on the Chapter 1 models. Non-LM perform worse than ridge (in tuning and combined nuisance loss) on the buffered two-way cluster-robust tasks. regr.lm is stable at no SLX but erratic otherwise. Combined nuisance loss is okay at non-clustered SLX, but explodes (to very extreme degrees) with clustering. Tree-based models do well on the non-clustered tasks.
+
+# 9/3/26 #
+-For BCL models, will need to compute coefficients directly using predictions and cluster numbers. See differences in score functions between ordinary PLR and cluster-robust PLR. (Same goes for standard errors, obviously, too.)
+
+# 9/4/26 #
+-For lasso models, switching to single batches improved speed by about 5 sec, turning off progress output by about 2 sec, and utilizing all cores (not n-1) by about 3 sec. Will use this setup moving forward.

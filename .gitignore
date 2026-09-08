@@ -5,44 +5,115 @@ data/ch1/results/imputations/imp_t_lags.rda
 data/ch2/results/imputations/imp_sp_t_lags.rda
 
 ## Fits
-### 2FE
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_gen.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_south.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_north.rda
-data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
+#### old
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_gen.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_south.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_north.rda
 
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_gen.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_south.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_north.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_gen.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_south.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_north.rda
 data/ch2/results/fits/dml_tree/full_dat/imp_dml_fits_2fe_gen.rda
 
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_class.rda
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_2fe_regr.rda
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_class.rda
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_regr.rda
 
-### Spatial (w/ country FE)
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_gen.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_south.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_north.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_gen.rda
 
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_gen.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_south.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_north.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_south.rda
 
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_class.rda
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_cfe_regr.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_gen.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_south.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_north.rda
 
-### Spatial (w/ regional FE)
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
-data/ch1/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_gen.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_south.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_north.rda
+
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_class.rda
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_regr.rda
+
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_north.rda
 data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_spat_regfe_gen.rda
 
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_gen.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_south.rda
-data/ch2/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_north.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_gen.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_south.rda
+data/ch2/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_north.rda
 
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_class.rda
-data/ch3/results/fits/dml_regularize/full_dat/imp_dml_fits_spat_regfe_regr.rda
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_class.rda
+data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_spat_regfe_regr.rda
+
+### no slx
+#### regz
+##### lasso
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_gen_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_south_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_north_regz_lasso.rda
+
+##### ridge
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_gen_regz_ridge.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_south_regz_ridge.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_no_slx_north_regz_ridge.rda
+
+#### tree
+##### xgb
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_gen_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_south_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_north_tree_xgb.rda
+
+#### rf
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_gen_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_south_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_no_slx_north_tree_rf.rda
+
+### norm slx
+#### regz
+##### lasso
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_gen_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_south_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_north_regz_lasso.rda
+
+##### ridge
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_gen_regz_ridge.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_south_ridge_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_north_ridge_lasso.rda
+
+#### tree
+##### xgb
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_gen_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_south_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_north_tree_xgb.rda
+
+##### rf
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_gen_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_south_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_norm_slx_north_tree_rf.rda
+
+### bcr
+#### regz
+##### lasso
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_south_regz_lasso.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_north_regz_lasso.rda
+
+##### ridge
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz_ridge.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_south_regz_ridge.rda
+data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_north_regz_ridge.rda
+
+#### tree
+##### xgb
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_gen_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_south_tree_xgb.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_north_tree_xgb.rda
+
+##### rf
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_gen_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_south_tree_rf.rda
+data/ch1/results/fits/dml_tree/full_dat/imp_dml_fits_bcr_slx_north_tree_rf.rda
 
 # History files
 .Rhistory

@@ -67,39 +67,35 @@ imp_base_1968 <- imp_base_1968 |>
     -starts_with("v2x_polyarchy_x_nn_enforce")
     ) |> 
   relocate(
-    contains("_x_"),
+    contains("_x_") & !ends_with("sp_lag"),
     .before = v2x_polyarchy
     )
 
 # make CREs ----
 ### note: creating summarize tbl to check success (rather than create CRE vars directly into dataset)
-m <- 1:imp_base$m
-
-for(i in m){
-  cres <- imp_base_1968 |> 
-    mutate(
-      .imp = as.factor(.imp),
-      curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
-      imf_prog = as.numeric(levels(imf_prog))[imf_prog]
-      ) |> 
-    summarize(
-      across(
-        where(is.numeric) & !.id,
-        ~ mean(.x, na.rm = TRUE),
-        .names = "{.col}_cre"
-        ),
-      .by = c(.imp, cow)
-      ) |> 
-    mutate(
-      across(
-        everything(),
-        ~ if_else(
-          is.nan(.x), NA, .x
-          )
-        ),
-      .imp = as.numeric(levels(.imp))[.imp]
-      )
-}
+cres <- imp_base_1968 |> 
+  mutate(
+    .imp = as.factor(.imp),
+    curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
+    imf_prog = as.numeric(levels(imf_prog))[imf_prog]
+    ) |> 
+  summarize(
+    across(
+      where(is.numeric) & !.id,
+      ~ mean(.x, na.rm = TRUE),
+      .names = "{.col}_cre"
+      ),
+    .by = c(.imp, cow)
+    ) |> 
+  mutate(
+    across(
+      everything(),
+      ~ if_else(
+        is.nan(.x), NA, .x
+        )
+      ),
+    .imp = as.numeric(levels(.imp))[.imp]
+    )
 
 ## final merge ----
 imp_base_1968 <- imp_base_1968 |> 

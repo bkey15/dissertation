@@ -4,9 +4,9 @@ library(here)
 library(naniar)
 
 # load data ----
-load(here("data/ch1/results/imputations/imp_sp_t_lags.rda"))
+load(here("data/ch1/results/imputations/imp_t_lags.rda"))
 
-test <- imp_sp_t_lags$start_1977$l1 |> 
+test <- imp_t_lags$start_1977$l1 |> 
   mice::complete(
   action = "long",
   include = TRUE
@@ -23,7 +23,12 @@ test <- imp_sp_t_lags$start_1977$l1 |>
       )
     )
 
-imp_1 <- test |> 
+imp_1 <- imp_t_lags$start_1977$l1 |> 
+  mice::complete(
+    action = "long",
+    include = TRUE
+    ) |> 
+  relocate(.imp, .id) |> 
   filter(.imp == 1)
 
 covar_names_1 <- test |> 
@@ -77,6 +82,13 @@ pta_obs <- subset(imp_1, n_ptas > 0)
 summary(lm(lech_hr_mean ~ n_ptas, data = pta_obs))
 cor.test(x = pta_obs$lech_hr_mean, y = pta_obs$n_ptas)
 
+## spatial corr ----
+cor.test(x = imp_1$hr_score_sp_lag, y = imp_1$hr_score)
+cor.test(x = imp_1$lech_hr_mean_sp_lag, y = imp_1$lech_hr_mean)
+cor.test(x = imp_1$n_ptas_sp_lag, y = imp_1$n_ptas)
+cor.test(x = imp_1$v2x_polyarchy_sp_lag, y = imp_1$v2x_polyarchy)
+cor.test(x = imp_1$e_polity2_sp_lag, y = imp_1$e_polity2)
+
 ## viz corrs ----
 desta_dat |> 
   ggplot(
@@ -100,6 +112,24 @@ desta_dat |>
   ggplot(
     aes(
       x = enforce01,
+      y = lech_hr_mean
+      )
+    ) +
+  geom_point()
+
+imp_1 |> 
+  ggplot(
+    aes(
+      x = n_ptas_sp_lag,
+      y = n_ptas
+      )
+    ) +
+  geom_point()
+
+imp_1 |> 
+  ggplot(
+    aes(
+      x = lech_hr_mean_sp_lag,
       y = lech_hr_mean
       )
     ) +
