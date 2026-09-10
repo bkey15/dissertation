@@ -20,9 +20,6 @@ data/ch3/results/fits/dml_regz/full_dat/imp_dml_fits_2fe_regr.rda
 
 data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_norm_slx_gen.rda
 
-data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz.rda
-data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_south.rda
-
 data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_gen.rda
 data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_south.rda
 data/ch1/results/fits/dml_regz/full_dat/imp_dml_fits_spat_cfe_north.rda

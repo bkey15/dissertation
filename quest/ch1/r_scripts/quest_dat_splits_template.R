@@ -1,13 +1,18 @@
+# Split DML dats for Quest fits
+
+# load packages ----
 library(tidyverse)
 library(here)
 
-source(here("scripts/ch1/4_prep_model/a_regz/ii_slx/4a(vi)_prep_regz_model_dml_slx_north.R"))
+# load all dats
+# source(here("scripts/ch1/4_prep_model/a_regz/i_no_slx/....R"))
+# source(here("scripts/ch1/4_prep_model/a_regz/ii_slx/....R"))
 
-interact_stat <- names(imp_dml_dats_slx_north)
+# interact_stat <- names(imp_dml_dats_...)
 task_id <- 0
 
 for(stat in interact_stat){
-  list_1 <- imp_dml_dats_slx_north[[stat]]
+  # list_1 <- imp_dml_dats_...[[stat]]
   start_yrs <- names(list_1)
   for(year in start_yrs){
     list_2 <- list_1[[year]]
@@ -34,7 +39,7 @@ for(stat in interact_stat){
           model_info |> 
             save(
               file = here(
-                "quest/ch1/data_splits/imp_dml_dats_slx_north",
+                # "quest/ch1/data_splits/imp_dml_dats_...",
                 sprintf("%03d.rda", task_id)
                 )
               )
