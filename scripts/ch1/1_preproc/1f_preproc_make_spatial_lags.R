@@ -23,7 +23,7 @@ imp_base <- imp_base |>
     cow = as.numeric(levels(cow))[cow],
     year = as.numeric(levels(year))[year],
     curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
-    imf_prog = as.numeric(levels(imf_prog))[imf_prog],
+    imf_prog = as.numeric(levels(imf_prog))[imf_prog]
     ) |> 
   relocate(.imp, .id)
 

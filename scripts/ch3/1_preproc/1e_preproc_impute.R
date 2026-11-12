@@ -12,33 +12,26 @@ load(here("data/ch3/preprocessed/ems_final.rda"))
 miss_vars <- miss_var_summary(ems_final)
 
 # specify imputation vals (T/F) ----
+no_imp_vars <- c(
+  "cow",
+  "year",
+  "hr_score",
+  "n_ems",
+  "any_inforce",
+  "gov_kill",
+  "coup_success",
+  "cont_elect",
+  "imf_prog",
+  "glb_s",
+  "pta_west",
+  "bit_tip_west"
+  )
+
 imp_vals <- ems_final |> 
   mutate(
+    across(contains(no_imp_vars), ~ FALSE),
     across(
-      c(
-        cow,
-        year,
-        hr_score,
-        n_ems,
-        any_inforce,
-        gov_kill,
-        coup_success,
-        cont_elect,
-        glb_s,
-        ends_with("_west")
-        ), ~ FALSE
-      ),
-    across(
-      c(
-        starts_with(
-          c("v2", "e_v2", "wdi_")
-          ),
-        ends_with("_log10"),
-        e_polity2,
-        p_durable,
-        bop_pct_gdp,
-        pol_prox
-        ),
+      !contains(no_imp_vars),
       ~ if_else(
         is.na(.x),
         TRUE,
@@ -51,7 +44,7 @@ imp_vals <- ems_final |>
 for(var in imp_vals){
   is.logical(var) |> 
     print()
-  }
+}
 
 # specify predictor cols ----
 ## get dimension names
@@ -60,8 +53,8 @@ dim_names <- list(pred_names, pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 54,
-  ncol = 54,
+  nrow = 56,
+  ncol = 56,
   dimnames = dim_names
   )
 
@@ -99,6 +92,8 @@ ems_mice <- ems_final |>
         coup_success,
         cont_elect,
         glb_s,
+        curr_crisis,
+        imf_prog,
         pta_west,
         bit_tip_west
         ),

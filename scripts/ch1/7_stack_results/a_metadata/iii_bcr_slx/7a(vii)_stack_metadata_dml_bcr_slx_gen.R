@@ -105,7 +105,6 @@ for(stat in interact_stat){
           nuis_part <- names(list_5)
           for(part in nuis_part){
             list_6 <- list_5[[part]]
-            list_6_names <- names(list_6)
             if(length(split_names) == 1){
               n_rep <- names(list_6)
               for(rep in n_rep){
@@ -116,13 +115,34 @@ for(stat in interact_stat){
                 
                 sq_resid <- Matrix::crossprod(cv_resid)
                 A <- cbind(matrix(1, nlearners, 1), diag(1, nlearners))
-                weights <- quadprog::solve.QP(
-                  Dmat = Matrix::nearPD(sq_resid)$mat,
-                  dvec = matrix(0, nlearners, 1),
-                  Amat = A,
-                  bvec = c(1, rep(0, nlearners)),
-                  meq = 1
-                  )$solution
+
+                fallback_used <- FALSE
+                weights <- tryCatch(
+                  {
+                    quadprog::solve.QP(
+                      Dmat = Matrix::nearPD(sq_resid)$mat,
+                      dvec = matrix(0, nlearners, 1),
+                      Amat = A,
+                      bvec = c(1, rep(0, nlearners)),
+                      meq = 1
+                      )$solution
+                  },
+                  error = function(e) {
+                    
+                    fallback_used <<- TRUE
+                    
+                    Dmat <- (sq_resid + t(sq_resid)) / 2
+                    Dmat <- Dmat / max(abs(Dmat))
+                    
+                    quadprog::solve.QP(
+                      Dmat = Dmat,
+                      dvec = matrix(0, nlearners, 1),
+                      Amat = A,
+                      bvec = c(1, rep(0, nlearners)),
+                      meq = 1
+                      )$solution
+                  }
+                )
                 
                 mse <- list()
                 names(weights) <- names(list_6[[rep]])
@@ -141,7 +161,7 @@ for(stat in interact_stat){
                   mse[[as.character(lrn)]] <- lrn_mse
                 }
                 
-                imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[as.character(part)]][[as.character(rep)]] <- list(weights = weights, stack_resid = stack_resid, mse = mse)
+                imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[as.character(part)]][[as.character(rep)]] <- list(weights = weights, stack_resid = stack_resid, mse = mse, fallback_used = fallback_used)
               }
             }
             else{
@@ -157,13 +177,34 @@ for(stat in interact_stat){
                   
                   sq_resid <- Matrix::crossprod(cv_resid)
                   A <- cbind(matrix(1, nlearners, 1), diag(1, nlearners))
-                  weights <- quadprog::solve.QP(
-                    Dmat = Matrix::nearPD(sq_resid)$mat,
-                    dvec = matrix(0, nlearners, 1),
-                    Amat = A,
-                    bvec = c(1, rep(0, nlearners)),
-                    meq = 1
-                  )$solution
+
+                  fallback_used <- FALSE
+                  weights <- tryCatch(
+                    {
+                      quadprog::solve.QP(
+                        Dmat = Matrix::nearPD(sq_resid)$mat,
+                        dvec = matrix(0, nlearners, 1),
+                        Amat = A,
+                        bvec = c(1, rep(0, nlearners)),
+                        meq = 1
+                        )$solution
+                    },
+                    error = function(e) {
+                      
+                      fallback_used <<- TRUE
+                      
+                      Dmat <- (sq_resid + t(sq_resid)) / 2
+                      Dmat <- Dmat / max(abs(Dmat))
+                      
+                      quadprog::solve.QP(
+                        Dmat = Dmat,
+                        dvec = matrix(0, nlearners, 1),
+                        Amat = A,
+                        bvec = c(1, rep(0, nlearners)),
+                        meq = 1
+                        )$solution
+                    }
+                  )
                   
                   mse <- list()
                   names(weights) <- names(list_7[[rep]])
@@ -182,8 +223,114 @@ for(stat in interact_stat){
                     mse[[as.character(lrn)]] <- lrn_mse
                     }
                   
-                  imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[as.character(part)]][[as.character(d_name)]][[as.character(rep)]] <- list(weights = weights, stack_resid = stack_resid, mse = mse)
+                  imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][[as.character(part)]][[as.character(d_name)]][[as.character(rep)]] <- list(weights = weights, stack_resid = stack_resid, mse = mse, fallback_used = fallback_used)
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+rm(
+  list = setdiff(
+    ls(),
+    c(
+      "interact_stat",
+      "imp_dml_fits_bcr_slx_gen_stack_metadata"
+      )
+    )
+  )
+gc()
+
+# check fallbacks ----
+count_fallback_fields <- function(x) {
+  if (!is.list(x)) {
+    return(0L)
+  }
+  
+  total <- if ("fallback_used" %in% names(x)) 1L else 0L
+  
+  if (length(x) > 0) {
+    total <- total + sum(vapply(x, count_fallback_fields, integer(1)))
+  }
+  
+  total
+}
+
+count_fallbacks <- function(x) {
+  if (!is.list(x)) return(0)
+  
+  total <- 0
+  
+  if ("fallback_used" %in% names(x)) {
+    total <- total + as.numeric(isTRUE(x[["fallback_used"]]))
+  }
+  
+  if (length(x) > 0) {
+    total <- total + sum(vapply(x, count_fallbacks, numeric(1)))
+  }
+  
+  total
+}
+
+n_total <- count_fallback_fields(imp_dml_fits_bcr_slx_gen_stack_metadata)
+
+n_fallback <- count_fallbacks(imp_dml_fits_bcr_slx_gen_stack_metadata)
+
+cat(
+  n_fallback, "of", n_total,
+  "stacking optimizations used the fallback (",
+  round(100 * n_fallback / n_total, 2),
+  "%).\n"
+  )
+
+# compute psi_a and psi_b ----
+for(stat in interact_stat){
+  list_1 <- imp_dml_fits_bcr_slx_gen_stack_metadata[[stat]]
+  start_yrs <- names(list_1)
+  for(year in start_yrs){
+    list_2 <- list_1[[year]]
+    lag_names <- names(list_2)
+    for(lag in lag_names){
+      list_3 <- list_2[[lag]]
+      treat_names <- names(list_3)
+      for(treat in treat_names){
+        list_4 <- list_3[[treat]]
+        m <- 1:length(list_4)
+        split_names <- treat |> 
+          str_split_1("_AND_")
+        for(i in m){
+          list_5_a <- list_4[[i]][["ml_l"]]
+          list_5_b <- list_4[[i]][["ml_m"]]
+          if(length(split_names) == 1){
+            n_rep <- names(list_5_a)
+            for(rep in n_rep){
+              ml_l_resid <- list_5_a[[rep]]$stack_resid
+              ml_m_resid <- list_5_b[[rep]]$stack_resid
+              
+              psi_a <- -(ml_m_resid^2)
+              psi_b <- ml_l_resid*ml_m_resid
+              
+              imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][["psi"]][[as.character(rep)]] <- list(psi_a = psi_a, psi_b = psi_b)
+            }
+          }
+          else{
+            d_all <- names(list_5_a)
+            for(d_name in d_all){
+              list_6_a <- list_5_a[[d_name]]
+              list_6_b <- list_5_b[[d_name]]
+              n_rep <- names(list_6_a)
+              for(rep in n_rep){
+                ml_l_resid <- list_6_a[[rep]]$stack_resid
+                ml_m_resid <- list_6_b[[rep]]$stack_resid
+                
+                psi_a <- -(ml_m_resid^2)
+                psi_b <- ml_l_resid*ml_m_resid
+                
+                imp_dml_fits_bcr_slx_gen_stack_metadata[[as.character(stat)]][[as.character(year)]][[as.character(lag)]][[as.character(treat)]][[as.character(i)]][["psi"]][[as.character(d_name)]][[as.character(rep)]] <- list(psi_a = psi_a, psi_b = psi_b)
               }
             }
           }

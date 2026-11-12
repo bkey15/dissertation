@@ -39,7 +39,7 @@ for(stat in interact_stat){
           model_info |> 
             save(
               file = here(
-                # "quest/ch1/data_splits/imp_dml_dats_...",
+                # "quest/ch1/data/data_splits/imp_dml_dats_...",
                 sprintf("%03d.rda", task_id)
                 )
               )

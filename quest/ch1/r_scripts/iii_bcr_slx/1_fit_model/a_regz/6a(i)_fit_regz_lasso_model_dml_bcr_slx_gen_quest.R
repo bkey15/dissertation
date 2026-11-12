@@ -116,17 +116,28 @@ toc(log = TRUE)
 tictoc_fit <- tic.log()
 
 # save fits ----
-fit |> 
-  save(
-    file = here(
-      "data/ch1/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz_lasso",
-      sprintf("%03d.rda", task_id)
-      )
+fit_metadata <- list(
+  task_id = task_id,
+  stat = stat,
+  year = year,
+  lag = lag,
+  treat = treat,
+  i = i
+  )
+
+save(
+  fit,
+  fit_metadata,
+  file = here(
+    "data/ch1/fits/dml_regz/full_dat/imp_dml_fits_bcr_slx_gen_regz_lasso",
+    sprintf("%03d.rda", task_id)
     )
-tictoc_fit |> 
-  save(
-    file = here(
-      "data/ch1/fits/dml_regz/runtimes/imp_dml_fits_bcr_slx_gen_regz_lasso",
-      sprintf("%03d.rda", task_id)
-      )
+  )
+save(
+  tictoc_fit,
+  fit_metadata,
+  file = here(
+    "data/ch1/fits/dml_regz/runtimes/imp_dml_fits_bcr_slx_gen_regz_lasso",
+    sprintf("%03d.rda", task_id)
     )
+  )

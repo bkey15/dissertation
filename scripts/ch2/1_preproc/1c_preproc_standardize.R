@@ -90,9 +90,13 @@ bits_ss <- bits_panel |>
       ~ if_else(
         is.nan(.x), NA, .x
         )
+      ),
+    ss_any_inforce = if_else(
+      ss_n_bits > 0, 1, 0
       )
     ) |> 
-  arrange(cow, year)
+  arrange(cow, year) |> 
+  relocate(ss_any_inforce, ss_n_bits, .after = year)
 
 ## north-south ----
 bits_ns <- bits_panel |> 
@@ -110,9 +114,13 @@ bits_ns <- bits_panel |>
       ~ if_else(
         is.nan(.x), NA, .x
         )
+      ),
+    ns_any_inforce = if_else(
+      ns_n_bits > 0, 1, 0
       )
     ) |> 
-  arrange(cow, year)
+  arrange(cow, year) |> 
+  relocate(ns_any_inforce, ns_n_bits, .after = year)
 
 ## north-north ----
 bits_nn <- bits_panel |> 
@@ -130,9 +138,13 @@ bits_nn <- bits_panel |>
       ~ if_else(
         is.nan(.x), NA, .x
         )
+      ),
+    nn_any_inforce = if_else(
+      nn_n_bits > 0, 1, 0
       )
     ) |> 
-  arrange(cow, year)
+  arrange(cow, year) |> 
+  relocate(nn_any_inforce, nn_n_bits, .after = year)
 
 ## merge ----
 bits_standard <- bits_gen |> 

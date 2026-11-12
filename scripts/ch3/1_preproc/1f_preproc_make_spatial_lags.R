@@ -20,6 +20,9 @@ imp_base <- imp_base |>
   mutate(
     cow = as.numeric(levels(cow))[cow],
     year = as.numeric(levels(year))[year],
+    any_inforce = as.numeric(levels(any_inforce))[any_inforce],
+    curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
+    imf_prog = as.numeric(levels(imf_prog))[imf_prog],
     gov_kill = as.numeric(levels(gov_kill))[gov_kill],
     coup_success = as.numeric(levels(coup_success))[coup_success],
     cont_elect = as.numeric(levels(cont_elect))[cont_elect],
@@ -27,6 +30,25 @@ imp_base <- imp_base |>
     bit_tip_west = as.numeric(levels(bit_tip_west))[bit_tip_west]
     ) |> 
   relocate(.imp, .id)
+
+## make interaction vars ----
+imp_base <- imp_base |> 
+  mutate(
+    across(
+    c(n_ems, any_inforce),
+    ~ .x * v2x_polyarchy,
+    .names = "v2x_polyarchy_x_{.col}"
+    ),
+  across(
+    c(n_ems, any_inforce),
+    ~ .x * e_v2x_polyarchy_5C,
+    .names = "e_v2x_polyarchy_5C_x_{.col}"
+    )
+  ) |> 
+  relocate(
+    contains("_x_"),
+    .after = any_inforce
+    )
 
 # prep spatial data ----
 ## get world country polygons ----
@@ -167,7 +189,7 @@ years <- nb_lists |>
   names()
 var_names <- imp_base_spt |> 
   select(
-    -c(.imp, .id, cow, region_wb, year, glb_s, n_ems, any_inforce)
+    -c(.imp, .id, cow, region_wb, year, glb_s)
   ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]
@@ -225,6 +247,18 @@ sp_lag_base <- sp_lag_base |>
       )
     )
 
+# make world_base ----
+## note: this will help make the spatially-buffered folds during fitting
+## note: this includes the maximum number of cow-countries appearing in any given year
+world_base <- imp_base_spt |> 
+  filter(
+    year == 2017,
+    .imp == 1
+    ) |> 
+  select(cow)
+
 # save ----
 sp_lag_base |> 
   save(file = here("data/ch3/results/imputations/sp_lag_base.rda"))
+world_base |> 
+  save(file = here("data/ch3/preprocessed/world_base.rda"))

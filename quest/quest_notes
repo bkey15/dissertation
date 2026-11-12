@@ -44,3 +44,6 @@ salloc --nodes=1 --ntasks=1 --cpus-per-task=24 --mem-per-cpu=4G --account=p33143
 module use ~/privatemodules
 module load R/4.5.1-openblas
 scancel <slurm-jobid>
+
+# 9/18/26 #
+-Error check (once in job script directory): grep -nEi "Error in|Execution halted|cannot|object .* not found|subscript out of bounds|unused argument" *.out

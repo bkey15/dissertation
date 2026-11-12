@@ -15,7 +15,7 @@ library(tictoc)
 set.seed(15275)
 
 # run prep script ----
-source(here("scripts/ch1/4_prep_model/a_regz/ii_slx/4a(iv)_prep_regz_model_dml_slx_gen.R"))
+source(here("scripts/ch1/4_prep_model/ii_slx/4b(i)_prep_model_dml_slx_gen.R"))
 
 # set cores ----
 ## check

@@ -253,3 +253,12 @@
 
 # 9/4/26 #
 -For lasso models, switching to single batches improved speed by about 5 sec, turning off progress output by about 2 sec, and utilizing all cores (not n-1) by about 3 sec. Will use this setup moving forward.
+
+# 9/10/26 #
+-Stacking model residuals with `ddml` package source code. See (`compute_w_nnls1`): https://raw.githubusercontent.com/thomaswiemann/ddml/master/R/ensemble.R.
+-I verified the accuracy of the for-loops assiduously.
+-Estimating `theta` with DML source code for cluster-robust inference. See (lookup "See Chiang et al. (2021) Algorithm 1"): https://rdrr.io/cran/DoubleML/src/R/double_ml.R
+-For PLR formula of psi_a and psi_b (as well as how they estimate theta), see https://docs.doubleml.org/stable/guide/scores.html.
+
+# 9/23/26 #
+-In testing the manual cluster-robust estimation code (for coefficients, SEs, etc.), results may differ very slightly due to discrepancies with the `smpls_cluster` object (stored in the larger fit object). Specifically, `smpls_cluster` stores clusters intended for fold assignment, whereas my code derives the clusters actually assigned per fold. These are typically the same, but discrepancies can arise due to the unbalanced nature of my panel data (e.g., newer countries like cow == 347 == "Kosovo" being assigned to folds containing only years that precede its entry to the dataset in 2008). I may now create `smpls_cluster` manually during the initial data splitting/resampling.

@@ -81,6 +81,8 @@ bits_final <- bits_final |>
     ends_with("log10"),
     e_polity2,
     p_durable,
+    curr_crisis,
+    imf_prog,
     glb_s,
     bop_pct_gdp
     ) |> 

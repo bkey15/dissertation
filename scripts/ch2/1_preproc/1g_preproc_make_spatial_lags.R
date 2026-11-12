@@ -21,16 +21,36 @@ imp_base <- imp_base |>
   filter(.imp != 0) |> 
   mutate(
     cow = as.numeric(levels(cow))[cow],
-    year = as.numeric(levels(year))[year]
+    year = as.numeric(levels(year))[year],
+    curr_crisis = as.numeric(levels(curr_crisis))[curr_crisis],
+    imf_prog = as.numeric(levels(imf_prog))[imf_prog]
     ) |> 
   relocate(.imp, .id)
+
+## make interaction vars ----
+imp_base <- imp_base |> 
+  mutate(
+    across(
+      ends_with("any_inforce"),
+      ~ as.numeric(levels(.x))[.x]
+      ),
+    across(
+      ends_with(c("n_bits", "any_inforce")) | contains("partner_"),
+      ~ .x * e_polity2,
+      .names = "e_polity2_x_{.col}"
+      )
+    ) |> 
+  relocate(
+    contains("_x_"),
+    .before = v2x_polyarchy
+    )
 
 ## impose val == 0 to all NAs in ss & nn ----
 ## IMPORTANT: this step is necessary to ensure that the lags are executed. See note in first code line. This is probably justifiable theoretically, too.
 imp_base <- imp_base |> 
   mutate(
     across(
-      starts_with("ss_") | starts_with("nn_"),
+      contains("ss_") | contains("nn_"),
       ~ if_else(is.na(.x), 0, .x)
       )
     )
@@ -111,7 +131,7 @@ for(i in years){
   dist_mat <- st_distance(yr_i, yr_i) |> 
     as_tibble()
   dist_mats[[as.character(i)]] <- dist_mat
-  }
+}
 
 ## get neighbors ----
 ## note: neighbor index == position in dist_mat (so US is 1, as first in cow list, by which I arranged imp_..._spt)
@@ -144,8 +164,8 @@ for(i in years){
       pull(index)
       
     nb_lists[[i]][[str_remove(name, "V")]] <- neighbors
-    }
   }
+}
 
 ## impose index == 0 for states w/o neighbors ----
 ## Note: step needed to execute nb2listw()
@@ -160,10 +180,9 @@ for(i in years) {
       } 
     else{
       nb_lists[[i]][[j]] <- nb_lists[[i]][[j]]
-      }
     }
   }
-
+}
 
 ## get weights ----
 years <- nb_lists |> 
@@ -173,8 +192,7 @@ for(i in years){
   class(nb_lists[[i]]) <- "nb"
   nb_lists[[i]] <- nb_lists[[i]] |> 
     nb2listw(zero.policy = TRUE)
-  }
-
+}
 
 # make spatial lags ----
 ## get specs ----
@@ -184,7 +202,7 @@ years <- nb_lists |>
   names()
 var_names <- imp_base_spt |> 
   select(
-    -c(.imp, .id, cow, region_wb, year, any_inforce, glb_s)
+    -c(.imp, .id, cow, region_wb, year, glb_s)
     ) |> 
   names()
 var_names <- var_names[!var_names == "geometry"]
@@ -242,6 +260,18 @@ sp_lag_base <- sp_lag_base |>
       )
     )
 
+# make world_base ----
+## note: this will help make the spatially-buffered folds during fitting
+## note: this includes the maximum number of cow-countries appearing in any given year
+world_base <- imp_base_spt |> 
+  filter(
+    year == 2017,
+    .imp == 1
+    ) |> 
+  select(cow)
+
 # save ----
 sp_lag_base |> 
   save(file = here("data/ch2/results/imputations/sp_lag_base.rda"))
+world_base |> 
+  save(file = here("data/ch2/preprocessed/world_base.rda"))

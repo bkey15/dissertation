@@ -1,7 +1,10 @@
 # load packages ----
 library(tidyverse)
 library(here)
+library(haven)
+library(readxl)
 library(vdemdata)
+library(countrycode)
 library(naniar)
 library(states)
 
@@ -27,6 +30,20 @@ wdi <- read_csv(
 
 ## bop
 load(here("data/ch1/preprocessed/bop_panel.rda"))
+
+## fin crises
+### curr_crisis
+curr_crisis <- read_xlsx(here("data/common/raw/fin_crises/nguyen_et_al/1-s2.0-S0264999322000165-mmc1.xlsx")) |> 
+  janitor::clean_names()
+
+### imf_prog
+imf_prog <- read_dta(
+  here("data/common/raw/fin_crises/vreeland/master_merge_wide.dta"),
+  col_select = -cname_gw
+  )
+imf_prog <- imf_prog |> 
+  zap_label() |> 
+  zap_labels()
 
 # prep merge ----
 ## vdem ----
@@ -125,6 +142,52 @@ wdi_small <- wdi_small |>
   filter(cname_qog != "Serbia and Montenegro") |> 
   select(-cname, -cname_qog)
 
+## fin crises ----
+### curr_crisis ----
+curr_crisis <- curr_crisis |> 
+  mutate(
+    cow = countrycode(
+      sourcevar = country,
+      origin = "country.name",
+      destination = "cown"
+    )
+  ) |> 
+  filter(
+    !(country == "Serbia" & year < 1999),
+    !(country == "Yugoslavia" & year > 1998)
+  ) |> 
+  mutate(
+    cow = ifelse(
+      country == "Serbia",
+      345,
+      cow
+    )
+  ) |> 
+  filter(!is.na(cow)) |> 
+  rename(curr_crisis = currency_crises) |> 
+  select(cow, year, curr_crisis) |> 
+  arrange(cow, year)
+
+### imf_prog ----
+#### note: NA vals are generally prior to IMF accession, so safe to code these as 0
+imf_prog <- imf_prog |> 
+  select(
+    ccode_cow,
+    year,
+    under
+    ) |> 
+  rename(
+    cow = ccode_cow,
+    imf_prog = under
+    ) |> 
+  filter(!is.na(cow)) |> 
+  mutate(
+    imf_prog = if_else(
+      is.na(imf_prog), 0, imf_prog
+      )
+    ) |> 
+  arrange(cow, year)
+
 # merge ----
 ## vdem & hr scores
 merge_base <- vdem_small |> 
@@ -163,6 +226,15 @@ merge_base <- merge_base |>
 merge_base <- merge_base |> 
   left_join(wdi_small)
 
+## merge_base & fin crises
+### curr_crisis
+merge_base <- merge_base |> 
+  left_join(curr_crisis)
+
+### imf_prog
+merge_base <- merge_base |> 
+  left_join(imf_prog)
+
 ## merge_base & standards
 merge_base <- merge_base |> 
   left_join(standards)
@@ -174,7 +246,7 @@ merge_base <- merge_base |>
 ## merge_base & ptas_standard
 merge_base <- merge_base |> 
   left_join(bits_standard) |> 
-  relocate(46:62, .after = hr_score)
+  relocate(48:67, .after = hr_score)
 
 # fix any_inforce ----
 merge_base <- merge_base |> 
@@ -196,6 +268,14 @@ merge_base <- merge_base |>
       cow == 760 ~ 1,
       cow == 817 ~ 1,
       .default = glb_s
+      )
+    )
+
+# fix imf_prog ----
+merge_base <- merge_base |> 
+  mutate(
+    imf_prog = if_else(
+      is.na(imf_prog), 0, imf_prog
       )
     )
 

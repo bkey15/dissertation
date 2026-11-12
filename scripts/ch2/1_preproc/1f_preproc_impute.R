@@ -16,7 +16,7 @@ bits_1962 <- bits_final |>
   select(-ends_with("mean_pop"))
 
 # set NA --> 0 ----
-## note: GDR is other country where n_bits is coerced to 0. This will help w/ imputations, but GDR will not feature in final dataset due to spatial lags (no polygon for it exists).
+## note: GDR is other country where n_bits is coerced to 0. This will help w/ imputations, but GDR will not feature in final models due to spatial lags (no polygon for it exists).
 bits_1962 <- bits_1962 |> 
   mutate(
     across(
@@ -58,7 +58,8 @@ no_imp_vars <- c(
   "any_inforce",
   "glb_s",
   "n_bits",
-  "partner_mean"
+  "partner_mean",
+  "imf_prog"
   )
 
 imp_vals <- bits_1962 |> 
@@ -84,11 +85,12 @@ for(var in imp_vals){
 ## get dimension names
 pred_names <- names(imp_vals)
 dim_names <- list(pred_names, pred_names)
+name_len <- length(pred_names)
 
 ## initialize matrix
 pred_mat <- matrix(
-  nrow = 54,
-  ncol = 54,
+  nrow = name_len,
+  ncol = name_len,
   dimnames = dim_names
   )
 
@@ -102,8 +104,7 @@ pred_mat <- pred_mat |>
       ),
     across(
       c(
-        starts_with("ss_"),
-        starts_with("nn_"),
+        starts_with(c("nn_", "ss_")),
         bop_pct_gdp,
         wdi_trade,
         wdi_fdiout,
@@ -122,10 +123,17 @@ bits_mice <- bits_1962 |>
   select(-1) |> 
   mutate(
     across(
-      c(cow, year, any_inforce, glb_s),
+      c(
+        cow,
+        year,
+        glb_s,
+        curr_crisis,
+        imf_prog,
+        contains("any_inforce")
+        ),
       ~ as_factor(.x)
+      )
     )
-  )
 
 ## complete ----
 ## note: setting n.core == m (5), since imputed datasets are completed by core 

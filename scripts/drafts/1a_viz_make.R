@@ -6,6 +6,8 @@ library(here)
 library(igraph)
 library(ggraph)
 library(ggforce)
+library(gganimate)
+library(ggtext)
 library(tidygraph)
 library(latex2exp)
 library(patchwork)
@@ -55,6 +57,8 @@ imp_base_3 <- imp_base |>
   filter(.imp == 0)
 
 rm(imp_base)
+
+load(here("visualizations/viz_data/test_splits_cow.rda"))
 
 # make flowcharts ----
 ## methodology ----
@@ -185,8 +189,8 @@ preproc_1_g <- graph_init_1 |>
 ## preproc 2 ----
 ### Y = start year, V = lagged imputed dataset
 flowchart_tbl_2 <- tibble(
-  from = rep("t[list(i,j)]", 8),
-  to = paste0("v[list(i,j,", 1:8, ")]")
+  from = rep("t[list(i,j)]", 4),
+  to = paste0("v[list(i,j,", 1:4, ")]")
   )
 
 graph_init_2 <- flowchart_tbl_2 |> 
@@ -229,49 +233,67 @@ flowchart_tbl_3 <- tibble(
     rep("v[list(i,j,l)]", 9),
     "dummy",
     "lambda",
-    paste0("k[", 1:5, "]"),
+    paste0("k[", 1:3, "]"),
+    "k[...]",
+    "k[K^2]",
     "tilde(lambda)",
     "hat(lambda)",
     "dummy[list(\u2113,1)]",
     "lambda[list(\u2113,1)]",
-    paste0("lambda[list(\u2113,1)]e[", 1:5, "]"),
+    paste0("lambda[list(\u2113,1)]e[", 1:3, "]"),
+    "lambda[list(\u2113,1)]e[...]",
+    "lambda[list(\u2113,1)]e[K^2]",
     "tilde(lambda)[list(\u2113,1)]",
     "hat(lambda)[\u2113]",
     "dummy[list(\u2113,n)]",
     "lambda[list(\u2113,n)]",
-    paste0("lambda[list(\u2113,n)]e[", 1:5, "]"),
+    paste0("lambda[list(\u2113,n)]e[", 1:3, "]"),
+    "lambda[list(\u2113,n)]e[...]",
+    "lambda[list(\u2113,n)]e[K^2]",
     "tilde(lambda)[list(\u2113,n)]",
     "hat(lambda)[list(n,none)]",
     "dummy[list(m,1)]",
     "lambda[list(m,1)]",
-    paste0("lambda[list(m,1)]e[", 1:5, "]"),
+    paste0("lambda[list(m,1)]e[", 1:3, "]"),
+    "lambda[list(m,1)]e[...]",
+    "lambda[list(m,1)]e[K^2]",
     "tilde(lambda)[list(m,1)]",
     "hat(lambda)[m]"
     ),
   to = c(
     "dummy",
     "lambda",
-    paste0("k[", 1:5, "]"),
+    paste0("k[", 1:3, "]"),
+    "k[...]",
+    "k[K^2]",
     "tilde(lambda)",
     "hat(lambda)",
     "dummy[list(\u2113,1)]",
     "lambda[list(\u2113,1)]",
-    paste0("lambda[list(\u2113,1)]e[", 1:5, "]"),
+    paste0("lambda[list(\u2113,1)]e[", 1:3, "]"),
+    "lambda[list(\u2113,1)]e[...]",
+    "lambda[list(\u2113,1)]e[K^2]",
     "tilde(lambda)[list(\u2113,1)]",
     "hat(lambda)[\u2113]",
     "dummy[list(\u2113,n)]",
     "lambda[list(\u2113,n)]",
-    paste0("lambda[list(\u2113,n)]e[", 1:5, "]"),
+    paste0("lambda[list(\u2113,n)]e[", 1:3, "]"),
+    "lambda[list(\u2113,n)]e[...]",
+    "lambda[list(\u2113,n)]e[K^2]",
     "tilde(lambda)[list(\u2113,n)]",
     "hat(lambda)[list(n,none)]",
     "dummy[list(m,1)]",
     "lambda[list(m,1)]",
-    paste0("lambda[list(m,1)]e[", 1:5, "]"),
+    paste0("lambda[list(m,1)]e[", 1:3, "]"),
+    "lambda[list(m,1)]e[...]",
+    "lambda[list(m,1)]e[K^2]",
     "tilde(lambda)[list(m,1)]",
     "hat(lambda)[m]",
     "dummy[list(m,n)]",
     "lambda[list(m,n)]",
-    paste0("lambda[list(m,n)]e[", 1:5, "]"),
+    paste0("lambda[list(m,n)]e[", 1:3, "]"),
+    "lambda[list(m,n)]e[...]",
+    "lambda[list(m,n)]e[K^2]",
     "tilde(lambda)[list(m,n)]",
     "hat(lambda)[list(m,none)]"
     )
@@ -285,8 +307,8 @@ new_labels_3 <- c(
   "k[1]" = "k[1]",
   "k[2]" = "k[2]",
   "k[3]" = "k[3]",
-  "k[4]" = "k[4]",
-  "k[5]" = "k[5]",
+  "k[...]" = "k[...]",
+  "k[K^2]" = "k[K^2]",
   "tilde(lambda)" = NA,
   "hat(lambda)" = NA,
   "dummy[list(\u2113,1)]" = NA,
@@ -294,8 +316,8 @@ new_labels_3 <- c(
   "lambda[list(\u2113,1)]e[1]" = "e[1]",
   "lambda[list(\u2113,1)]e[2]" = "e[2]",
   "lambda[list(\u2113,1)]e[3]" = "e[3]",
-  "lambda[list(\u2113,1)]e[4]" = "e[4]",
-  "lambda[list(\u2113,1)]e[5]" = "e[5]",
+  "lambda[list(\u2113,1)]e[...]" = "e[...]",
+  "lambda[list(\u2113,1)]e[K^2]" = "e[K^2]",
   "tilde(lambda)[list(\u2113,1)]" = "tilde(lambda)[list(\u2113,1)]",
   "hat(lambda)[\u2113]" = "hat(lambda)[\u2113]",
   "dummy[list(\u2113,n)]" = NA,
@@ -303,8 +325,8 @@ new_labels_3 <- c(
   "lambda[list(\u2113,n)]e[1]" = "e[1]",
   "lambda[list(\u2113,n)]e[2]" = "e[2]",
   "lambda[list(\u2113,n)]e[3]" = "e[3]",
-  "lambda[list(\u2113,n)]e[4]" = "e[4]",
-  "lambda[list(\u2113,n)]e[5]" = "e[5]",
+  "lambda[list(\u2113,n)]e[...]" = "e[...]",
+  "lambda[list(\u2113,n)]e[K^2]" = "e[K^2]",
   "tilde(lambda)[list(\u2113,n)]" = "tilde(lambda)[list(\u2113,n)]",
   "hat(lambda)[list(n,none)]" = NA,
   "dummy[list(m,1)]" = NA,
@@ -312,8 +334,8 @@ new_labels_3 <- c(
   "lambda[list(m,1)]e[1]" = "e[1]",
   "lambda[list(m,1)]e[2]" = "e[2]",
   "lambda[list(m,1)]e[3]" = "e[3]",
-  "lambda[list(m,1)]e[4]" = "e[4]",
-  "lambda[list(m,1)]e[5]" = "e[5]",
+  "lambda[list(m,1)]e[...]" = "e[...]",
+  "lambda[list(m,1)]e[K^2]" = "e[K^2]",
   "tilde(lambda)[list(m,1)]" = "tilde(lambda)[list(m,1)]",
   "hat(lambda)[m]" = "hat(lambda)[m]",
   "dummy[list(m,n)]" = NA,
@@ -321,8 +343,8 @@ new_labels_3 <- c(
   "lambda[list(m,n)]e[1]" = "e[1]",
   "lambda[list(m,n)]e[2]" = "e[2]",
   "lambda[list(m,n)]e[3]" = "e[3]",
-  "lambda[list(m,n)]e[4]" = "e[4]",
-  "lambda[list(m,n)]e[5]" = "e[5]",
+  "lambda[list(m,n)]e[...]" = "e[...]",
+  "lambda[list(m,n)]e[K^2]" = "e[K^2]",
   "tilde(lambda)[list(m,n)]" = "tilde(lambda)[list(m,n)]",
   "hat(lambda)[list(m,none)]" = NA
   )
@@ -499,7 +521,7 @@ dml_flow_viz_1 <- graph_init_3 |>
     ) +
   plot_annotation(
     title = "DML Modeling",
-    subtitle = "Hyperparameter Tuning (Ridge)"
+    subtitle = "Hyperparameter Tuning (Lasso & Ridge)"
     ) &
   theme(
     plot.title = element_text(color = "#586e75"),
@@ -666,6 +688,149 @@ pool_flow_viz <- graph_init_5 |>
     )
 
 # note on subscripts: i = imputation id, j = start-year id, k = lag id
+
+# make bcr animation ----
+## note: generally replicating: purrr::walk(test_splits_cow, function(x) print(autoplot(x)))
+## clean data ----
+bcr_anim_dat <- map_dfr(
+  seq_along(test_splits_cow),
+  function(i) {
+    
+    s <- test_splits_cow[[i]]
+    
+    analysis_cow <- analysis(s)$cow
+    assessment_cow <- assessment(s)$cow
+    
+    s[["data"]] |>
+      mutate(
+        fold = i,
+        set = case_when(
+          cow %in% analysis_cow ~ "Analysis",
+          cow %in% assessment_cow ~ "Assessment",
+          TRUE ~ "Buffer"
+          )
+        )
+  }
+)
+
+## test frame ----
+bcr_anim_dat |> 
+  filter(fold == 1) |> 
+  ggplot(aes(fill = set)) +
+  geom_sf(
+    aes(geometry = geometry)) +
+  scale_fill_manual(
+    values = c("#1a9850", "#d73027", "lightgrey")
+    ) +
+  labs(
+    fill = "Assignment:",
+    title = "Spatially-Buffered Resampling: An Example",
+    subtitle = "Fold: {current_frame}",
+    caption = paste0(
+      "Generated with:<br>",
+      "<span style='font-family: Menlo;'>",
+      "spatialsample::spatial_buffer_vfold_cv()",
+      "</span>"
+      )
+    ) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "skyblue1"),
+    panel.grid = element_line(color = "skyblue1"),
+    legend.position = "bottom",
+    legend.title = element_text(
+      family = "sans",
+      vjust = 0.875,
+      hjust = 1,
+      size = 12
+      ),
+    legend.text = element_text(
+      family = "sans",
+      size = 10
+      ),
+    plot.title = element_text(
+      hjust = 0.5,
+      family = "sans",
+      face = "bold",
+      size = 19.5
+      ),
+    plot.subtitle = element_text(
+      hjust = 0.5,
+      family = "sans",
+      size = 15.5
+      ),
+    plot.caption = element_markdown(
+      hjust = 0.99,
+      vjust = -10,
+      family = "sans"
+      )
+    )
+
+## finalize ----
+bcr_anim_base <- bcr_anim_dat |> 
+  ggplot(aes(fill = set)) +
+  geom_sf(
+    aes(geometry = geometry)) +
+  scale_fill_manual(
+    values = c("#1a9850", "#d73027", "lightgrey")
+    ) +
+  labs(
+    fill = "Assignment:",
+    title = "Spatially-Buffered Resampling: An Example",
+    subtitle = "Fold: {current_frame}",
+    caption = paste0(
+      "Generated with:<br>",
+      "<span style='font-family: Menlo;'>",
+      "spatialsample::spatial_buffer_vfold_cv()",
+      "</span>"
+      )
+    ) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "skyblue1"),
+    panel.grid = element_line(color = "skyblue1"),
+    legend.position = "bottom",
+    legend.title = element_text(
+      family = "sans",
+      vjust = 0.875,
+      hjust = 1,
+      size = 12
+      ),
+    legend.text = element_text(
+      family = "sans",
+      size = 10
+      ),
+    plot.title = element_text(
+      hjust = 0.5,
+      family = "sans",
+      face = "bold",
+      size = 19.5
+      ),
+    plot.subtitle = element_text(
+      hjust = 0.5,
+      family = "sans",
+      size = 15.5
+      ),
+    plot.caption = element_markdown(
+      hjust = 0.99,
+      vjust = -10,
+      family = "sans"
+      )
+    ) +
+  transition_manual(frames = fold)
+
+### BDK: nframes = nrow(years_hrs) + start_pause + end_pause
+bcr_anim <- bcr_anim_base |> 
+  animate(
+    nframes = 14,
+    fps = 1,
+    height = 576,
+    width = 672,
+    res = 125,
+    start_pause = 2,
+    end_pause = 2,
+    renderer = gifski_renderer()
+    )
 
 # appendix a ----
 ## cow dat ----
@@ -1095,6 +1260,11 @@ ggsave(
   units = "px",
   file = here("visualizations/drafts/pool_flow_viz.png")
   )
+
+bcr_anim |> 
+  anim_save(
+    file = here("visualizations/drafts/bcr_anim.gif")
+    )
 
 gtsave(
   appx_a_viz,
